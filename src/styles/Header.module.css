@@ -1,0 +1,6 @@
+.main {
+    background-color: var(--color-bg-banner);
+    color: var(--color-fg-banner);
+    column-gap: var(--spacing);
+    padding: var(--spacing);
+}

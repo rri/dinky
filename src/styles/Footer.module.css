@@ -1,0 +1,9 @@
+.main {
+    background-color: var(--color-bg-text);
+    color: var(--color-fg-text);
+    column-gap: var(--spacing);
+    font-size: smaller;
+    justify-content: center;
+    letter-spacing: 0.05em;
+    padding: calc(var(--spacing) * 2);
+}

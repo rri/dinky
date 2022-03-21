@@ -1,0 +1,37 @@
+.group {
+    font-size: 1em;
+    padding: var(--spacing);
+    row-gap: calc(var(--spacing) / 2);
+}
+
+.main .label {
+    padding: var(--spacing);
+    min-width: 30%;
+    white-space: nowrap;
+}
+
+.main input {
+    width: inherit;
+    flex-grow: 1;
+}
+
+.main .bullet {
+    padding: var(--spacing);
+}
+
+.main .link {
+    cursor: pointer;
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    white-space: nowrap;
+}
+
+.link .shortcuts {
+    margin-left: auto;
+}
+
+.link .shortcuts kbd {
+    cursor: pointer;
+    margin: calc(var(--spacing) / 4);
+}

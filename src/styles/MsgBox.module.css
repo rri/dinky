@@ -1,0 +1,16 @@
+.main {
+    font-style: italic;
+    padding: calc(1.6 * var(--spacing));
+    text-align: center;
+}
+
+.main .emoji {
+    font-size: 4em;
+    font-style: normal;
+    padding: 0 var(--spacing);
+}
+
+.main p {
+    font-family: var(--font-decorative);
+    padding: calc(var(--spacing) * 2)
+}

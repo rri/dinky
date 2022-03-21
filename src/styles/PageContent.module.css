@@ -1,0 +1,4 @@
+.main {
+    border: var(--width-line) solid var(--color-line-2);
+    padding: var(--spacing);
+}
