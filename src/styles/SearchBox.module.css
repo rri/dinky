@@ -1,0 +1,8 @@
+.wrap {
+    flex-grow: 1;
+}
+
+.main {
+    background: var(--image-gradient-default-light);
+    padding: var(--spacing);
+}

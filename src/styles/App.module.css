@@ -1,0 +1,9 @@
+.wrapper {
+    margin: auto;
+    min-width: calc(var(--width-page) / 2);
+    max-width: var(--width-page);
+}
+
+.main {
+    font-family: var(--font-content);
+}

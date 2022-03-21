@@ -1,0 +1,16 @@
+.icon {
+    cursor: pointer;
+    padding: calc(var(--spacing) / 4);
+}
+
+.icon:hover {
+    transform: scale(1.2);
+}
+
+.gray {
+    opacity: 0.1;
+}
+
+.gray:hover {
+    opacity: 1.0;
+}

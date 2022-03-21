@@ -1,0 +1,42 @@
+.group {
+    padding: var(--spacing);
+    margin-bottom: calc(var(--spacing) * 2);
+    row-gap: calc(var(--spacing) / 2);
+}
+
+.groupname {
+    font-family: var(--font-cursive);
+    font-size: larger;
+    text-decoration: underline;
+    padding: 0 0 calc(var(--spacing) * 2) 0;
+}
+
+.main .label {
+    border: var(--width-line) solid transparent;
+    font-size: 1em;
+    padding: 0 calc(var(--spacing) * 4);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.main .codes {
+    text-align: right;
+}
+
+.main .codes kbd {
+    color: var(--color-fg-text);
+    display: inline-block;
+    height: calc(var(--width-icon) * 2);
+    line-height: calc(var(--width-icon) * 2);
+    width: calc(var(--width-icon) * 2);
+    text-align: center;
+    cursor: default;
+    border: var(--width-line) solid var(--color-line-1);
+    border-radius: calc(var(--width-line) * 10);
+    text-shadow: var(--text-shadow-kbd);
+    background: var(--image-gradient-kbd);
+    font-family: var(--font-content);
+    font-size: 1em;
+    user-select: none;
+}
