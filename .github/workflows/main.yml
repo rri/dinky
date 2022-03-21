@@ -1,0 +1,37 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+ id-token: write
+ contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: configure
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::337136710266:role/Builder
+          aws-region: us-west-1          
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: get-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '17'
+          cache: 'npm'
+      - name: build-package
+        run: |
+          npm install
+          npm run build
+      - name: deploy-package
+        run: |
+          aws s3 sync build/ s3://dinky-dev-website-assets
+          aws cloudfront create-invalidation --distribution-id E3KRAT6E9HNOWI --paths '/*'

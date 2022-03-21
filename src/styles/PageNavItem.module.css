@@ -1,0 +1,45 @@
+.main {
+    align-items: center;
+    background-color: transparent;
+    border: var(--width-line) solid transparent;
+    column-gap: calc(var(--spacing) / 4);
+    display: flex;
+    padding: var(--spacing);
+}
+
+.main.active,
+.main:hover,
+.main:active {
+    border-color: var(--color-line-2);
+    border-bottom-color: var(--color-bg-text);
+    z-index: 100;
+}
+
+.main .icon {
+    height: var(--width-icon);
+    width: var(--width-icon);
+}
+
+.main .name {
+    font-size: 1em;
+}
+
+a.main,
+a.main:link,
+a.main:visited,
+a.main:focus,
+a.main:active {
+    color: var(--color-fg-text);
+    outline: none;
+    text-decoration: none;
+}
+
+a.main:hover,
+a.main:active {
+    background-color: var(--color-bg-text);
+}
+
+a.main:hover.active,
+a.main:active.active {
+    background-color: transparent;
+}

@@ -1,0 +1,30 @@
+.main {
+    row-gap: var(--spacing);
+}
+
+.titlebar {
+    background-image: var(--image-gradient-heading);
+    border-radius: 0.2rem;
+    display: flex;
+    font-size: 1.2em;
+    height: 2.2em;
+}
+
+.title {
+    flex-grow: 1;
+    padding: var(--spacing);
+}
+
+.button {
+    display: flex;
+}
+
+.button img {
+    padding: var(--spacing);
+    height: 100%;
+    width: 100%;
+}
+
+.content {
+    margin-bottom: var(--spacing);
+}
