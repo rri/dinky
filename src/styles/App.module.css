@@ -1,6 +1,5 @@
 .wrapper {
     margin: auto;
-    min-width: calc(var(--width-page) / 2);
     max-width: var(--width-page);
 }
 
