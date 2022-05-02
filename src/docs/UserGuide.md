@@ -39,6 +39,6 @@ apple
 lemon
 ```
 
-# Source Code
+# Getting in Touch
 
-This application's source code is distributed as open-source software under the Apache 2.0 license. You can find more details (including the source code) on its [GitHub page](https://github.com/rri/dinky).
+This application's source code is distributed as open-source software under the Apache 2.0 license. You can find more details (including the source code) on its [GitHub page](https://github.com/rri/dinky). Please feel free to report bugs or request features using the [issue tracker](https://github.com/rri/dinky/issues). If you're interested in contributing or would like to chat, my email address is **riyer** at **optimix.dev**.
