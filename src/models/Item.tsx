@@ -71,7 +71,7 @@ export function filterByArchive(archive: boolean) {
 
 export function filterByToday(eveningBufferHours: number, morningBufferHours: number) {
     return (item: Item) => {
-        const referencePoint = Number.parseInt(moment().format("HH")) >= morningBufferHours
+        const referencePoint = Number.parseInt(moment().format("H")) >= morningBufferHours
             ? moment()
             : moment().subtract(1, "days")
         return item.today
