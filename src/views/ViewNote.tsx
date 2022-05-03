@@ -10,6 +10,7 @@ interface Props {
     item: IdItem,
     hideDetails?: boolean,
     icon?: string,
+    oneline?: boolean,
     autoNew?: boolean,
     clear?: Action,
     highlight?: Term,
@@ -46,7 +47,8 @@ export function ViewNote(props: Props) {
             item={props.item}
             strikethru={props.item.archive}
             icon={props.icon}
-            rows={3}
+            rows={10}
+            oneline={props.oneline}
             actions={actions}
             placeholder={"Start typing your note..."}
             highlight={props.highlight}

@@ -101,6 +101,7 @@ export function Search(props: Props) {
                                     z1.map(item => <ViewNote
                                         key={item.id}
                                         item={item}
+                                        oneline={true}
                                         highlight={props.term}
                                         icon={icons.notes}
                                         clear={props.clear}
@@ -132,6 +133,7 @@ export function Search(props: Props) {
                                     z2.map(item => <ViewNote
                                         key={item.id}
                                         item={item}
+                                        oneline={true}
                                         highlight={props.term}
                                         icon={icons.notes}
                                         clear={props.clear}

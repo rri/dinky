@@ -21,6 +21,7 @@ interface Props {
     readonly?: boolean,
     icon?: string,
     rows?: number,
+    oneline?: boolean,
     actions: Action[],
     highlight?: Term,
     autoNew?: boolean,
@@ -109,7 +110,7 @@ export function ViewItem(props: Props) {
     const item = edit && !props.readonly
         ? <textarea
             autoFocus
-            className={[styles.data, styles.edit].join(" ")}
+            className={[styles.data, styles.edit, props.oneline && (!props.rows || props.rows === 1) ? styles.oneline : ""].join(" ")}
             rows={props.rows ? props.rows : 1}
             spellCheck={false}
             defaultValue={props.item.data}
@@ -119,7 +120,7 @@ export function ViewItem(props: Props) {
                 updateItem(evt.currentTarget.value, false)
             }}
             onKeyDownCapture={evt => {
-                if (evt.key === "Enter") {
+                if (evt.key === "Enter" && (!props.rows || props.rows === 1)) {
                     evt.preventDefault()
                     updateItem(evt.currentTarget.value, true)
                     return
@@ -136,6 +137,7 @@ export function ViewItem(props: Props) {
             className={[
                 styles.data,
                 props.readonly ? styles.readonly : "",
+                props.oneline ? styles.oneline : "",
                 props.details ? styles.link : "",
             ].join(" ")}
             onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>

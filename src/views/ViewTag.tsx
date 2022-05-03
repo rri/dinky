@@ -53,6 +53,7 @@ export function ViewTag(props: Props) {
             key={props.item.id}
             slug={slug}
             item={props.item}
+            oneline={true}
             actions={actions}
             strikethru={props.item.archive}
             placeholder={"Describe your tag..."}

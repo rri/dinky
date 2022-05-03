@@ -73,6 +73,7 @@ export function ViewTask(props: Props) {
             item={props.item}
             readonly={props.readonly ? props.readonly : item.archive}
             icon={props.icon}
+            oneline={true}
             actions={actions}
             strikethru={item.archive}
             placeholder={"Describe your task..."}
