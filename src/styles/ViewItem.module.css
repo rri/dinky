@@ -120,7 +120,9 @@ div.data.oneline {
 .data.oneline ul,
 .data.oneline ol,
 .data.oneline li,
-.data.oneline p {
+.data.oneline p,
+.data.oneline pre,
+.data.oneline code {
     display: inline;
     padding: 0;
 }
