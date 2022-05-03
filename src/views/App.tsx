@@ -117,7 +117,7 @@ export function App() {
     }
 
     const putTask = (id: string, item: Task): boolean => {
-        const data = item.data
+        const data = item.data.trim()
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
@@ -148,7 +148,7 @@ export function App() {
     }
 
     const putNote = (id: string, item: Note): boolean => {
-        const data = item.data
+        const data = item.data.trim()
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }

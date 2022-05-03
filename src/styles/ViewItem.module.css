@@ -25,10 +25,14 @@
     font-size: 1em;
     flex-grow: 1;
     line-height: 1.6em;
+    padding: calc(var(--spacing) / 2) var(--spacing);
+}
+
+textarea.data.oneline,
+div.data.oneline {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: calc(var(--spacing) / 2) var(--spacing);
 }
 
 .data.readonly {
@@ -39,16 +43,55 @@
     cursor: pointer;
 }
 
+
+.data * {
+    font-size: 1em;
+    margin: 0;
+}
+
 .data h1 {
-    font-size: 1.2em;
     font-weight: bold;
+    margin-bottom: calc(var(--spacing));
 }
 
 .data h2 {
-    font-size: 1em;
+    font-weight: normal;
+    text-transform: uppercase;
+    margin-bottom: calc(var(--spacing) / 2);
+}
+
+.data h3 {
     font-weight: normal;
     font-style: italic;
+    margin-bottom: calc(var(--spacing) / 2);
+}
+
+.data h3 {
+    font-weight: normal;
     text-decoration: underline;
+    font-style: italic;
+    margin-bottom: calc(var(--spacing) / 2);
+}
+
+.data h4 {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: calc(var(--spacing) / 2);
+}
+
+.data h5 {
+    font-weight: normal;
+    text-decoration: underline;
+    text-transform: uppercase;
+    margin-bottom: calc(var(--spacing) / 2);
+}
+
+.data h6 {
+    font-weight: normal;
+    text-decoration: underline;
+    font-style: italic;
+    text-transform: uppercase;
+    margin-bottom: calc(var(--spacing) / 2);
 }
 
 .data p {
@@ -66,4 +109,22 @@
     background-color: var(--color-highlight);
     font-style: normal;
     font-family: inherit;
+}
+
+.data.oneline h1,
+.data.oneline h2,
+.data.oneline h3,
+.data.oneline h4,
+.data.oneline h5,
+.data.oneline h6,
+.data.oneline ul,
+.data.oneline ol,
+.data.oneline li,
+.data.oneline p {
+    display: inline;
+    padding: 0;
+}
+
+.data.oneline p+p:before {
+    content: "□ ";
 }

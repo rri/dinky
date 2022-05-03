@@ -51,6 +51,7 @@ export function Notes(props: Props) {
                                 results.map(item => <ViewNote
                                     key={item.id}
                                     item={item}
+                                    oneline={true}
                                     autoNew={true}
                                     newNote={props.newNote}
                                     putNote={props.putNote}
