@@ -94,12 +94,6 @@ div.data.oneline {
     margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .data p strong>code {
     color: var(--color-tag);
     font-weight: 600;
@@ -125,6 +119,9 @@ div.data.oneline {
 .data.oneline code {
     display: inline;
     padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .data.oneline p+p:before {
