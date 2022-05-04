@@ -30,8 +30,8 @@ export function ViewTag(props: Props) {
             icon: icons.notes,
             desc: "Create a note associated with this tag",
             action: () => {
-                navigate("/notes")
-                props.newNote(`\n\n${props.item.data}`)
+                const id = props.newNote(`\n\n${props.item.data}`)
+                navigate(`/notes/${id}`)
             },
         },
     ]
