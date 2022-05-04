@@ -9,8 +9,8 @@ import { icons } from "../views/Icon"
 
 interface Props {
     tags: Record<string, Tag>,
-    newNote: (template?: string) => void,
-    newTag: (template?: string) => void,
+    newNote: (template?: string) => string,
+    newTag: (template?: string) => string,
     putTag: (id: string, item: Tag) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }

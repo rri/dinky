@@ -6,20 +6,28 @@ import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
 import { ViewNote } from "../views/ViewNote"
 import { icons } from "../views/Icon"
+import { useNavigate } from "react-router-dom"
 
 interface Props {
     notes: Record<string, Note>,
-    newNote: (template?: string) => void,
+    newNote: (template?: string) => string,
     putNote: (id: string, item: Note) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
 export function Notes(props: Props) {
 
+    const newNote = () => {
+        const id = props.newNote()
+        navigate(id)
+    }
+
     props.registerNewHandler((evt?: KeyboardEvent) => {
         evt?.preventDefault()
-        props.newNote()
+        newNote()
     })
+
+    const navigate = useNavigate()
 
     const openNotes = fetchNotes({
         notes: props.notes,
@@ -37,7 +45,7 @@ export function Notes(props: Props) {
     const action = {
         icon: icons.plus,
         desc: "Add a new note",
-        action: () => props.newNote()
+        action: newNote,
     }
 
     return (
@@ -52,6 +60,7 @@ export function Notes(props: Props) {
                                     key={item.id}
                                     item={item}
                                     oneline={true}
+                                    readonly={true}
                                     autoNew={true}
                                     newNote={props.newNote}
                                     putNote={props.putNote}

@@ -14,8 +14,9 @@ interface Props {
     autoNew?: boolean,
     clear?: Action,
     highlight?: Term,
+    readonly?: boolean,
     actionOnDelete?: boolean,
-    newNote?: (template?: string) => void,
+    newNote?: (template?: string) => string,
     putNote: (id: string, item: Note) => boolean,
 }
 
@@ -33,6 +34,8 @@ export function ViewNote(props: Props) {
     }
 
     props.hideDetails
+        || props.readonly
+        || props.item.archive
         || actions.push(
             {
                 icon: icons.more,
@@ -49,6 +52,7 @@ export function ViewNote(props: Props) {
             icon={props.icon}
             rows={10}
             oneline={props.oneline}
+            readonly={props.readonly}
             actions={actions}
             placeholder={"Start typing your note..."}
             highlight={props.highlight}

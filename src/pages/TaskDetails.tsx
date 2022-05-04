@@ -25,7 +25,7 @@ export function TaskDetails(props: Props) {
         <Wrapper layout="col">
             <Card title="Task Details" action={props.topAction}>
                 {
-                    item?.data
+                    item?.id
                         ? <ViewTask
                             item={item}
                             today={props.today}

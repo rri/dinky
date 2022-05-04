@@ -19,7 +19,7 @@ interface Props {
     clear?: Action,
     highlight?: Term,
     actionOnDelete?: boolean,
-    newTask?: (template?: string) => void,
+    newTask?: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
 }
 

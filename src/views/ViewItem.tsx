@@ -27,9 +27,9 @@ interface Props {
     autoNew?: boolean,
     actionOnDelete?: () => void,
     details?: () => void,
-    newTask?: (template?: string) => void,
-    newTag?: (template?: string) => void,
-    newNote?: (template?: string) => void,
+    newTask?: (template?: string) => string,
+    newTag?: (template?: string) => string,
+    newNote?: (template?: string) => string,
     putTask?: (id: string, item: Task) => boolean,
     putTag?: (id: string, item: Tag) => boolean,
     putNote?: (id: string, item: Note) => boolean,
@@ -39,7 +39,7 @@ export function ViewItem(props: Props) {
 
     let dirty = !props.item.created // Guard that ensures the update only fires once
 
-    const [edit, setEdit] = useState(!props.item.created)
+    const [edit, setEdit] = useState(!props.item.created && !props.readonly)
 
     const updateItem = (update: string, more: boolean) => {
         const drafting = !props.item.created

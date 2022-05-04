@@ -21,7 +21,7 @@ export function NoteDetails(props: Props) {
         <Wrapper layout="col">
             <Card title="Note Details" action={props.topAction}>
                 {
-                    item?.data
+                    item?.id
                         ? <ViewNote
                             item={item}
                             putNote={props.putNote}
