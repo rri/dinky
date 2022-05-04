@@ -9,7 +9,7 @@ import { ViewTag } from "../views/ViewTag"
 interface Props {
     tags: Record<string, Tag>,
     topAction: Action,
-    newNote: (template?: string) => void,
+    newNote: (template?: string) => string,
     putTag: (id: string, item: Tag) => boolean,
 }
 
@@ -22,7 +22,7 @@ export function TagDetails(props: Props) {
         <Wrapper layout="col">
             <Card title="Tag Details" action={props.topAction}>
                 {
-                    item?.data
+                    item?.id
                         ? <ViewTag
                             item={item}
                             newNote={props.newNote}

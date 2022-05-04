@@ -13,7 +13,7 @@ interface Props {
         eveningBufferHours: number,
         morningBufferHours: number,
     },
-    newTask: (template?: string) => void,
+    newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
 }
 

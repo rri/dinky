@@ -48,7 +48,7 @@ export function App() {
         action: () => setTerm(new Term(""))
     }
 
-    const newTask = (template?: string) => {
+    const newTask = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
         setData(prev => {
@@ -56,9 +56,10 @@ export function App() {
             res.contents.tasks[id] = item
             return res
         })
+        return id
     }
 
-    const newTag = (template?: string) => {
+    const newTag = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
         setData(prev => {
@@ -66,9 +67,10 @@ export function App() {
             res.contents.tags[id] = item
             return res
         })
+        return id
     }
 
-    const newNote = (template?: string) => {
+    const newNote = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
         setData(prev => {
@@ -76,6 +78,7 @@ export function App() {
             res.contents.notes[id] = item
             return res
         })
+        return id
     }
 
     const enrich = <T extends Item,>(item: T): T => {

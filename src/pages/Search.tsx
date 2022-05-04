@@ -21,7 +21,7 @@ type Props = Contents & {
         morningBufferHours: number,
     },
     clear: Action,
-    newNote: (template?: string) => void,
+    newNote: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
     putTag: (id: string, item: Tag) => boolean,
     putNote: (id: string, item: Note) => boolean,
