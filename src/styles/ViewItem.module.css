@@ -130,6 +130,7 @@ div.data.oneline {
     text-align: justify;
 }
 
-.data.oneline p+p:before {
+.data.oneline p+p:before,
+.data.oneline li+li:before {
     content: "□ ";
 }
