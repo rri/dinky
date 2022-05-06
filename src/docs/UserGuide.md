@@ -1,6 +1,6 @@
 # Introduction
 
-[dinky.dev](https://dinky.dev) is a tool you may find useful for organizing your life. Its core concepts are simple, and built to take advantage of your *daily rhythms*, the natural ways in which any person acquires and manages information. Here's what you need to know:
+[dinky.dev](https://dinky.dev) helps you organize your life. Its core concepts are simple, and built to take advantage of your *daily rhythms*, the natural ways in which someone acquires and manages information. Here's what you need to know:
 
 * Create [notes](https://dinky.dev/notes) to write down short blurbs of information (ideas, suggestions, meeting outcomes, action items). Notes make it easy to quickly collect *raw* information, to be synthesized later.
 * Create [tasks](https://dinky.dev/tasks) representing concrete actions you need to take. Each task ideally requires no more than 20 minutes to complete, and large tasks are broken down into smaller ones.
