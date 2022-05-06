@@ -6,4 +6,4 @@
 
 ---
 
-[dinky.dev](https://dinky.dev) is a tool you may find useful for organizing your life. Refer to the [user guide section](https://dinky.dev/help#user-guide) of the website to learn more and start using it. If you want to contribute to the code, request a feature, or simply connect to say hello, email me at **riyer** at **optimix.dev**.
+[dinky.dev](https://dinky.dev) helps you organize your life. To learn more and get started, refer to the [user guide section](https://dinky.dev/help#user-guide) on the website. If you wish to contribute code to make it better, request a new feature, or simply connect to say hello, email me at **riyer** at **optimix.dev**.
