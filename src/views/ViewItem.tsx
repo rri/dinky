@@ -39,7 +39,7 @@ export function ViewItem(props: Props) {
 
     let dirty = !props.item.created // Guard that ensures the update only fires once
 
-    const [edit, setEdit] = useState(!props.item.created && !props.readonly)
+    const [edit, setEdit] = useState(false)
 
     const updateItem = (update: string, more: boolean) => {
         const drafting = !props.item.created
@@ -107,7 +107,7 @@ export function ViewItem(props: Props) {
 
     const enrich = (source: string) => source.replaceAll(/#([^\s]+\w)/g, "**`#$1`**")
 
-    const item = edit && !props.readonly
+    const item = (edit || !props.item.created) && !props.readonly
         ? <textarea
             autoFocus
             className={[styles.data, styles.edit, props.oneline && (!props.rows || props.rows === 1) ? styles.oneline : ""].join(" ")}
