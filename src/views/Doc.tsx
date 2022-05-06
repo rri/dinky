@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Wrapper } from "./Wrapper"
+import { renderLink } from './Link'
 import styles from "../styles/Doc.module.css"
-import { useEffect, useState } from 'react'
 
 interface Props {
     src: string,
@@ -23,6 +24,9 @@ export function Doc(props: Props) {
             <ReactMarkdown
                 children={markdown}
                 remarkPlugins={[remarkGfm]}
+                components={{
+                    a: renderLink
+                }}
             />
         </Wrapper>
     )

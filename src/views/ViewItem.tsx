@@ -11,6 +11,7 @@ import { Button } from './Button'
 import { Icon } from './Icon'
 import { Wrapper } from "./Wrapper"
 import { v4 } from 'uuid'
+import { renderLink } from './Link'
 import styles from "../styles/ViewItem.module.css"
 
 interface Props {
@@ -144,6 +145,9 @@ export function ViewItem(props: Props) {
             <ReactMarkdown
                 children={enrich(props.item.data)}
                 remarkPlugins={[remarkGfm]}
+                components={{
+                    a: renderLink
+                }}
             />
         </div>
 
