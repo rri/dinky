@@ -15,13 +15,14 @@ interface Props {
 export function NoteDetails(props: Props) {
 
     const { id } = useParams()
+    const found: boolean = id ? !!props.notes[id] : false
     const item = id ? { ...props.notes[id], id } : undefined
 
     return (
         <Wrapper layout="col">
             <Card title="Note Details" action={props.topAction}>
                 {
-                    item?.id
+                    item && found
                         ? <ViewNote
                             item={item}
                             putNote={props.putNote}

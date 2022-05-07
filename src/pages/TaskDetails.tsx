@@ -19,13 +19,14 @@ interface Props {
 export function TaskDetails(props: Props) {
 
     const { id } = useParams()
+    const found: boolean = id ? !!props.tasks[id] : false
     const item = id ? { ...props.tasks[id], id } : undefined
 
     return (
         <Wrapper layout="col">
             <Card title="Task Details" action={props.topAction}>
                 {
-                    item?.id
+                    item && found
                         ? <ViewTask
                             item={item}
                             today={props.today}

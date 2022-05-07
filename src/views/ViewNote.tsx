@@ -17,7 +17,7 @@ interface Props {
     readonly?: boolean,
     actionOnDelete?: boolean,
     newNote?: (template?: string) => string,
-    putNote: (id: string, item: Note) => boolean,
+    putNote?: (id: string, item: Note) => boolean,
 }
 
 export function ViewNote(props: Props) {

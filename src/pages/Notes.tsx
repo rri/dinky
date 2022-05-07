@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 interface Props {
     notes: Record<string, Note>,
     newNote: (template?: string) => string,
-    putNote: (id: string, item: Note) => boolean,
+    putNote?: (id: string, item: Note) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 

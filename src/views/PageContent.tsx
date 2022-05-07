@@ -55,8 +55,6 @@ export function PageContent(props: Props) {
             clear={props.clear}
             newNote={props.newNote}
             putTask={props.putTask}
-            putTag={props.putTag}
-            putNote={props.putNote}
         />
     )
 
@@ -121,10 +119,14 @@ export function PageContent(props: Props) {
             <Route
                 path="/tags/:id"
                 element={<TagDetails
+                    today={props.settings.today}
+                    tasks={props.contents.tasks}
+                    notes={props.contents.notes}
                     tags={props.contents.tags}
                     topAction={props.back}
+                    clear={props.clear}
                     newNote={props.newNote}
-                    putTag={props.putTag}
+                    putTask={props.putTask}
                 />}
             />
             <Route
