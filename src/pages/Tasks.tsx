@@ -58,6 +58,7 @@ export function Tasks(props: Props) {
                                         autoNew={true}
                                         newTask={props.newTask}
                                         putTask={props.putTask}
+                                        readonly={true}
                                     />)
                                 }
                             </React.Fragment>
@@ -75,6 +76,7 @@ export function Tasks(props: Props) {
                                         item={item}
                                         today={props.today}
                                         putTask={props.putTask}
+                                        readonly={true}
                                     />)
                                 }
                             </React.Fragment>

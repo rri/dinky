@@ -52,6 +52,7 @@ export function Tags(props: Props) {
                                 results.map(item => <ViewTag
                                     key={item.id}
                                     item={item}
+                                    readonly={true}
                                     autoNew={true}
                                     newNote={props.newNote}
                                     newTag={props.newTag}
