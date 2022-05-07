@@ -74,7 +74,6 @@ export function Today(props: Props) {
                             : doneTasks.length
                                 ? < MsgBox emoji="🍷">All done for today (or find more <NavLink to="/tasks" title="Go to tasks">tasks</NavLink>)! </MsgBox>
                                 : < MsgBox emoji="🏄">Pick tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink> to get done today!</MsgBox>
-
                     }
                 </Card>
                 <Card title="Done">
@@ -93,7 +92,6 @@ export function Today(props: Props) {
                                 }
                             </React.Fragment>
                             : <MsgBox emoji="🤷">Waiting for you to get something done!</MsgBox>
-
                     }
                 </Card>
             </Wrapper>
