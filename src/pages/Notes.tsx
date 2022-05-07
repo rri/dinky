@@ -17,6 +17,8 @@ interface Props {
 
 export function Notes(props: Props) {
 
+    const navigate = useNavigate()
+
     const newNote = () => {
         const id = props.newNote()
         navigate(id)
@@ -26,8 +28,6 @@ export function Notes(props: Props) {
         evt?.preventDefault()
         newNote()
     })
-
-    const navigate = useNavigate()
 
     const openNotes = fetchNotes({
         notes: props.notes,

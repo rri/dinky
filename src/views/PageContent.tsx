@@ -69,6 +69,7 @@ export function PageContent(props: Props) {
                     tasks={props.contents.tasks}
                     newTask={props.newTask}
                     putTask={props.putTask}
+                    registerNewHandler={props.registerNewHandler}
                 />}
             />
             <Route

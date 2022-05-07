@@ -97,7 +97,7 @@ export function ViewItem(props: Props) {
 
     const enrich = (source: string) => source.replaceAll(/#([^\s]+\w)/g, "**`#$1`**")
 
-    const item = (edit || !props.item.created) && !props.readonly
+    const item = edit || !props.item.created
         ? <textarea
             autoFocus
             className={[styles.data, styles.edit, props.oneline && (!props.rows || props.rows === 1) ? styles.oneline : ""].join(" ")}
