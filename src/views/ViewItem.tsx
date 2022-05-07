@@ -5,7 +5,7 @@ import { Action } from '../models/Action'
 import { Note } from '../models/Note'
 import { Tag } from '../models/Tag'
 import { Task } from '../models/Task'
-import { IdItem } from "../models/Item"
+import { IdItem, Item } from "../models/Item"
 import { Term } from '../models/Term'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -42,65 +42,54 @@ export function ViewItem(props: Props) {
 
     const [edit, setEdit] = useState(false)
 
+    const putItem = (id: string, item: Item, update: string, slug: string, more?: boolean, autoNew?: boolean, drafting?: boolean, bulkAdd?: boolean, actionOnDelete?: () => void) => {
+        const putAction = {
+            "tasks": props.putTask,
+            "tags": props.putTag,
+            "notes": props.putNote,
+        }[slug]
+        const newAction = {
+            "tasks": props.newTask,
+            "tags": props.newTag,
+            "notes": props.newNote,
+        }[slug]
+
+        if (putAction) {
+            let exists = false
+            if (bulkAdd) {
+                const [first, ...rest] = update.split(/\r?\n/).filter(val => !!val)
+                exists = putAction(id, { ...item, data: first })
+                if (rest) {
+                    rest.forEach(val => putAction(v4(), { ...item, data: val }))
+                }
+            } else {
+                exists = putAction(id, { ...item, data: update })
+            }
+            !exists && actionOnDelete && actionOnDelete()
+        }
+        if (more
+            && autoNew
+            && drafting
+            && update
+            && newAction) {
+            newAction()
+        }
+    }
+
     const updateItem = (update: string, more: boolean) => {
         const drafting = !props.item.created
         if (dirty && (!update || (update !== props.item.data))) {
             const { id, ...item } = props.item
-            switch (props.slug) {
-                case "tasks":
-                    if (props.putTask) {
-                        const putTask = props.putTask
-                        const [first, ...rest] = update.split(/\r?\n/).filter(val => !!val)
-                        const exists = putTask(id, { ...item, data: first })
-
-                        if (rest) {
-                            rest.forEach(val => putTask(v4(), { ...item, data: val }))
-                        }
-
-                        !exists && props.actionOnDelete && props.actionOnDelete()
-                    }
-                    if (more
-                        && props.autoNew
-                        && drafting
-                        && update
-                        && props.newTask) {
-                        props.newTask()
-                    }
-                    break
-                case "tags":
-                    if (props.putTag) {
-                        const putTag = props.putTag
-                        const [first, ...rest] = update.split(/\r?\n/).filter(val => !!val)
-                        const exists = putTag(id, { ...item, data: first })
-
-                        if (rest) {
-                            rest.forEach(val => putTag(v4(), { ...item, data: val }))
-                        }
-
-                        !exists && props.actionOnDelete && props.actionOnDelete()
-                    }
-                    if (more
-                        && props.autoNew
-                        && drafting
-                        && update
-                        && props.newTag) {
-                        props.newTag()
-                    }
-                    break
-                case "notes":
-                    if (props.putNote) {
-                        const exists = props.putNote(id, { ...item, data: update })
-                        !exists && props.actionOnDelete && props.actionOnDelete()
-                    }
-                    if (more
-                        && props.autoNew
-                        && drafting
-                        && update
-                        && props.newNote) {
-                        props.newNote()
-                    }
-                    break
-            }
+            putItem(id,
+                item,
+                update,
+                props.slug,
+                more,
+                props.autoNew,
+                drafting,
+                props.oneline,
+                props.actionOnDelete
+            )
         }
         dirty = false
         setEdit(false)
