@@ -1,8 +1,9 @@
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import { filterByToday, sortByToday, sortByUpdated } from "../models/Item"
 import { fetchTasks, Task } from "../models/Task"
 import { Card } from "../views/Card"
+import { icons } from "../views/Icon"
 import { MsgBox } from "../views/MsgBox"
 import { ViewTask } from "../views/ViewTask"
 import { Wrapper } from "../views/Wrapper"
@@ -15,9 +16,22 @@ interface Props {
     },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
+    registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
 export function Today(props: Props) {
+
+    const navigate = useNavigate()
+
+    const newTask = () => {
+        props.newTask()
+        navigate("/tasks")
+    }
+
+    props.registerNewHandler((evt?: KeyboardEvent) => {
+        evt?.preventDefault()
+        newTask()
+    })
 
     const openTasks = fetchTasks({
         tasks: props.tasks,
@@ -32,10 +46,16 @@ export function Today(props: Props) {
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
 
+    const action = {
+        icon: icons.plus,
+        desc: "Add a new task to the backlog",
+        action: newTask
+    }
+
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda">
+                <Card title="Agenda" action={action}>
                     {
                         openTasks.length
                             ?
