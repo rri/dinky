@@ -23,8 +23,6 @@ type Props = Contents & {
     clear: Action,
     newNote: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
-    putTag: (id: string, item: Tag) => boolean,
-    putNote: (id: string, item: Note) => boolean,
 }
 
 export function Search(props: Props) {
@@ -80,16 +78,17 @@ export function Search(props: Props) {
                                     x1.map(item => <ViewTag
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         highlight={props.term}
                                         clear={props.clear}
                                         newNote={props.newNote}
-                                        putTag={props.putTag}
                                     />)
                                 }
                                 {
                                     y1.map(item => <ViewTask
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         highlight={props.term}
                                         today={props.today}
                                         icon={icons.tasks}
@@ -101,27 +100,28 @@ export function Search(props: Props) {
                                     z1.map(item => <ViewNote
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         oneline={true}
                                         highlight={props.term}
                                         icon={icons.notes}
                                         clear={props.clear}
-                                        putNote={props.putNote}
                                     />)
                                 }
                                 {
                                     x2.map(item => <ViewTag
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         highlight={props.term}
                                         clear={props.clear}
                                         newNote={props.newNote}
-                                        putTag={props.putTag}
                                     />)
                                 }
                                 {
                                     y2.map(item => <ViewTask
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         highlight={props.term}
                                         today={props.today}
                                         icon={icons.tasks}
@@ -133,11 +133,11 @@ export function Search(props: Props) {
                                     z2.map(item => <ViewNote
                                         key={item.id}
                                         item={item}
+                                        readonly={true}
                                         oneline={true}
                                         highlight={props.term}
                                         icon={icons.notes}
                                         clear={props.clear}
-                                        putNote={props.putNote}
                                     />)
                                 }
                             </React.Fragment>

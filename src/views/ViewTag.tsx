@@ -16,7 +16,7 @@ interface Props {
     actionOnDelete?: boolean,
     newNote: (template?: string) => string,
     newTag?: (template?: string) => string,
-    putTag: (id: string, item: Tag) => boolean,
+    putTag?: (id: string, item: Tag) => boolean,
 }
 
 export function ViewTag(props: Props) {
