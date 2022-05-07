@@ -2,6 +2,7 @@ import back from "@material-design-icons/svg/two-tone/keyboard_backspace.svg"
 import clear from "@material-design-icons/svg/two-tone/backspace.svg"
 import download from "@material-design-icons/svg/two-tone/file_download.svg"
 import help from "@material-design-icons/svg/two-tone/help.svg"
+import listadd from "@material-design-icons/svg/two-tone/playlist_add.svg"
 import more from "@material-design-icons/svg/two-tone/more_horiz.svg"
 import notes from "@material-design-icons/svg/two-tone/edit_note.svg"
 import plus from "@material-design-icons/svg/two-tone/add_box.svg"
@@ -34,6 +35,7 @@ export const icons = {
     clear,
     download,
     help,
+    listadd,
     more,
     notes,
     plus,

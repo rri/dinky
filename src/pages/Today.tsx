@@ -47,7 +47,7 @@ export function Today(props: Props) {
     })
 
     const action = {
-        icon: icons.plus,
+        icon: icons.listadd,
         desc: "Add a new task to the backlog",
         action: newTask
     }
