@@ -126,6 +126,7 @@ export function PageContent(props: Props) {
                     topAction={props.back}
                     clear={props.clear}
                     newNote={props.newNote}
+                    putTag={props.putTag}
                     putTask={props.putTask}
                 />}
             />
