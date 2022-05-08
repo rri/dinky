@@ -94,6 +94,15 @@ div.data.oneline {
     margin-bottom: calc(var(--spacing) / 2);
 }
 
+.data p,
+.data ul,
+.data ol,
+.data hr,
+.data blockquote,
+.data pre {
+    margin: calc(var(--spacing) * 2) 0;
+}
+
 .data p strong>code {
     color: var(--color-tag);
     font-weight: 600;
