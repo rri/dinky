@@ -19,7 +19,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::337136710266:role/Builder
-          aws-region: us-west-1          
+          aws-region: us-west-1
       - name: checkout
         uses: actions/checkout@v3
       - name: get-node
@@ -33,5 +33,5 @@ jobs:
           npm run build
       - name: deploy-package
         run: |
-          aws s3 sync build/ s3://dinky-dev-website-assets
+          aws s3 sync build/ s3://dinky-dev-website-assets --delete --cache-control max-age=86400
           aws cloudfront create-invalidation --distribution-id E3KRAT6E9HNOWI --paths '/*'
