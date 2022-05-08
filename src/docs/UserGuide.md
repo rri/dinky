@@ -1,3 +1,5 @@
+> 💫 *Read [this blog post](https://optimix.dev/2022/05/07/dinky-dev/) introducing dinky.dev!*
+
 # Introduction
 
 [dinky.dev](/) helps you organize your life. Its core concepts are simple, and built to take advantage of your *daily rhythms*, the natural ways in which someone acquires and manages information. Here's what you need to know:
