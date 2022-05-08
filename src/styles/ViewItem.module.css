@@ -94,13 +94,20 @@ div.data.oneline {
     margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data p,
-.data ul,
-.data ol,
-.data hr,
-.data blockquote,
-.data pre {
-    margin: calc(var(--spacing) * 2) 0;
+.data h1:not(:first-child),
+.data h2:not(:first-child),
+.data h3:not(:first-child),
+.data h4:not(:first-child),
+.data h5:not(:first-child),
+.data h6:not(:first-child),
+.data p:not(:first-child),
+.data ul:not(:first-child),
+.data ol:not(:first-child),
+.data hr:not(:first-child),
+.data blockquote:not(:first-child),
+.data pre:not(:first-child),
+.data code:not(:first-child) {
+    margin-top: calc(var(--spacing) * 2);
 }
 
 .data p strong>code {
@@ -124,6 +131,7 @@ div.data.oneline {
 .data.oneline ol,
 .data.oneline li,
 .data.oneline p,
+.data.oneline blockquote,
 .data.oneline pre,
 .data.oneline code {
     display: inline;
