@@ -134,6 +134,7 @@ export function ViewItem(props: Props) {
             <ReactMarkdown
                 children={enrich(props.item.data)}
                 remarkPlugins={[remarkGfm]}
+                disallowedElements={props.oneline ? ["hr"] : []}
                 components={{
                     a: renderLink
                 }}
