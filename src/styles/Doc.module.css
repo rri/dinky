@@ -25,11 +25,6 @@
     text-align: justify;
 }
 
-.main p em,
-.main li em {
-    font-family: var(--font-decorative);
-}
-
 .main pre {
     background-color: var(--color-bg-highlight);
     padding: var(--spacing);
