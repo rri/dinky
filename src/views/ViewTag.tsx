@@ -51,6 +51,8 @@ export function ViewTag(props: Props) {
                 action: details,
             })
 
+    console.log("putTag = " + props.putTag)
+
     return (
         <ViewItem
             key={props.item.id}

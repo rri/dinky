@@ -1,3 +1,4 @@
+import React from "react"
 import { useParams } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Tag } from "../models/Tag"
@@ -9,7 +10,6 @@ import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes, Note } from "../models/Note"
 import { sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
-import React from "react"
 import { ViewTask } from "../views/ViewTask"
 import { icons } from "../views/Icon"
 import { ViewNote } from "../views/ViewNote"
@@ -25,6 +25,7 @@ interface Props {
         morningBufferHours: number,
     },
     newNote: (template?: string) => string,
+    putTag: (id: string, item: Tag) => boolean,
     putTask: (id: string, item: Task) => boolean,
 }
 
@@ -70,6 +71,7 @@ export function TagDetails(props: Props) {
                         ? <ViewTag
                             item={item}
                             newNote={props.newNote}
+                            putTag={props.putTag}
                             hideDetails={true}
                             actionOnDelete={true}
                         />
