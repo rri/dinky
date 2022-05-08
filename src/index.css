@@ -80,3 +80,8 @@ a:hover {
 p {
     margin: 0;
 }
+
+p em,
+li em {
+    font-family: var(--font-decorative);
+}
