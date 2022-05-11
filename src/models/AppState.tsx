@@ -2,7 +2,7 @@ import { Contents } from "./Contents"
 import { Note } from "./Note"
 import { Settings } from "./Settings"
 import { StorageSettings } from "./StorageSettings"
-import { Tag } from "./Tag"
+import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 
@@ -24,7 +24,7 @@ export const empty = (): AppState => ({
     },
     contents: {
         tasks: {},
-        tags: {},
+        topics: {},
         notes: {},
     },
 })
@@ -68,14 +68,14 @@ export const mergeTask = (state: AppState, id: string, item: Task): AppState => 
     })
 }
 
-export const mergeTag = (state: AppState, id: string, item: Tag): AppState => {
+export const mergeTopic = (state: AppState, id: string, item: Topic): AppState => {
 
-    const makeUnique = (tags: Record<string, Tag>) => {
-        const res: Record<string, Tag> = {}
+    const makeUnique = (topics: Record<string, Topic>) => {
+        const res: Record<string, Topic> = {}
         const chk: string[] = []
         Object
-            .entries(tags)
-            .forEach((value: [string, Tag]) => {
+            .entries(topics)
+            .forEach((value: [string, Topic]) => {
                 if (chk.indexOf(value[1].data) < 0) {
                     chk.push(value[1].data)
                     res[value[0]] = value[1]
@@ -84,12 +84,12 @@ export const mergeTag = (state: AppState, id: string, item: Tag): AppState => {
         return res
     }
 
-    const tags = { ...state.contents.tags, [id]: item }
+    const topics = { ...state.contents.topics, [id]: item }
     return ({
         ...state,
         contents: {
             ...state.contents,
-            tags: makeUnique(tags),
+            topics: makeUnique(topics),
         }
     })
 }
@@ -126,9 +126,9 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
                 ...curr.contents.tasks,
                 ...data.contents.tasks,
             },
-            tags: {
-                ...curr.contents.tags,
-                ...data.contents.tags,
+            topics: {
+                ...curr.contents.topics,
+                ...data.contents.topics,
             },
             notes: {
                 ...curr.contents.notes,

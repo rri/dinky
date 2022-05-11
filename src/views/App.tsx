@@ -7,7 +7,7 @@ import { AppState, empty, mergeData } from "../models/AppState"
 import { Item } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
-import { Tag } from "../models/Tag"
+import { Topic } from "../models/Topic"
 import { LocalStore } from "../models/Store"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
@@ -59,12 +59,12 @@ export function App() {
         return id
     }
 
-    const newTag = (template?: string): string => {
+    const newTopic = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
         setData(prev => {
             const res = { ...prev }
-            res.contents.tags[id] = item
+            res.contents.topics[id] = item
             return res
         })
         return id
@@ -93,17 +93,17 @@ export function App() {
         }
     }
 
-    const createTags = (text: string) => {
+    const createTopics = (text: string) => {
         const exp = /#([^\s]+\w)/g
         while (true) {
             const match = exp.exec(text)
             if (match != null) {
-                const newTag = match[0]
+                const newTopic = match[0]
                 if (Object
-                    .values(data.contents.tags)
-                    .filter(tag => tag.data === newTag)
+                    .values(data.contents.topics)
+                    .filter(topic => topic.data === newTopic)
                     .length === 0) {
-                    putTag(v4(), { data: newTag })
+                    putTopic(v4(), { data: newTopic })
                 }
             } else {
                 break
@@ -128,24 +128,24 @@ export function App() {
                 return res
             })
         } else {
-            data && createTags(data)
+            data && createTopics(data)
             store.putTask(id, enrich(item))
         }
         return !!data
     }
 
-    const putTag = (id: string, item: Tag): boolean => {
+    const putTopic = (id: string, item: Topic): boolean => {
         const data = item.data?.trim()
             .replaceAll(/^[# ]+/g, "")
             .replaceAll(/[^a-zA-Z_-]+/g, "-")
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.tags[id]
+                delete res.contents.topics[id]
                 return res
             })
         } else {
-            store.putTag(id, { ...enrich(item), data: data ? `#${data}` : "" })
+            store.putTopic(id, { ...enrich(item), data: data ? `#${data}` : "" })
         }
         return !!data
     }
@@ -159,7 +159,7 @@ export function App() {
                 return res
             })
         } else {
-            data && createTags(data)
+            data && createTopics(data)
             store.putNote(id, enrich(item))
         }
         return !!data
@@ -255,7 +255,7 @@ export function App() {
         },
         LINK_2: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            navigate("/tags")
+            navigate("/topics")
         },
         LINK_3: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
@@ -301,12 +301,12 @@ export function App() {
                 clear={clear}
                 back={back}
                 newTask={newTask}
-                newTag={newTag}
+                newTopic={newTopic}
                 newNote={newNote}
                 putTodaySettings={putTodaySettings}
                 putStorageSettings={putStorageSettings}
                 putTask={putTask}
-                putTag={putTag}
+                putTopic={putTopic}
                 putNote={putNote}
                 exportData={exportData}
                 importData={importData}

@@ -1,7 +1,7 @@
-import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTag, mergeTask, mergeTodaySettings } from "./AppState"
+import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings } from "./AppState"
 import { Note } from "./Note"
 import { StorageSettings } from "./StorageSettings"
-import { Tag } from "./Tag"
+import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 
@@ -22,11 +22,11 @@ export class LocalStore {
     }
 
     sync() {
-        // T1: Retrieve etag from local store
-        // T2: Fetch data from S3 conditional on etag
+        // T1: Retrieve etopic from local store
+        // T2: Fetch data from S3 conditional on etopic
         // T3: If new data has been retrieved, merge it into local store
         // T5: Write local store to S3
-        // T6: Save returned etag in local store
+        // T6: Save returned etopic in local store
     }
 
     putTodaySettings(value: TodaySettings) {
@@ -54,9 +54,9 @@ export class LocalStore {
         })
     }
 
-    putTag(id: string, item: Tag) {
+    putTopic(id: string, item: Topic) {
         this.setData(prev => {
-            const updated = mergeTag(prev, id, item)
+            const updated = mergeTopic(prev, id, item)
             updateLocalStorage("data", JSON.stringify(updated))
             return updated
         })

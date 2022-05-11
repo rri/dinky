@@ -1,11 +1,11 @@
 import React from "react"
 import { useParams } from "react-router-dom"
 import { Action } from "../models/Action"
-import { Tag } from "../models/Tag"
+import { Topic } from "../models/Topic"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
-import { ViewTag } from "../views/ViewTag"
+import { ViewTopic } from "../views/ViewTopic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes, Note } from "../models/Note"
 import { sortByUpdated } from "../models/Item"
@@ -17,7 +17,7 @@ import { ViewNote } from "../views/ViewNote"
 interface Props {
     tasks: Record<string, Task>,
     notes: Record<string, Note>,
-    tags: Record<string, Tag>,
+    topics: Record<string, Topic>,
     topAction: Action,
     clear: Action,
     today: {
@@ -25,15 +25,15 @@ interface Props {
         morningBufferHours: number,
     },
     newNote: (template?: string) => string,
-    putTag: (id: string, item: Tag) => boolean,
+    putTopic: (id: string, item: Topic) => boolean,
     putTask: (id: string, item: Task) => boolean,
 }
 
-export function TagDetails(props: Props) {
+export function TopicDetails(props: Props) {
 
     const { id } = useParams()
-    const found: boolean = id ? !!props.tags[id] : false
-    const item = id ? { ...props.tags[id], id } : undefined
+    const found: boolean = id ? !!props.topics[id] : false
+    const item = id ? { ...props.topics[id], id } : undefined
     const term = item ? new Term(item.data) : new Term("")
 
     const y1 = fetchTasks({
@@ -65,17 +65,17 @@ export function TagDetails(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Tag Details" action={props.topAction}>
+            <Card title="Topic Details" action={props.topAction}>
                 {
                     item && found
-                        ? <ViewTag
+                        ? <ViewTopic
                             item={item}
                             newNote={props.newNote}
-                            putTag={props.putTag}
+                            putTopic={props.putTopic}
                             hideDetails={true}
                             actionOnDelete={true}
                         />
-                        : <MsgBox emoji="🚫">The tag you're looking for cannot be found!</MsgBox>
+                        : <MsgBox emoji="🚫">The topic you're looking for cannot be found!</MsgBox>
                 }
             </Card>
             {

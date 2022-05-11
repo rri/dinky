@@ -111,7 +111,7 @@ div.data.oneline {
 }
 
 .data p strong>code {
-    color: var(--color-tag);
+    color: var(--color-topic);
     font-weight: 600;
 }
 
