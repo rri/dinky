@@ -14,7 +14,7 @@ export function PageNav(props: Props) {
         <Wrapper layout="row" className={styles.main}>
             <PageNavItem name="Today" slug="" icon={icons.today} hideName={true} clear={props.clear} />
             <PageNavItem name="Tasks" slug="tasks" icon={icons.tasks} clear={props.clear} />
-            <PageNavItem name="Tags" slug="tags" icon={icons.tags} clear={props.clear} />
+            <PageNavItem name="Topics" slug="topics" icon={icons.topics} clear={props.clear} />
             <PageNavItem name="Notes" slug="notes" icon={icons.notes} clear={props.clear} />
             <Spacer />
             <PageNavItem name="Profile" slug="profile" icon={icons.profile} hideName={true} clear={props.clear} />

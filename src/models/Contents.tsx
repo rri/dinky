@@ -1,9 +1,9 @@
 import { Task } from "./Task"
 import { Note } from "./Note"
-import { Tag } from "./Tag"
+import { Topic } from "./Topic"
 
 export interface Contents {
     tasks: Record<string, Task>,
-    tags: Record<string, Tag>,
+    topics: Record<string, Topic>,
     notes: Record<string, Note>,
 }

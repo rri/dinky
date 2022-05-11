@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
-import { Tag } from "../models/Tag"
+import { Topic } from "../models/Topic"
 import { Note } from "../models/Note"
 import { Term } from "../models/Term"
 import { Contents } from "../models/Contents"
@@ -13,8 +13,8 @@ import { Profile } from "../pages/Profile"
 import { TaskDetails } from "../pages/TaskDetails"
 import { Tasks } from "../pages/Tasks"
 import { Today } from "../pages/Today"
-import { Tags } from "../pages/Tags"
-import { TagDetails } from "../pages/TagDetails"
+import { Topics } from "../pages/Topics"
+import { TopicDetails } from "../pages/TopicDetails"
 import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
@@ -29,12 +29,12 @@ interface Props {
     back: Action,
     clear: Action,
     newTask: (template?: string) => string,
-    newTag: (template?: string) => string,
+    newTopic: (template?: string) => string,
     newNote: (template?: string) => string,
     putTodaySettings: (value: TodaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     putTask: (id: string, item: Task) => boolean,
-    putTag: (id: string, item: Tag) => boolean,
+    putTopic: (id: string, item: Topic) => boolean,
     putNote: (id: string, item: Note) => boolean,
     exportData: () => void,
     importData: () => void,
@@ -50,7 +50,7 @@ export function PageContent(props: Props) {
             today={props.settings.today}
             tasks={props.contents.tasks}
             notes={props.contents.notes}
-            tags={props.contents.tags}
+            topics={props.contents.topics}
             term={props.term}
             clear={props.clear}
             newNote={props.newNote}
@@ -107,26 +107,26 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/tags/"
-                element={<Tags
-                    tags={props.contents.tags}
+                path="/topics/"
+                element={<Topics
+                    topics={props.contents.topics}
                     newNote={props.newNote}
-                    newTag={props.newTag}
-                    putTag={props.putTag}
+                    newTopic={props.newTopic}
+                    putTopic={props.putTopic}
                     registerNewHandler={props.registerNewHandler}
                 />}
             />
             <Route
-                path="/tags/:id"
-                element={<TagDetails
+                path="/topics/:id"
+                element={<TopicDetails
                     today={props.settings.today}
                     tasks={props.contents.tasks}
                     notes={props.contents.notes}
-                    tags={props.contents.tags}
+                    topics={props.contents.topics}
                     topAction={props.back}
                     clear={props.clear}
                     newNote={props.newNote}
-                    putTag={props.putTag}
+                    putTopic={props.putTopic}
                     putTask={props.putTask}
                 />}
             />

@@ -1,18 +1,18 @@
 import { filterByArchive, filterByDeleted, IdItem, Item, reduceByTerm } from "./Item"
 import { Term } from "./Term"
 
-export interface Tag extends Item {}
+export interface Topic extends Item {}
 
 interface Props {
-    tags: Record<string, Tag>,
+    topics: Record<string, Topic>,
     archive: boolean,
     sortBy: (x: IdItem, y: IdItem) => 1 | -1 | 0,
     term?: Term,
 }
 
-export function fetchTags(props: Props) {
+export function fetchTopics(props: Props) {
     return Object
-        .entries(props.tags)
+        .entries(props.topics)
         .map(([id, item]) => ({ id, ...item }))
         .filter(filterByDeleted(false))
         .reduce(reduceByTerm(props.term), [])

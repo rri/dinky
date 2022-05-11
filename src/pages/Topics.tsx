@@ -1,66 +1,66 @@
 import React from "react"
 import { sortByCreated, sortByUpdated } from "../models/Item"
-import { fetchTags, Tag } from "../models/Tag"
+import { fetchTopics, Topic } from "../models/Topic"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
-import { ViewTag } from "../views/ViewTag"
+import { ViewTopic } from "../views/ViewTopic"
 import { icons } from "../views/Icon"
 
 interface Props {
-    tags: Record<string, Tag>,
+    topics: Record<string, Topic>,
     newNote: (template?: string) => string,
-    newTag: (template?: string) => string,
-    putTag: (id: string, item: Tag) => boolean,
+    newTopic: (template?: string) => string,
+    putTopic: (id: string, item: Topic) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
-export function Tags(props: Props) {
+export function Topics(props: Props) {
 
     props.registerNewHandler((evt?: KeyboardEvent) => {
         evt?.preventDefault()
-        props.newTag()
+        props.newTopic()
     })
 
-    const openTags = fetchTags({
-        tags: props.tags,
+    const openTopics = fetchTopics({
+        topics: props.topics,
         archive: false,
         sortBy: sortByCreated(),
     })
-    const doneTags = fetchTags({
-        tags: props.tags,
+    const doneTopics = fetchTopics({
+        topics: props.topics,
         archive: true,
         sortBy: sortByUpdated(),
     })
 
-    const results = openTags.concat(doneTags)
+    const results = openTopics.concat(doneTopics)
 
     const action = {
         icon: icons.plus,
         desc: "Add a new task",
-        action: () => props.newTag()
+        action: () => props.newTopic()
     }
 
     return (
         <Wrapper layout="col">
-            <Card title="Tags" action={action}>
+            <Card title="Topics" action={action}>
                 {
                     results.length
                         ?
                         <React.Fragment>
                             {
-                                results.map(item => <ViewTag
+                                results.map(item => <ViewTopic
                                     key={item.id}
                                     item={item}
                                     readonly={true}
                                     autoNew={true}
                                     newNote={props.newNote}
-                                    newTag={props.newTag}
-                                    putTag={props.putTag}
+                                    newTopic={props.newTopic}
+                                    putTopic={props.putTopic}
                                 />)
                             }
                         </React.Fragment>
-                        : <MsgBox emoji="🎺">No tags in your list!</MsgBox>
+                        : <MsgBox emoji="🎺">No topics in your list!</MsgBox>
                 }
             </Card>
         </Wrapper>

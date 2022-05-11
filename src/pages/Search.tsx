@@ -3,14 +3,14 @@ import { Action } from "../models/Action"
 import { Contents } from "../models/Contents"
 import { sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
-import { fetchTags } from "../models/Tag"
+import { fetchTopics } from "../models/Topic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes } from "../models/Note"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
 import { ViewNote } from "../views/ViewNote"
-import { ViewTag } from "../views/ViewTag"
+import { ViewTopic } from "../views/ViewTopic"
 import { ViewTask } from "../views/ViewTask"
 import { icons } from "../views/Icon"
 
@@ -27,14 +27,14 @@ type Props = Contents & {
 
 export function Search(props: Props) {
 
-    const x1 = fetchTags({
-        tags: props.tags,
+    const x1 = fetchTopics({
+        topics: props.topics,
         archive: false,
         sortBy: sortByUpdated(true),
         term: props.term,
     })
-    const x2 = fetchTags({
-        tags: props.tags,
+    const x2 = fetchTopics({
+        topics: props.topics,
         archive: true,
         sortBy: sortByUpdated(true),
         term: props.term,
@@ -75,7 +75,7 @@ export function Search(props: Props) {
                             ?
                             <React.Fragment>
                                 {
-                                    x1.map(item => <ViewTag
+                                    x1.map(item => <ViewTopic
                                         key={item.id}
                                         item={item}
                                         readonly={true}
@@ -108,7 +108,7 @@ export function Search(props: Props) {
                                     />)
                                 }
                                 {
-                                    x2.map(item => <ViewTag
+                                    x2.map(item => <ViewTopic
                                         key={item.id}
                                         item={item}
                                         readonly={true}

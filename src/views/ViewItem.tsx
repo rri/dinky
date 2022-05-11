@@ -3,7 +3,7 @@ import remarkGfm from 'remark-gfm'
 import { useState } from "react"
 import { Action } from '../models/Action'
 import { Note } from '../models/Note'
-import { Tag } from '../models/Tag'
+import { Topic } from '../models/Topic'
 import { Task } from '../models/Task'
 import { IdItem, Item } from "../models/Item"
 import { Term } from '../models/Term'
@@ -29,10 +29,10 @@ interface Props {
     actionOnDelete?: () => void,
     details?: () => void,
     newTask?: (template?: string) => string,
-    newTag?: (template?: string) => string,
+    newTopic?: (template?: string) => string,
     newNote?: (template?: string) => string,
     putTask?: (id: string, item: Task) => boolean,
-    putTag?: (id: string, item: Tag) => boolean,
+    putTopic?: (id: string, item: Topic) => boolean,
     putNote?: (id: string, item: Note) => boolean,
 }
 
@@ -45,12 +45,12 @@ export function ViewItem(props: Props) {
     const putItem = (id: string, item: Item, update: string, slug: string, more?: boolean, autoNew?: boolean, drafting?: boolean, bulkAdd?: boolean, actionOnDelete?: () => void) => {
         const putAction = {
             "tasks": props.putTask,
-            "tags": props.putTag,
+            "topics": props.putTopic,
             "notes": props.putNote,
         }[slug]
         const newAction = {
             "tasks": props.newTask,
-            "tags": props.newTag,
+            "topics": props.newTopic,
             "notes": props.newNote,
         }[slug]
 

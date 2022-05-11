@@ -6,7 +6,7 @@
 
 * Create [notes](/notes) to write down short blurbs of information (ideas, suggestions, meeting outcomes, action items). Notes make it easy to quickly collect *raw* information, to be synthesized later.
 * Create [tasks](/tasks) representing concrete actions you need to take. Each task ideally requires no more than 20 minutes to complete, and large tasks are broken down into smaller ones.
-* Create [tags](/tags) associated with either tasks or notes, by including them inline as part of the text. Tags are hyphenated phrases introduced with a "`#`" in front of the phrase (example: `#my-topic`).
+* Create [topics](/topics) associated with either tasks or notes, by including them inline as part of the text. Topics are hyphenated phrases introduced with a "`#`" in front of the phrase (example: `#my-topic`).
 
 You can quickly search for text by pressing the "`/`" (forward slash) shortcut at any time. Search text may include regular expressions, in case you're savvy with those. Additional [keyboard shortcuts](/help#keyboard-shortcuts) are available for easy navigation.
 
@@ -33,7 +33,7 @@ Your data is stored locally within the browser's "local storage", and none of it
 
 You can export all of your data from the [profile](/profile) page. You'll be prompted for the download of a [JSON](https://www.json.org) file that includes all your data, **except** for any sensitive settings (such as credentials). You can import previously exported data from the same page. Any data you import will be merged into the existing data, overwriting existing entries (where they exist).
 
-For tasks and tags (but **not** notes), there's another way to bulk-import items. If you create a new task or tag, and copy-and-paste a newline-separated *list* of items into the input text area, it'll automatically create individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new tag, you'll end up with three individual tags: `#home-improvement`, `#reading`, and `#action-item`.
+For tasks and topics (but **not** notes), there's another way to bulk-import items. If you create a new task or topic, and copy-and-paste a newline-separated *list* of items into the input text area, it'll automatically create individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new topic, you'll end up with three individual topics: `#home-improvement`, `#reading`, and `#action-item`.
 
 ```
 home-improvement
