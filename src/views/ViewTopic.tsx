@@ -51,8 +51,6 @@ export function ViewTopic(props: Props) {
                 action: details,
             })
 
-    console.log("putTopic = " + props.putTopic)
-
     return (
         <ViewItem
             key={props.item.id}

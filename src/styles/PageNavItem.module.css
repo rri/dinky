@@ -2,9 +2,8 @@
     align-items: center;
     background-color: transparent;
     border: var(--width-line) solid transparent;
-    column-gap: calc(var(--spacing) / 4);
     display: flex;
-    padding: var(--spacing);
+    padding: var(--spacing) calc(var(--spacing) / 1.5);
 }
 
 .main.active,
