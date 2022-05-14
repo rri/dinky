@@ -14,6 +14,10 @@
     z-index: 100;
 }
 
+.main::after {
+    content: "\200b";
+}
+
 .main .icon {
     height: var(--width-icon);
     width: var(--width-icon);
