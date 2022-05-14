@@ -4,6 +4,7 @@ import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
+import moment from "moment"
 
 const updateLocalStorage = (key: string, val: string) => {
     localStorage.setItem(key, val)
@@ -22,11 +23,11 @@ export class LocalStore {
     }
 
     sync() {
-        // T1: Retrieve etopic from local store
-        // T2: Fetch data from S3 conditional on etopic
+        // T1: Retrieve etag from local store
+        // T2: Fetch data from S3 conditional on etag
         // T3: If new data has been retrieved, merge it into local store
         // T5: Write local store to S3
-        // T6: Save returned etopic in local store
+        // T6: Save returned etag in local store
     }
 
     putTodaySettings(value: TodaySettings) {
