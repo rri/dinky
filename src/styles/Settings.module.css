@@ -4,6 +4,13 @@
     row-gap: calc(var(--spacing) / 2);
 }
 
+.group>.label {
+    border-top: var(--width-line) solid var(--color-line-2);
+    font-family: var(--font-decorative);
+    font-style: italic;
+    padding: calc(var(--spacing) * 2) 0;
+}
+
 .main .label {
     padding: var(--spacing);
     min-width: 30%;
@@ -27,6 +34,13 @@
     white-space: nowrap;
 }
 
+.link,
+.button {
+    justify-content: center;
+    display: inline-flex;
+    column-gap: var(--spacing);
+}
+
 .link .shortcuts {
     margin-left: auto;
 }
@@ -34,4 +48,9 @@
 .link .shortcuts kbd {
     cursor: pointer;
     margin: calc(var(--spacing) / 4);
+}
+
+.button {
+    cursor: pointer;
+    margin: var(--spacing) 0;
 }

@@ -1,10 +1,12 @@
 import { InputHTMLAttributes, PropsWithChildren } from "react"
 import { Wrapper } from "./Wrapper"
 import { Icon } from "./Icon"
-import styles from "../styles/Settings.module.css"
 import { Shortcut } from "./Shortcuts"
+import styles from "../styles/Settings.module.css"
 
-interface GroupProps {}
+interface GroupProps {
+    label?: string,
+}
 
 interface SettingProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string,
@@ -15,9 +17,12 @@ interface ActionLinkProps extends InputHTMLAttributes<HTMLAnchorElement> {
     shortcuts: string[],
 }
 
+interface ActionButtonProps extends InputHTMLAttributes<HTMLInputElement> {}
+
 export function SettingList(props: PropsWithChildren<GroupProps>) {
     return (
         <Wrapper layout="col" className={styles.group}>
+            {props.label && <div className={styles.label}>{props.label}</div>}
             {props.children}
         </Wrapper>
     )
@@ -42,6 +47,17 @@ export function ActionLink(props: ActionLinkProps) {
                 {rest.children}
                 <div className={styles.shortcuts}><Shortcut codes={props.shortcuts} /></div>
             </a>
+        </Wrapper>
+    )
+}
+
+export function ActionButton(props: ActionButtonProps) {
+    const { ...rest } = props
+    return (
+        <Wrapper layout="row" className={styles.main}>
+            <input {...rest} className={styles.button} type="button">
+                {rest.children}
+            </input>
         </Wrapper>
     )
 }
