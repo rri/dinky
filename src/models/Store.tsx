@@ -4,7 +4,6 @@ import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
-import moment from "moment"
 
 const updateLocalStorage = (key: string, val: string) => {
     localStorage.setItem(key, val)

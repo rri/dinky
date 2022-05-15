@@ -68,83 +68,81 @@ export function Search(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Wrapper layout="col">
-                <Card title="Search Results" action={props.clear}>
-                    {
-                        results
-                            ?
-                            <React.Fragment>
-                                {
-                                    x1.map(item => <ViewTopic
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        highlight={props.term}
-                                        clear={props.clear}
-                                        newNote={props.newNote}
-                                    />)
-                                }
-                                {
-                                    y1.map(item => <ViewTask
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        highlight={props.term}
-                                        today={props.today}
-                                        icon={icons.tasks}
-                                        clear={props.clear}
-                                        putTask={props.putTask}
-                                    />)
-                                }
-                                {
-                                    z1.map(item => <ViewNote
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        oneline={true}
-                                        highlight={props.term}
-                                        icon={icons.notes}
-                                        clear={props.clear}
-                                    />)
-                                }
-                                {
-                                    x2.map(item => <ViewTopic
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        highlight={props.term}
-                                        clear={props.clear}
-                                        newNote={props.newNote}
-                                    />)
-                                }
-                                {
-                                    y2.map(item => <ViewTask
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        highlight={props.term}
-                                        today={props.today}
-                                        icon={icons.tasks}
-                                        clear={props.clear}
-                                        putTask={props.putTask}
-                                    />)
-                                }
-                                {
-                                    z2.map(item => <ViewNote
-                                        key={item.id}
-                                        item={item}
-                                        readonly={true}
-                                        oneline={true}
-                                        highlight={props.term}
-                                        icon={icons.notes}
-                                        clear={props.clear}
-                                    />)
-                                }
-                            </React.Fragment>
-                            : <MsgBox emoji="🔍">Nothing found that matches your search term!</MsgBox>
-                    }
-                </Card>
-            </Wrapper>
+            <Card title="Search Results" action={props.clear}>
+                {
+                    results
+                        ?
+                        <React.Fragment>
+                            {
+                                x1.map(item => <ViewTopic
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    clear={props.clear}
+                                    newNote={props.newNote}
+                                />)
+                            }
+                            {
+                                y1.map(item => <ViewTask
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    today={props.today}
+                                    icon={icons.tasks}
+                                    clear={props.clear}
+                                    putTask={props.putTask}
+                                />)
+                            }
+                            {
+                                z1.map(item => <ViewNote
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    oneline={true}
+                                    highlight={props.term}
+                                    icon={icons.notes}
+                                    clear={props.clear}
+                                />)
+                            }
+                            {
+                                x2.map(item => <ViewTopic
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    clear={props.clear}
+                                    newNote={props.newNote}
+                                />)
+                            }
+                            {
+                                y2.map(item => <ViewTask
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    today={props.today}
+                                    icon={icons.tasks}
+                                    clear={props.clear}
+                                    putTask={props.putTask}
+                                />)
+                            }
+                            {
+                                z2.map(item => <ViewNote
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    oneline={true}
+                                    highlight={props.term}
+                                    icon={icons.notes}
+                                    clear={props.clear}
+                                />)
+                            }
+                        </React.Fragment>
+                        : <MsgBox emoji="🔍">Nothing found that matches your search term!</MsgBox>
+                }
+            </Card>
         </Wrapper>
     )
 }

@@ -61,7 +61,7 @@ export function PageContent(props: Props) {
     const routes = (
         <Routes>
             <Route
-                path="/"
+                path="/*"
                 element={<Today
                     today={props.settings.today}
                     tasks={props.contents.tasks}
@@ -71,7 +71,7 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/tasks/"
+                path="/tasks/*"
                 element={<Tasks
                     today={props.settings.today}
                     tasks={props.contents.tasks}
@@ -90,7 +90,7 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/notes/"
+                path="/notes/*"
                 element={<Notes
                     notes={props.contents.notes}
                     newNote={props.newNote}
@@ -107,7 +107,7 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/topics/"
+                path="/topics/*"
                 element={<Topics
                     topics={props.contents.topics}
                     newNote={props.newNote}
@@ -131,7 +131,7 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/profile/"
+                path="/profile/*"
                 element={<Profile
                     settings={props.settings}
                     putTodaySettings={props.putTodaySettings}
@@ -143,10 +143,10 @@ export function PageContent(props: Props) {
                 />}
             />
             <Route
-                path="/help/"
+                path="/help/*"
                 element={<Help />}
             />
-            <Route path='*' element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
         </Routes>
     )
 
