@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
-import { AppState, empty, mergeData } from "../models/AppState"
+import { AppState, empty } from "../models/AppState"
 import { Item } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
@@ -201,7 +201,7 @@ export function App() {
                         if (evt.target && evt.target.result) {
                             try {
                                 const toImport = JSON.parse(evt.target.result.toString())
-                                setData(prev => mergeData(prev, toImport))
+                                store.push(toImport)
                             } catch (e) {
                                 window.alert("Unable to understand the contents of the selected file!")
                             }

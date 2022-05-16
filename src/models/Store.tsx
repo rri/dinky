@@ -79,4 +79,12 @@ export class LocalStore {
             this.setData(empty())
         }
     }
+
+    push(data: AppState) {
+        this.setData(prev => {
+            const updated = mergeData(prev, data)
+            updateLocalStorage("data", JSON.stringify(updated))
+            return updated
+        })
+    }
 }
