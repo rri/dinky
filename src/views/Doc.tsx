@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Wrapper } from "./Wrapper"
@@ -13,7 +13,7 @@ export function Doc(props: Props) {
 
     const [markdown, setMarkdown] = useState("")
 
-    useEffect(() => {
+    useMemo(() => {
         fetch(props.src)
             .then(res => res.text())
             .then(setMarkdown)
