@@ -42,5 +42,8 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.94.0"
     }
 }

@@ -29,6 +29,7 @@ export function Help() {
                     <Shortcut codes={["n"]}>New note (on <NavLink to="/notes" title="Go to notes">notes</NavLink> page)</Shortcut>
                 </ShortcutList>
                 <ShortcutList group="Profile Data">
+                    <Shortcut codes={["s"]}>Sync now (<NavLink to="/profile" title="Configure sync settings">configure</NavLink>)</Shortcut>
                     <Shortcut codes={["d"]}>Download (on <NavLink to="/profile" title="Go to your profile">profile</NavLink> page)</Shortcut>
                     <Shortcut codes={["u"]}>Upload (on <NavLink to="/profile" title="Go to your profile">profile</NavLink> page)</Shortcut>
                 </ShortcutList>

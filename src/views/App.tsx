@@ -12,6 +12,7 @@ import { LocalStore } from "../models/Store"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
 import { TodaySettings } from "../models/TodaySettings"
+import { NotifyBox } from "./NotifyBox"
 import { Footer } from "./Footer"
 import { Header } from "./Header"
 import { PageContent } from "./PageContent"
@@ -29,6 +30,7 @@ export function App() {
 
     const [term, setTerm] = useState<Term>(new Term(""))
     const [data, setData] = useState<AppState>(empty())
+    const [note, setNotify] = useState<string>("")
 
     const store = useMemo(() => new LocalStore(setData), [setData])
 
@@ -46,6 +48,11 @@ export function App() {
         icon: icons.clear,
         desc: "Clear search results",
         action: () => setTerm(new Term(""))
+    }
+
+    const notify = (note?: string) => {
+        setNotify(note || "")
+        setTimeout(setNotify, 3000)
     }
 
     const newTask = (template?: string): string => {
@@ -112,7 +119,10 @@ export function App() {
     }
 
     const putTodaySettings = (value: TodaySettings) => {
-        store.putTodaySettings(value)
+        store.putTodaySettings({
+            ...value,
+            updated: moment().toISOString(),
+        })
     }
 
     const putStorageSettings = (value: StorageSettings) => {
@@ -170,9 +180,7 @@ export function App() {
             ...data,
             settings: {
                 ...data.settings,
-                storage: {
-                    type: "Local",
-                },
+                storage: {},
             }
         } as const
 
@@ -203,18 +211,26 @@ export function App() {
                                 const toImport = JSON.parse(evt.target.result.toString())
                                 store.push(toImport)
                             } catch (e) {
-                                window.alert("Unable to understand the contents of the selected file!")
+                                notify("File contents could not be read!")
                             }
                         }
                     }
                     reader.onerror = () => {
-                        window.alert("Unable to read the selected file!")
+                        notify("File could not be read!")
                     }
                     reader.readAsText(input.files[0], "UTF-8")
                 }
             }
         }
         input.click()
+    }
+
+    const sync = () => {
+        notify("Syncing to the cloud...")
+        store
+            .sync(data)
+            .then((res: boolean) => notify(res ? "Sync complete!" : "Sync not set up!"))
+            .catch(e => notify("Sync failed: " + JSON.stringify(e)))
     }
 
     useEffect(() => store.pull(), [store])
@@ -280,7 +296,7 @@ export function App() {
         },
         SYNC: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            store.sync()
+            sync()
         },
     }
 
@@ -293,6 +309,7 @@ export function App() {
             <GlobalHotKeys keyMap={keyMap} handlers={handlers} allowChanges={true} />
             <Header clear={clear} />
             <SearchBox value={term.source()} action={val => setTerm(new Term(val))} refs={refs} />
+            <NotifyBox note={note} />
             <PageNav clear={clear} />
             <PageContent
                 settings={data.settings}
@@ -310,6 +327,7 @@ export function App() {
                 putNote={putNote}
                 exportData={exportData}
                 importData={importData}
+                sync={sync}
                 registerNewHandler={registerNewHandler}
                 registerExportHandler={registerExportHandler}
                 registerImportHandler={registerImportHandler}

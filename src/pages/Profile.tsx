@@ -14,6 +14,7 @@ interface Props {
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     exportData: () => void,
     importData: () => void,
+    sync: () => void,
 }
 
 export function Profile(props: Props) {
@@ -28,9 +29,23 @@ export function Profile(props: Props) {
         props.importData()
     })
 
+    const updateCloudSync = (s3Bucket?: string, awsAccessKey?: string, awsSecretKey?: string, awsRegion?: string) => {
+        props.putStorageSettings({
+            s3Bucket,
+            awsAccessKey,
+            awsSecretKey,
+            awsRegion,
+        })
+    }
+
+    const s3Bucket = props.settings.storage.s3Bucket || ""
+    const awsAccessKey = props.settings.storage.awsAccessKey || ""
+    const awsSecretKey = props.settings.storage.awsSecretKey || ""
+    const awsRegion = props.settings.storage.awsRegion || ""
+
     return (
         <Wrapper layout="col">
-            <Card title="Agenda Preferences">
+            <Card title="Agenda Preferences" id="agenda-preferences">
                 <SettingList>
                     <Setting
                         label="Evening buffer (hours)"
@@ -56,7 +71,53 @@ export function Profile(props: Props) {
                     />
                 </SettingList>
             </Card>
-            <Card title="Manage Your Data">
+            <Card title="Cloud Sync" id="cloud-sync">
+                <SettingList>
+                    <Setting
+                        label="S3 Bucket"
+                        type="text"
+                        value={s3Bucket}
+                        onChange={evt => updateCloudSync(evt.currentTarget.value, awsAccessKey, awsSecretKey, awsRegion)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                    />
+                    <Setting
+                        label="AWS Access Key"
+                        type="text"
+                        value={awsAccessKey}
+                        onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)
+                        }
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                    />
+                    <Setting
+                        label="AWS Secret Key"
+                        type="password"
+                        value={awsSecretKey}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                    />
+                    <Setting
+                        label="AWS Region"
+                        type="text"
+                        placeholder="us-west-2"
+                        value={awsRegion}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                    />
+                </SettingList>
+                <SettingList>
+                    <ActionLink
+                        icon={icons.cloud}
+                        shortcuts={["s"]}
+                        onClick={props.sync}>
+                        Sync your data now
+                    </ActionLink>
+                </SettingList>
+            </Card>
+            <Card title="Manage Your Data" id="manage-your-data">
                 <SettingList>
                     <ActionLink
                         icon={icons.download}

@@ -1,3 +1,4 @@
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings } from "./AppState"
 import { Note } from "./Note"
 import { StorageSettings } from "./StorageSettings"
@@ -21,12 +22,89 @@ export class LocalStore {
         this.setData = setData
     }
 
-    sync() {
-        // T1: Retrieve etag from local store
-        // T2: Fetch data from S3 conditional on etag
-        // T3: If new data has been retrieved, merge it into local store
-        // T5: Write local store to S3
-        // T6: Save returned etag in local store
+    async sync(data: AppState): Promise<boolean> {
+
+        if (!data.settings.storage.s3Bucket
+            || !data.settings.storage.awsAccessKey
+            || !data.settings.storage.awsSecretKey
+            || !data.settings.storage.awsRegion) {
+            return false
+        }
+
+        const client = new S3Client({
+            credentials: {
+                accessKeyId: data.settings.storage.awsAccessKey || "",
+                secretAccessKey: data.settings.storage.awsSecretKey || "",
+            },
+            region: data.settings.storage.awsRegion
+        })
+
+        const readAndMergeData = async (Body: ReadableStream, ETag?: string) => {
+            const body = await new Response(Body as ReadableStream).text()
+            this.setData(prev => {
+                const res = mergeData(prev, JSON.parse(body))
+                res.settings.storage.eTag = ETag
+                return res
+            })
+        }
+
+        const get = new GetObjectCommand({
+            Bucket: data.settings.storage.s3Bucket,
+            Key: "data",
+            IfNoneMatch: data.settings.storage.eTag,
+        })
+
+        client.send(get).then(res => {
+            const { Body, ETag } = res
+            readAndMergeData(Body as ReadableStream, ETag)
+        }).catch(err => {
+            const { $metadata: { httpStatusCode } } = err
+            if (!httpStatusCode
+                || ((httpStatusCode < 200
+                    || httpStatusCode >= 300)
+                    && httpStatusCode !== 304)) {
+                throw err
+            }
+        })
+
+        const toExport: AppState = {
+            ...data,
+            settings: {
+                ...data.settings,
+                storage: {},
+            }
+        } as const
+
+        const put = new PutObjectCommand({
+            Bucket: data.settings.storage.s3Bucket,
+            Key: "data",
+            Body: JSON.stringify(toExport),
+            ContentType: "application/json",
+        })
+
+        client.send(put).then(res => {
+            const { ETag } = res
+            this.setData(prev => ({
+                ...prev,
+                settings: {
+                    ...prev.settings,
+                    storage: {
+                        ...prev.settings.storage,
+                        eTag: ETag,
+                    }
+                }
+            }))
+        }).catch(err => {
+            const { $metadata: { httpStatusCode } } = err
+            if (!httpStatusCode
+                || ((httpStatusCode < 200
+                    || httpStatusCode >= 300)
+                    && httpStatusCode !== 304)) {
+                throw err
+            }
+        })
+
+        return true
     }
 
     putTodaySettings(value: TodaySettings) {

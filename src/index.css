@@ -1,6 +1,9 @@
 @import-normalize;
 
 :root {
+    --color-rgb-bg-notify-box: 53, 56, 57;
+    --color-rgb-fg-notify-box: 255, 255, 255;
+    --color-alpha-bg-notify-box: 0.9;
     --color-bg-banner: #353839;
     --color-fg-banner: #ffffff;
     --color-rgb-fg-text: 51, 51, 51;
