@@ -1,0 +1,24 @@
+.wrap {
+    position: relative;
+}
+
+.main {
+    position: fixed;
+    background-color: rgba(var(--color-rgb-bg-notify-box), var(--color-alpha-bg-notify-box));
+    border-radius: 1em;
+    color: rgba(var(--color-rgb-fg-notify-box), 1.0);
+    align-items: center;
+    display: flex;
+    font-family: var(--font-content);
+    justify-content: center;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: var(--spacing);
+    width: 20em;
+    height: 10em;
+    line-height: 1.5em;
+    top: calc(80% - 5em);
+    left: calc(50% - 10em);
+    margin-bottom: calc(-20% + 5em);
+    margin-right: calc(-50% + 10em);
+}

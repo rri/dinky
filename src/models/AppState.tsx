@@ -5,6 +5,7 @@ import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
+import { Item } from "./Item"
 
 export interface AppState {
     error?: string,
@@ -14,9 +15,7 @@ export interface AppState {
 
 export const empty = (): AppState => ({
     settings: {
-        storage: {
-            type: "Local",
-        },
+        storage: {},
         today: {
             eveningBufferHours: 7,
             morningBufferHours: 2,
@@ -108,6 +107,39 @@ export const mergeNote = (state: AppState, id: string, item: Note): AppState => 
 }
 
 export const mergeData = (curr: AppState, data: AppState): AppState => {
+
+    const mergeByUpdated = <T extends { updated?: string }>(oldVal: T, newVal: T) => {
+        if (!newVal) {
+            return oldVal
+        }
+
+        if (!oldVal) {
+            return newVal
+        }
+
+        if (!oldVal.updated
+            || (newVal.updated
+                && oldVal.updated < newVal.updated)) {
+            return newVal
+        }
+        return oldVal
+    }
+
+    const mergeRecordsByUpdated = <T extends Item>(arr1: Record<string, T>, arr2: Record<string, T>) => {
+        const res: Record<string, T> = {}
+        Object
+            .entries(arr1)
+            .forEach((val: [id: string, obj: T]) => {
+                res[val[0]] = val[1]
+            })
+        Object
+            .entries(arr2)
+            .forEach((val: [id: string, obj: T]) => {
+                res[val[0]] = mergeByUpdated(res[val[0]], val[1])
+            })
+        return res
+    }
+
     return {
         settings: {
             ...curr.settings,
@@ -115,25 +147,13 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
                 ...curr.settings.storage,
                 ...data.settings.storage,
             },
-            today: {
-                ...curr.settings.today,
-                ...data.settings.today,
-            },
+            today: mergeByUpdated(curr.settings.today, data.settings.today),
         },
         contents: {
             ...curr.contents,
-            tasks: {
-                ...curr.contents.tasks,
-                ...data.contents.tasks,
-            },
-            topics: {
-                ...curr.contents.topics,
-                ...data.contents.topics,
-            },
-            notes: {
-                ...curr.contents.notes,
-                ...data.contents.notes,
-            },
+            tasks: mergeRecordsByUpdated(curr.contents.tasks, data.contents.tasks),
+            topics: mergeRecordsByUpdated(curr.contents.topics, data.contents.topics),
+            notes: mergeRecordsByUpdated(curr.contents.notes, data.contents.notes),
         }
     }
 }

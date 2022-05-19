@@ -38,6 +38,7 @@ interface Props {
     putNote: (id: string, item: Note) => boolean,
     exportData: () => void,
     importData: () => void,
+    sync: () => void,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerExportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
@@ -140,13 +141,17 @@ export function PageContent(props: Props) {
                     registerImportHandler={props.registerImportHandler}
                     exportData={props.exportData}
                     importData={props.importData}
+                    sync={props.sync}
                 />}
             />
             <Route
                 path="/help/*"
                 element={<Help />}
             />
-            <Route path="*" element={<NotFound />} />
+            <Route
+                path="*"
+                element={<NotFound />}
+            />
         </Routes>
     )
 

@@ -1,5 +1,6 @@
 import back from "@material-design-icons/svg/two-tone/keyboard_backspace.svg"
 import clear from "@material-design-icons/svg/two-tone/backspace.svg"
+import cloud from "@material-design-icons/svg/two-tone/cloud.svg"
 import download from "@material-design-icons/svg/two-tone/file_download.svg"
 import help from "@material-design-icons/svg/two-tone/help.svg"
 import listadd from "@material-design-icons/svg/two-tone/playlist_add.svg"
@@ -33,6 +34,7 @@ export function Icon(props: Props) {
 export const icons = {
     back,
     clear,
+    cloud,
     download,
     help,
     listadd,
