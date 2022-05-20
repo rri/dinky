@@ -45,6 +45,7 @@ export class LocalStore {
             this.setData(prev => {
                 const res = mergeData(prev, JSON.parse(body))
                 res.settings.storage.eTag = ETag
+                updateLocalStorage("data", JSON.stringify(res))
                 return res
             })
         }
@@ -105,16 +106,20 @@ export class LocalStore {
 
         await client.send(put).then(res => {
             const { ETag } = res
-            this.setData(prev => ({
-                ...prev,
-                settings: {
-                    ...prev.settings,
-                    storage: {
-                        ...prev.settings.storage,
-                        eTag: ETag,
+            this.setData(prev => {
+                const updated = {
+                    ...prev,
+                    settings: {
+                        ...prev.settings,
+                        storage: {
+                            ...prev.settings.storage,
+                            eTag: ETag,
+                        }
                     }
                 }
-            }))
+                updateLocalStorage("data", JSON.stringify(updated))
+                return updated
+            })
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
