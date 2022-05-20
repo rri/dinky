@@ -36,7 +36,8 @@ export class LocalStore {
                 accessKeyId: data.settings.storage.awsAccessKey || "",
                 secretAccessKey: data.settings.storage.awsSecretKey || "",
             },
-            region: data.settings.storage.awsRegion
+            region: data.settings.storage.awsRegion,
+            maxAttempts: 1,
         })
 
         const readAndMergeData = async (Body: ReadableStream, ETag?: string) => {
@@ -48,23 +49,43 @@ export class LocalStore {
             })
         }
 
+        const checkHttpStatusCode = (err: any, httpStatusCode?: number) => {
+            if (httpStatusCode) {
+                if (httpStatusCode < 200 || httpStatusCode >= 500) {
+                    err.desc = "unexpected server error"
+                    throw err
+                }
+                if (httpStatusCode < 400 && httpStatusCode >= 300) {
+                    if (httpStatusCode !== 304) {
+                        err.desc = "unexpected redirect"
+                        throw err
+                    }
+                }
+                if (httpStatusCode < 500 && httpStatusCode >= 400) {
+                    if (httpStatusCode === 401) {
+                        err.desc = "missing authentication credentials"
+                        throw err
+                    }
+                    if (httpStatusCode === 403) {
+                        err.desc = "invalid authentication credentials"
+                        throw err
+                    }
+                }
+            }
+        }
+
         const get = new GetObjectCommand({
             Bucket: data.settings.storage.s3Bucket,
             Key: "data",
             IfNoneMatch: data.settings.storage.eTag,
         })
 
-        client.send(get).then(res => {
+        await client.send(get).then(res => {
             const { Body, ETag } = res
             readAndMergeData(Body as ReadableStream, ETag)
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
-            if (!httpStatusCode
-                || ((httpStatusCode < 200
-                    || httpStatusCode >= 300)
-                    && httpStatusCode !== 304)) {
-                throw err
-            }
+            checkHttpStatusCode(err, httpStatusCode)
         })
 
         const toExport: AppState = {
@@ -82,7 +103,7 @@ export class LocalStore {
             ContentType: "application/json",
         })
 
-        client.send(put).then(res => {
+        await client.send(put).then(res => {
             const { ETag } = res
             this.setData(prev => ({
                 ...prev,
@@ -96,12 +117,7 @@ export class LocalStore {
             }))
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
-            if (!httpStatusCode
-                || ((httpStatusCode < 200
-                    || httpStatusCode >= 300)
-                    && httpStatusCode !== 304)) {
-                throw err
-            }
+            checkHttpStatusCode(err, httpStatusCode)
         })
 
         return true
