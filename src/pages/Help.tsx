@@ -3,13 +3,16 @@ import { Card } from "../views/Card"
 import { Shortcut, ShortcutList } from "../views/Shortcuts"
 import { Doc } from "../views/Doc"
 import { Wrapper } from "../views/Wrapper"
-import userguide from "../docs/UserGuide.md"
 
-export function Help() {
+interface Props {
+    userguide: string,
+}
+
+export function Help(props: Props) {
     return (
         <Wrapper layout="col">
             <Card title="User Guide" id="user-guide">
-                <Doc src={userguide} />
+                <Doc markdown={props.userguide} />
             </Card>
             <Card title="Keyboard Shortcuts" id="keyboard-shortcuts">
                 <ShortcutList group="Navigation">

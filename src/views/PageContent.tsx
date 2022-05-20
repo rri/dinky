@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
@@ -18,9 +19,10 @@ import { TopicDetails } from "../pages/TopicDetails"
 import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
-import styles from "../styles/PageContent.module.css"
 import { TodaySettings } from "../models/TodaySettings"
 import { StorageSettings } from "../models/StorageSettings"
+import userguide from "../docs/UserGuide.md"
+import styles from "../styles/PageContent.module.css"
 
 interface Props {
     settings: Settings,
@@ -45,6 +47,14 @@ interface Props {
 }
 
 export function PageContent(props: Props) {
+
+    const [userguideMarkdown, setUserguideMarkdown] = useState("")
+
+    useMemo(() => {
+        fetch(userguide)
+            .then(res => res.text())
+            .then(setUserguideMarkdown)
+    }, [])
 
     const search = (
         <Search
@@ -146,7 +156,7 @@ export function PageContent(props: Props) {
             />
             <Route
                 path="/help/*"
-                element={<Help />}
+                element={<Help userguide={userguideMarkdown} />}
             />
             <Route
                 path="*"
