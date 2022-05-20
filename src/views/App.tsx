@@ -230,7 +230,7 @@ export function App() {
         store
             .sync(data)
             .then((res: boolean) => notify(res ? "Sync complete!" : "Sync not set up!"))
-            .catch(e => notify("Sync failed: " + JSON.stringify(e)))
+            .catch(e => notify("Sync failed: " + e.desc))
     }
 
     useEffect(() => store.pull(), [store])
