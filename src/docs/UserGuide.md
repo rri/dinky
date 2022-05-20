@@ -22,11 +22,13 @@ The way you manage your agenda can be customized in a couple of ways. Firstly, y
 
 Your data is stored locally within the browser's [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), and is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time.
 
+*Replace $bucket, $region, $policy, $usergroup and $user with arbitrary fresh values.*
+
 To set up your sync configuration:
 
 1. Create an [AWS account](https://aws.amazon.com) and sign in to your AWS Console.
 2. Navigate to the [S3 console](https://s3.console.aws.amazon.com).
-3. Create a new empty private S3 bucket called `dinky-data` to store your data, in a region of your choice, **blocking public access**.
+3. Create a new empty private S3 bucket called `$bucket` to store your data, in a region `$region` of your choice, **blocking public access**.
 4. Go to the **permissions** tab for your bucket.
 5. Add the Cross-Origin Resource Sharing (CORS) policy listed below.
 
@@ -57,19 +59,19 @@ To set up your sync configuration:
 ```
 
 6. Search for `IAM` within the AWS Console and switch to it.
-7. Create a new **policy** called `DinkyDataAccess` with the following content:
+7. Create a new **policy** called `$policy` with the following content:
 
 * Service: `S3`
 * Actions: `ListBucket`, `GetObject`, `PutObject`, `DeleteObject`
 * Resources:
     - Bucket resource:
-        - Bucket name: `dinky-data`
+        - Bucket name: `$bucket`
     - Object resource:
-        - Bucket name: `dinky-data`, Object name: `*`
+        - Bucket name: `$bucket`, Object name: `*`
 
-8. Create a new **user group** called `DinkyUserGroup`.
-9. Attach the `DinkyDataAccess` policy to the `DinkyUserGroup` group.
-10. Create a new **user** called `DinkyUser`, and add this user to `DinkyUserGroup`.
+8. Create a new **user group** called ``.
+9. Attach the `$policy` policy to the `$usergroup` group.
+10. Create a new **user** called `$user`, and add this user to `$usergroup`.
 11. Create a new access key and copy the **Access key ID** and **Secret access key** values.
 
 Finally, enter the information collected above into your sync settings on the [profile](/profile/#cloud-sync) page.
