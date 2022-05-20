@@ -84,42 +84,44 @@ export class LocalStore {
         await client.send(get).then(res => {
             const { Body, ETag } = res
             readAndMergeData(Body as ReadableStream, ETag)
-        }).catch(err => {
-            const { $metadata: { httpStatusCode } } = err
-            checkHttpStatusCode(err, httpStatusCode)
-        })
-
-        const toExport: AppState = {
-            ...data,
-            settings: {
-                ...data.settings,
-                storage: {},
-            }
-        } as const
-
-        const put = new PutObjectCommand({
-            Bucket: data.settings.storage.s3Bucket,
-            Key: "data",
-            Body: JSON.stringify(toExport),
-            ContentType: "application/json",
-        })
-
-        await client.send(put).then(res => {
-            const { ETag } = res
-            this.setData(prev => {
-                const updated = {
-                    ...prev,
-                    settings: {
-                        ...prev.settings,
-                        storage: {
-                            ...prev.settings.storage,
-                            eTag: ETag,
+                .then(() => {
+                    const toExport: AppState = {
+                        ...data,
+                        settings: {
+                            ...data.settings,
+                            storage: {},
                         }
-                    }
-                }
-                updateLocalStorage("data", JSON.stringify(updated))
-                return updated
-            })
+                    } as const
+
+                    const put = new PutObjectCommand({
+                        Bucket: data.settings.storage.s3Bucket,
+                        Key: "data",
+                        Body: JSON.stringify(toExport),
+                        ContentType: "application/json",
+                    })
+
+                    client.send(put).then(res => {
+                        const { ETag } = res
+                        this.setData(prev => {
+                            const updated = {
+                                ...prev,
+                                settings: {
+                                    ...prev.settings,
+                                    storage: {
+                                        ...prev.settings.storage,
+                                        eTag: ETag,
+                                    }
+                                }
+                            }
+                            updateLocalStorage("data", JSON.stringify(updated))
+                            return updated
+                        })
+                    }).catch(err => {
+                        const { $metadata: { httpStatusCode } } = err
+                        checkHttpStatusCode(err, httpStatusCode)
+                    })
+
+                })
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
