@@ -4,7 +4,7 @@ import { StorageSettings } from "../models/StorageSettings"
 import { TodaySettings } from "../models/TodaySettings"
 import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
-import { MsgBox } from "../views/MsgBox"
+import { Info } from "../views/Info"
 import { ActionLink, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
 
@@ -81,9 +81,7 @@ export function Profile(props: Props) {
                         onClick={props.sync}>
                         Sync your data now
                     </ActionLink>
-                </SettingList>
-                <MsgBox>Provide your AWS configuration below, following instructions <NavLink to="/help">on the help page</NavLink>.</MsgBox>
-                <SettingList>
+                    <Info emoji="ℹ️">Provide your AWS configuration below, following instructions <NavLink to="/help">on the help page</NavLink>.</Info>
                     <Setting
                         label="S3 Bucket"
                         type="text"
