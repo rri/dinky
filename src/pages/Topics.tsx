@@ -1,5 +1,5 @@
 import React from "react"
-import { sortByCreated, sortByUpdated } from "../models/Item"
+import { sortByData, sortByUpdated } from "../models/Item"
 import { fetchTopics, Topic } from "../models/Topic"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
@@ -25,7 +25,7 @@ export function Topics(props: Props) {
     const openTopics = fetchTopics({
         topics: props.topics,
         archive: false,
-        sortBy: sortByCreated(),
+        sortBy: sortByData(),
     })
     const doneTopics = fetchTopics({
         topics: props.topics,
