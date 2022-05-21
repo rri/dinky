@@ -36,12 +36,12 @@ div.data.oneline {
 
 .data.readonly {
     cursor: default;
+    user-select: none;
 }
 
 .data.readonly.link {
     cursor: pointer;
 }
-
 
 .data * {
     font-size: 1em;
