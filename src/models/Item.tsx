@@ -83,6 +83,18 @@ export function filterByToday(eveningBufferHours: number, morningBufferHours: nu
     }
 }
 
+export function sortByData(reverse?: boolean) {
+    return (x: Item, y: Item) => {
+        const a = x.data
+        const b = y.data
+        if (reverse) {
+            return a > b ? 1 : a < b ? -1 : 0
+        } else {
+            return a > b ? -1 : a < b ? 1 : 0
+        }
+    }
+}
+
 export function sortByCreated(reverse?: boolean) {
     return sortByChronology(item => withDefaultDate(item.created, new Date()), reverse)
 }
