@@ -1,0 +1,10 @@
+.main {
+    justify-content: center;
+    border-top: var(--width-line) solid var(--color-line-1);
+    padding: calc(var(--spacing) * 2);
+}
+
+.main .emoji {
+    font-size: 2em;
+    margin: 0 var(--spacing);
+}
