@@ -69,7 +69,7 @@ To set up your sync configuration:
     - Object resource:
         - Bucket name: `$bucket`, Object name: `*`
 
-8. Create a new **user group** called ``.
+8. Create a new **user group** called `$usergroup`.
 9. Attach the `$policy` policy to the `$usergroup` group.
 10. Create a new **user** called `$user`, and add this user to `$usergroup`.
 11. Create a new access key and copy the **Access key ID** and **Secret access key** values.
