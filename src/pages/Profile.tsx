@@ -1,8 +1,10 @@
+import { NavLink } from "react-router-dom"
 import { Settings } from "../models/Settings"
 import { StorageSettings } from "../models/StorageSettings"
 import { TodaySettings } from "../models/TodaySettings"
 import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
+import { MsgBox } from "../views/MsgBox"
 import { ActionLink, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
 
@@ -73,6 +75,15 @@ export function Profile(props: Props) {
             </Card>
             <Card title="Cloud Sync" id="cloud-sync">
                 <SettingList>
+                    <ActionLink
+                        icon={icons.cloud}
+                        shortcuts={["s"]}
+                        onClick={props.sync}>
+                        Sync your data now
+                    </ActionLink>
+                </SettingList>
+                <MsgBox>Provide your AWS configuration below, following instructions <NavLink to="/help">on the help page</NavLink>.</MsgBox>
+                <SettingList>
                     <Setting
                         label="S3 Bucket"
                         type="text"
@@ -82,7 +93,7 @@ export function Profile(props: Props) {
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                     />
                     <Setting
-                        label="AWS Access Key"
+                        label="Access Key"
                         type="text"
                         value={awsAccessKey}
                         onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion)}
@@ -91,7 +102,7 @@ export function Profile(props: Props) {
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                     />
                     <Setting
-                        label="AWS Secret Key"
+                        label="Secret Key"
                         type="password"
                         value={awsSecretKey}
                         onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion)}
@@ -99,7 +110,7 @@ export function Profile(props: Props) {
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                     />
                     <Setting
-                        label="AWS Region"
+                        label="Region"
                         type="text"
                         placeholder="us-west-2"
                         value={awsRegion}
@@ -107,14 +118,6 @@ export function Profile(props: Props) {
                         onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                     />
-                </SettingList>
-                <SettingList>
-                    <ActionLink
-                        icon={icons.cloud}
-                        shortcuts={["s"]}
-                        onClick={props.sync}>
-                        Sync your data now
-                    </ActionLink>
                 </SettingList>
             </Card>
             <Card title="Manage Your Data" id="manage-your-data">
