@@ -1,0 +1,9 @@
+.main {
+    background-color: var(--color-bg-highlight);
+    border: var(--width-line) solid var(--color-line-1);
+    font-family: var(--font-decorative);
+    font-style: italic;
+    justify-content: center;
+    margin: calc(var(--spacing) * 2) 0 0 0;
+    padding: calc(var(--spacing) * 2);
+}
