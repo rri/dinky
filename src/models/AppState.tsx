@@ -13,6 +13,51 @@ export interface AppState {
     contents: Contents,
 }
 
+const mergeByUpdated = <T extends { updated?: string }>(oldVal: T, newVal: T) => {
+    if (!newVal) {
+        return oldVal
+    }
+
+    if (!oldVal) {
+        return newVal
+    }
+
+    if (!oldVal.updated
+        || (newVal.updated
+            && oldVal.updated < newVal.updated)) {
+        return newVal
+    }
+
+    return oldVal
+}
+
+const makeUnique = (topics: Record<string, Topic>) => {
+    const res: Record<string, Topic> = {}   // <id, Topic>
+    const chk: Record<string, string> = {}  // <[topic], id>
+    Object
+        .entries(topics)
+        .forEach((value: [string, Topic]) => {
+            const newId = value[0]
+            const newTopic = value[1]
+            const oldId = chk[newTopic.data]
+
+            if (oldId) {
+                const oldTopic = res[oldId]
+                if (!oldTopic.updated
+                    || (newTopic.updated
+                        && oldTopic.updated < newTopic.updated)) {
+                    delete res[oldId]
+                    res[newId] = newTopic
+                    chk[newTopic.data] = newId
+                }
+            } else {
+                chk[newTopic.data] = newId
+                res[newId] = newTopic
+            }
+        })
+    return res
+}
+
 export const empty = (): AppState => ({
     settings: {
         storage: {},
@@ -68,21 +113,6 @@ export const mergeTask = (state: AppState, id: string, item: Task): AppState => 
 }
 
 export const mergeTopic = (state: AppState, id: string, item: Topic): AppState => {
-
-    const makeUnique = (topics: Record<string, Topic>) => {
-        const res: Record<string, Topic> = {}
-        const chk: string[] = []
-        Object
-            .entries(topics)
-            .forEach((value: [string, Topic]) => {
-                if (chk.indexOf(value[1].data) < 0) {
-                    chk.push(value[1].data)
-                    res[value[0]] = value[1]
-                }
-            })
-        return res
-    }
-
     const topics = { ...state.contents.topics, [id]: item }
     return ({
         ...state,
@@ -107,23 +137,6 @@ export const mergeNote = (state: AppState, id: string, item: Note): AppState => 
 }
 
 export const mergeData = (curr: AppState, data: AppState): AppState => {
-
-    const mergeByUpdated = <T extends { updated?: string }>(oldVal: T, newVal: T) => {
-        if (!newVal) {
-            return oldVal
-        }
-
-        if (!oldVal) {
-            return newVal
-        }
-
-        if (!oldVal.updated
-            || (newVal.updated
-                && oldVal.updated < newVal.updated)) {
-            return newVal
-        }
-        return oldVal
-    }
 
     const mergeRecordsByUpdated = <T extends Item>(arr1: Record<string, T>, arr2: Record<string, T>) => {
         const res: Record<string, T> = {}
@@ -152,7 +165,7 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
         contents: {
             ...curr.contents,
             tasks: mergeRecordsByUpdated(curr.contents.tasks, data.contents.tasks),
-            topics: mergeRecordsByUpdated(curr.contents.topics, data.contents.topics),
+            topics: makeUnique(mergeRecordsByUpdated(curr.contents.topics, data.contents.topics)),
             notes: mergeRecordsByUpdated(curr.contents.notes, data.contents.notes),
         }
     }
