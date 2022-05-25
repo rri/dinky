@@ -30,37 +30,37 @@ export function Search(props: Props) {
     const x1 = fetchTopics({
         topics: props.topics,
         archive: false,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const x2 = fetchTopics({
         topics: props.topics,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const y1 = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const y2 = fetchTasks({
         tasks: props.tasks,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const z1 = fetchNotes({
         notes: props.notes,
         archive: false,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const z2 = fetchNotes({
         notes: props.notes,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term: props.term,
     })
 

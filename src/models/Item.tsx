@@ -10,6 +10,8 @@ export interface Item {
     archive?: boolean,
 }
 
+export type Sorter = (x: IdItem, y: IdItem) => 1 | -1 | 0
+
 export type IdItem = Item & {
     id: string,
 }
@@ -35,7 +37,6 @@ function withDefaultDate(obj: any, date: Date) {
 }
 
 export function reduceByTerm(term?: Term) {
-
     return (result: IdItem[], value: IdItem) => {
         if (term?.source()) {
             let count = 0
@@ -75,7 +76,8 @@ export function filterByToday(eveningBufferHours: number, morningBufferHours: nu
             ? moment()
             : moment().subtract(1, "days")
         return item.today
-            ? referencePoint
+            ? moment(item.today) <= moment()
+            && referencePoint
                 .startOf("day")
                 .subtract(eveningBufferHours, "hours")
                 .isBefore(moment(item.today))
@@ -87,10 +89,19 @@ export function sortByData(reverse?: boolean) {
     return (x: Item, y: Item) => {
         const a = x.data
         const b = y.data
+        if (!a && b) {
+            return -1
+        }
+        if (a && !b) {
+            return 1
+        }
+        if (!a && !b) {
+            return 0
+        }
         if (reverse) {
-            return a > b ? 1 : a < b ? -1 : 0
+            return a > b ? -1 : a < b ? -1 : 0
         } else {
-            return a > b ? -1 : a < b ? 1 : 0
+            return a > b ? 1 : a < b ? 1 : 0
         }
     }
 }
@@ -113,4 +124,30 @@ export function sortByToday(reverse?: boolean) {
 
 export function belongsToToday(item: Item, eveningBufferHours: number, morningBufferHours: number) {
     return filterByToday(eveningBufferHours, morningBufferHours)(item)
+}
+
+export function sortByReminder() {
+    return (x: Item, y: Item) => {
+        const a = x.today
+        const b = y.today
+        if (a && moment().isBefore(moment(a))) {
+            // X's today is in the future
+            if (b && moment().isBefore(moment(b))) {
+                // Y's today is in the future
+                return 0
+            } else {
+                // X in the future, Y in the past
+                return 1
+            }
+        } else {
+            // X's today is not in the future
+            if (b && moment().isBefore(moment(b))) {
+                // Y in the future, X in the past
+                return -1
+            } else {
+                // Both in the past
+                return 0
+            }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { sortByCreated, sortByUpdated } from "../models/Item"
+import { sortByUpdated } from "../models/Item"
 import { fetchNotes, Note } from "../models/Note"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
@@ -32,12 +32,12 @@ export function Notes(props: Props) {
     const openNotes = fetchNotes({
         notes: props.notes,
         archive: false,
-        sortBy: sortByCreated(),
+        sortBy: [sortByUpdated(true)],
     })
     const doneNotes = fetchNotes({
         notes: props.notes,
         archive: true,
-        sortBy: sortByUpdated(),
+        sortBy: [sortByUpdated(true)],
     })
 
     const results = openNotes.concat(doneNotes)

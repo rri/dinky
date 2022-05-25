@@ -39,25 +39,25 @@ export function TopicDetails(props: Props) {
     const y1 = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term,
     })
     const y2 = fetchTasks({
         tasks: props.tasks,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term,
     })
     const z1 = fetchNotes({
         notes: props.notes,
         archive: false,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term,
     })
     const z2 = fetchNotes({
         notes: props.notes,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         term,
     })
 

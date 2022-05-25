@@ -36,13 +36,13 @@ export function Today(props: Props) {
     const openTasks = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: sortByToday(),
+        sortBy: [sortByToday()],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
     const doneTasks = fetchTasks({
         tasks: props.tasks,
         archive: true,
-        sortBy: sortByUpdated(true),
+        sortBy: [sortByUpdated(true)],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
 
