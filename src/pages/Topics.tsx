@@ -25,12 +25,12 @@ export function Topics(props: Props) {
     const openTopics = fetchTopics({
         topics: props.topics,
         archive: false,
-        sortBy: sortByData(),
+        sortBy: [sortByData()],
     })
     const doneTopics = fetchTopics({
         topics: props.topics,
         archive: true,
-        sortBy: sortByUpdated(),
+        sortBy: [sortByUpdated(true)],
     })
 
     const results = openTopics.concat(doneTopics)
