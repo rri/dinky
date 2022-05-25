@@ -10,6 +10,10 @@
 
 Everyday, you can pick tasks in your backlog to be completed, by adding them to your [agenda](/) on the start page. Tasks added to your agenda disappear (from your agenda, not the backlog) at the end of the day. You can always visit the backlog and re-add them, if you want to pick them up again.
 
+# Reminders
+
+If you go to task details by clicking on a task, you can set a reminder for the task on any future date (today inclusive). When you set a reminder, the task will automatically appear in your [agenda](/) on that date. *Note that you won't get any email or popup notifications.*
+
 # Search
 
 You can quickly search for text by pressing the "`/`" (forward slash) shortcut at any time. Search text may include regular expressions, in case you're savvy with those. Additional [keyboard shortcuts](#keyboard-shortcuts) are available for easy navigation.
