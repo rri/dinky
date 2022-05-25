@@ -40,12 +40,13 @@ export class LocalStore {
             maxAttempts: 1,
         })
 
-        const readAndMergeData = async (Body: ReadableStream, ETag?: string) => {
+        const readMergeAndUploadData = async (Body: ReadableStream, ETag?: string) => {
             const body = await new Response(Body as ReadableStream).text()
             this.setData(prev => {
                 const res = mergeData(prev, JSON.parse(body))
                 res.settings.storage.eTag = ETag
                 updateLocalStorage("data", JSON.stringify(res))
+                uploadData(res)
                 return res
             })
         }
@@ -81,7 +82,7 @@ export class LocalStore {
             IfNoneMatch: data.settings.storage.eTag,
         })
 
-        const uploadData = () => {
+        const uploadData = (data: AppState) => {
             const toExport: AppState = {
                 ...data,
                 settings: {
@@ -121,12 +122,11 @@ export class LocalStore {
 
         await client.send(get).then(res => {
             const { Body, ETag } = res
-            readAndMergeData(Body as ReadableStream, ETag)
-                .then(uploadData)
+            readMergeAndUploadData(Body as ReadableStream, ETag)
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
-            uploadData()
+            uploadData(data)
         })
 
         return true
