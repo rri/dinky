@@ -1,7 +1,7 @@
 import React from "react"
 import { Action } from "../models/Action"
 import { Contents } from "../models/Contents"
-import { sortByUpdated } from "../models/Item"
+import { sortByReminder, sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
 import { fetchTopics } from "../models/Topic"
 import { fetchTasks, Task } from "../models/Task"
@@ -42,7 +42,7 @@ export function Search(props: Props) {
     const y1 = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: [sortByUpdated(true)],
+        sortBy: [sortByUpdated(true), sortByReminder()],
         term: props.term,
     })
     const y2 = fetchTasks({
