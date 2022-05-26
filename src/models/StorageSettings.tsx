@@ -4,4 +4,5 @@ export interface StorageSettings {
     awsSecretKey?: string,
     awsRegion?: string,
     eTag?: string,
+    lastSynced?: string,
 }

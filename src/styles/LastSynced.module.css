@@ -1,0 +1,13 @@
+.main {
+    border-top: var(--width-line) solid var(--color-line-2);
+    border-bottom: var(--width-line) solid var(--color-line-2);
+    font-family: var(--font-decorative);
+    font-style: italic;
+    margin-bottom: var(--spacing);
+    padding: var(--spacing) 0;
+}
+
+.main .when {
+    display: inline;
+    letter-spacing: 0.05em;
+}
