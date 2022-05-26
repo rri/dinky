@@ -48,7 +48,7 @@ export function Profile(props: Props) {
     const awsRegion = props.settings.storage.awsRegion || ""
 
     const lastSynced = props.settings.storage.lastSynced
-        ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:MM")
+        ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:mm")
         : "never"
 
     return (
