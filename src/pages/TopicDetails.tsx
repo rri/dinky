@@ -8,7 +8,7 @@ import { Wrapper } from "../views/Wrapper"
 import { ViewTopic } from "../views/ViewTopic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes, Note } from "../models/Note"
-import { sortByUpdated } from "../models/Item"
+import { sortByReminder, sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
 import { ViewTask } from "../views/ViewTask"
 import { icons } from "../views/Icon"
@@ -39,7 +39,7 @@ export function TopicDetails(props: Props) {
     const y1 = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: [sortByUpdated(true)],
+        sortBy: [sortByUpdated(true), sortByReminder()],
         term,
     })
     const y2 = fetchTasks({
