@@ -44,6 +44,7 @@
         ]
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.94.0"
+        "@aws-sdk/client-s3": "^3.94.0",
+        "react-string-replace": "^1.1.0"
     }
 }
