@@ -73,7 +73,28 @@ export class LocalStore {
                         throw err
                     }
                 }
+            } else {
+                err.desc = "unexpected error"
+                throw err
             }
+        }
+
+        const setMetadata = (lastSynced?: string, eTag?: string) => {
+            this.setData(prev => {
+                const updated = {
+                    ...prev,
+                    settings: {
+                        ...prev.settings,
+                        storage: {
+                            ...prev.settings.storage,
+                            eTag: eTag ? eTag : prev.settings.storage.eTag,
+                            lastSynced,
+                        }
+                    }
+                }
+                updateLocalStorage("data", JSON.stringify(updated))
+                return updated
+            })
         }
 
         const get = new GetObjectCommand({
@@ -100,23 +121,11 @@ export class LocalStore {
 
             client.send(put).then(res => {
                 const { ETag } = res
-                this.setData(prev => {
-                    const updated = {
-                        ...prev,
-                        settings: {
-                            ...prev.settings,
-                            storage: {
-                                ...prev.settings.storage,
-                                eTag: ETag,
-                            }
-                        }
-                    }
-                    updateLocalStorage("data", JSON.stringify(updated))
-                    return updated
-                })
+                setMetadata(new Date().toISOString(), ETag)
             }).catch(err => {
                 const { $metadata: { httpStatusCode } } = err
                 checkHttpStatusCode(err, httpStatusCode)
+                setMetadata(new Date().toISOString())
             })
         }
 

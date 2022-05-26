@@ -1,3 +1,4 @@
+import moment from "moment"
 import { NavLink } from "react-router-dom"
 import { Settings } from "../models/Settings"
 import { StorageSettings } from "../models/StorageSettings"
@@ -5,6 +6,7 @@ import { TodaySettings } from "../models/TodaySettings"
 import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
 import { InfoBox } from "../views/InfoBox"
+import { LastSynced, LastSyncedDateTime } from "../views/LastSynced"
 import { ActionLink, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
 
@@ -45,6 +47,10 @@ export function Profile(props: Props) {
     const awsSecretKey = props.settings.storage.awsSecretKey || ""
     const awsRegion = props.settings.storage.awsRegion || ""
 
+    const lastSynced = props.settings.storage.lastSynced
+        ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:MM")
+        : "never"
+
     return (
         <Wrapper layout="col">
             <Card title="Agenda Preferences" id="agenda-preferences">
@@ -75,6 +81,7 @@ export function Profile(props: Props) {
             </Card>
             <Card title="Cloud Sync" id="cloud-sync">
                 <SettingList>
+                    <LastSynced>Last sync: <LastSyncedDateTime>{lastSynced}</LastSyncedDateTime></LastSynced>
                     <ActionLink
                         icon={icons.cloud}
                         shortcuts={["s"]}

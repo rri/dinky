@@ -92,7 +92,10 @@ export const mergeStorageSettings = (state: AppState, value: StorageSettings): A
         settings: {
             ...state.settings,
             storage: {
-                ...state.settings.storage,
+                s3Bucket: state.settings.storage.s3Bucket,
+                awsAccessKey: state.settings.storage.awsAccessKey,
+                awsSecretKey: state.settings.storage.awsSecretKey,
+                awsRegion: state.settings.storage.awsRegion,
                 ...value,
             },
         }
