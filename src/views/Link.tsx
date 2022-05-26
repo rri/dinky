@@ -1,7 +1,7 @@
 import { AnchorHTMLAttributes } from "react"
 import { NavLink } from "react-router-dom"
 
-export function renderLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
+export function Link(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
     const alink = () => <a
         href={props.href}
         title={props.children?.toString()}

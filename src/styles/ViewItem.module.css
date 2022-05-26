@@ -117,11 +117,6 @@ div.data.oneline {
     margin-top: calc(var(--spacing) * 2);
 }
 
-.data p strong>code {
-    color: var(--color-topic);
-    font-weight: 600;
-}
-
 .data p em>code {
     background-color: var(--color-highlight);
     font-style: normal;

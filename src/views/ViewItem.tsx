@@ -12,7 +12,8 @@ import { Button } from './Button'
 import { Icon } from './Icon'
 import { Wrapper } from "./Wrapper"
 import { v4 } from 'uuid'
-import { renderLink } from './Link'
+import { Enriched } from './Enriched'
+import { Link } from './Link'
 import styles from "../styles/ViewItem.module.css"
 
 interface Props {
@@ -96,8 +97,6 @@ export function ViewItem(props: Props) {
         setEdit(false)
     }
 
-    const enrich = (source: string) => source.replaceAll(/#([^\s]+\w)/g, "**`#$1`**")
-
     const item = edit || !props.item.created
         ? <textarea
             autoFocus
@@ -134,11 +133,12 @@ export function ViewItem(props: Props) {
             ].join(" ")}
             onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
             <ReactMarkdown
-                children={enrich(props.item.data)}
+                children={props.item.data}
                 remarkPlugins={[remarkGfm]}
                 disallowedElements={props.oneline ? ["hr"] : []}
                 components={{
-                    a: renderLink
+                    a: Link,
+                    p: Enriched,
                 }}
             />
         </div>
