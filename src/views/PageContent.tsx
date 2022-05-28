@@ -38,6 +38,7 @@ interface Props {
     putTask: (id: string, item: Task) => boolean,
     putTopic: (id: string, item: Topic) => boolean,
     putNote: (id: string, item: Note) => boolean,
+    delTasks: (makeIdList: () => string[]) => void,
     exportData: () => void,
     importData: () => void,
     sync: () => void,
@@ -78,6 +79,7 @@ export function PageContent(props: Props) {
                     tasks={props.contents.tasks}
                     newTask={props.newTask}
                     putTask={props.putTask}
+                    delTasks={props.delTasks}
                     registerNewHandler={props.registerNewHandler}
                 />}
             />
@@ -88,6 +90,7 @@ export function PageContent(props: Props) {
                     tasks={props.contents.tasks}
                     newTask={props.newTask}
                     putTask={props.putTask}
+                    delTasks={props.delTasks}
                     registerNewHandler={props.registerNewHandler}
                 />}
             />

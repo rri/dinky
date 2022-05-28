@@ -115,6 +115,19 @@ export const mergeTask = (state: AppState, id: string, item: Task): AppState => 
     })
 }
 
+export const mergeTasks = (state: AppState, items: Record<string, Task>): AppState => {
+    return ({
+        ...state,
+        contents: {
+            ...state.contents,
+            tasks: {
+                ...state.contents.tasks,
+                ...items,
+            },
+        }
+    })
+}
+
 export const mergeTopic = (state: AppState, id: string, item: Topic): AppState => {
     const topics = { ...state.contents.topics, [id]: item }
     return ({
