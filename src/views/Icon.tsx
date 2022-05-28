@@ -12,6 +12,7 @@ import topics from "@material-design-icons/svg/two-tone/tag.svg"
 import tasks from "@material-design-icons/svg/two-tone/directions_run.svg"
 import tick from "@material-design-icons/svg/two-tone/done.svg"
 import today from "@material-design-icons/svg/two-tone/wb_sunny.svg"
+import trash from "@material-design-icons/svg/two-tone/delete.svg"
 import upload from "@material-design-icons/svg/two-tone/file_upload.svg"
 import styles from "../styles/Icon.module.css"
 
@@ -46,5 +47,6 @@ export const icons = {
     tasks,
     tick,
     today,
+    trash,
     upload,
 } as const

@@ -175,6 +175,11 @@ export function App() {
         return !!data
     }
 
+    const delTasks = (makeIdList: () => string[]) => {
+        const idList = makeIdList()
+        store.delTasks(idList)
+    }
+
     const exportData = () => {
         const toExport: AppState = {
             ...data,
@@ -325,6 +330,7 @@ export function App() {
                 putTask={putTask}
                 putTopic={putTopic}
                 putNote={putNote}
+                delTasks={delTasks}
                 exportData={exportData}
                 importData={importData}
                 sync={sync}

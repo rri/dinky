@@ -1,5 +1,5 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings } from "./AppState"
+import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings, mergeTasks } from "./AppState"
 import { Note } from "./Note"
 import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
@@ -177,6 +177,21 @@ export class LocalStore {
     putNote(id: string, item: Note) {
         this.setData(prev => {
             const updated = mergeNote(prev, id, item)
+            updateLocalStorage("data", JSON.stringify(updated))
+            return updated
+        })
+    }
+
+    delTasks(idList: string[]) {
+        this.setData(prev => {
+            const items: Record<string, Task> = {}
+            idList.forEach(id => {
+                items[id] = {
+                    ...prev.contents.tasks[id],
+                    deleted: new Date().toISOString(),
+                }
+            })
+            const updated = mergeTasks(prev, items)
             updateLocalStorage("data", JSON.stringify(updated))
             return updated
         })

@@ -15,6 +15,7 @@ interface Props {
     },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
+    delTasks: (makeIdList: () => string[]) => void,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -36,16 +37,22 @@ export function Tasks(props: Props) {
         sortBy: [sortByUpdated(true)],
     })
 
-    const action = {
+    const newAction = {
         icon: icons.plus,
         desc: "Add a new task",
         action: () => props.newTask()
     }
 
+    const delAction = {
+        icon: icons.trash,
+        desc: "Delete all completed tasks listed below",
+        action: () => props.delTasks(() => doneTasks.map(item => item.id))
+    }
+
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Backlog" action={action}>
+                <Card title="Backlog" action={newAction}>
                     {
                         openTasks.length
                             ?
@@ -65,7 +72,7 @@ export function Tasks(props: Props) {
                             : <MsgBox emoji="🔨">No tasks in your backlog!</MsgBox>
                     }
                 </Card>
-                <Card title="Done">
+                <Card title="Done" action={delAction}>
                     {
                         doneTasks.length
                             ?

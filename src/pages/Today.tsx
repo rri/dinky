@@ -16,6 +16,7 @@ interface Props {
     },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
+    delTasks: (makeIdList: () => string[]) => void,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -46,16 +47,22 @@ export function Today(props: Props) {
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
 
-    const action = {
+    const newAction = {
         icon: icons.listadd,
         desc: "Add a new task to the backlog",
         action: newTask
     }
 
+    const delAction = {
+        icon: icons.trash,
+        desc: "Delete all completed tasks listed below",
+        action: () => props.delTasks(() => doneTasks.map(item => item.id))
+    }
+
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda" action={action}>
+                <Card title="Agenda" action={newAction}>
                     {
                         openTasks.length
                             ?
@@ -76,7 +83,7 @@ export function Today(props: Props) {
                                 : < MsgBox emoji="🏄">Pick tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink> to get done today!</MsgBox>
                     }
                 </Card>
-                <Card title="Done">
+                <Card title="Done" action={delAction}>
                     {
                         doneTasks.length
                             ?
