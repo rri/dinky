@@ -6,6 +6,7 @@ import { Action } from '../models/Action'
 import { Note } from '../models/Note'
 import { Topic } from '../models/Topic'
 import { Task } from '../models/Task'
+import { Work } from '../models/Work'
 import { IdItem, Item } from "../models/Item"
 import { Term } from '../models/Term'
 import { Button } from './Button'
@@ -33,9 +34,11 @@ interface Props {
     newTask?: (template?: string) => string,
     newTopic?: (template?: string) => string,
     newNote?: (template?: string) => string,
+    newWork?: (template?: string) => string,
     putTask?: (id: string, item: Task) => boolean,
     putTopic?: (id: string, item: Topic) => boolean,
     putNote?: (id: string, item: Note) => boolean,
+    putWork?: (id: string, item: Work) => boolean,
 }
 
 export function ViewItem(props: Props) {
@@ -49,11 +52,13 @@ export function ViewItem(props: Props) {
             "tasks": props.putTask,
             "topics": props.putTopic,
             "notes": props.putNote,
+            "works": props.putWork,
         }[slug]
         const newAction = {
             "tasks": props.newTask,
             "topics": props.newTopic,
             "notes": props.newNote,
+            "works": props.newWork,
         }[slug]
 
         if (putAction) {

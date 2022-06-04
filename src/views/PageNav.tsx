@@ -17,6 +17,7 @@ export function PageNav(props: Props) {
             <PageNavItem name="Topics" slug="topics" icon={icons.topics} clear={props.clear} />
             <PageNavItem name="Notes" slug="notes" icon={icons.notes} clear={props.clear} />
             <Spacer />
+            <PageNavItem name="Library" slug="works" icon={icons.works} hideName={true} clear={props.clear} />
             <PageNavItem name="Profile" slug="profile" icon={icons.profile} hideName={true} clear={props.clear} />
             <PageNavItem name="Help" slug="help" icon={icons.help} hideName={true} clear={props.clear} />
         </Wrapper>

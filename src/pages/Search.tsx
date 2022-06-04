@@ -6,6 +6,7 @@ import { Term } from "../models/Term"
 import { fetchTopics } from "../models/Topic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes } from "../models/Note"
+import { fetchWorks, Work } from "../models/Work"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
@@ -13,6 +14,7 @@ import { ViewNote } from "../views/ViewNote"
 import { ViewTopic } from "../views/ViewTopic"
 import { ViewTask } from "../views/ViewTask"
 import { icons } from "../views/Icon"
+import { ViewWork } from "../views/ViewWork"
 
 type Props = Contents & {
     term: Term,
@@ -23,6 +25,7 @@ type Props = Contents & {
     clear: Action,
     newNote: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
+    putWork: (id: string, item: Work) => boolean,
 }
 
 export function Search(props: Props) {
@@ -51,6 +54,18 @@ export function Search(props: Props) {
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
+    const w1 = fetchWorks({
+        works: props.works,
+        archive: false,
+        sortBy: [sortByUpdated(true), sortByReminder()],
+        term: props.term,
+    })
+    const w2 = fetchWorks({
+        works: props.works,
+        archive: true,
+        sortBy: [sortByUpdated(true)],
+        term: props.term,
+    })
     const z1 = fetchNotes({
         notes: props.notes,
         archive: false,
@@ -64,7 +79,7 @@ export function Search(props: Props) {
         term: props.term,
     })
 
-    const results = x1.length + y1.length + z1.length + x2.length + y2.length + z2.length
+    const results = x1.length + y1.length + w1.length + z1.length + x2.length + y2.length + w2.length + z2.length
 
     return (
         <Wrapper layout="col">
@@ -93,6 +108,18 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
+                                />)
+                            }
+                            {
+                                w1.map(item => <ViewWork
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    today={props.today}
+                                    icon={icons.works}
+                                    clear={props.clear}
+                                    putWork={props.putWork}
                                 />)
                             }
                             {
@@ -126,6 +153,18 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
+                                />)
+                            }
+                            {
+                                w2.map(item => <ViewWork
+                                    key={item.id}
+                                    item={item}
+                                    readonly={true}
+                                    highlight={props.term}
+                                    today={props.today}
+                                    icon={icons.works}
+                                    clear={props.clear}
+                                    putWork={props.putWork}
                                 />)
                             }
                             {

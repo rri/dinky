@@ -67,7 +67,7 @@ export function Notes(props: Props) {
                                 />)
                             }
                         </React.Fragment>
-                        : <MsgBox emoji="📓">No notes in your list!</MsgBox>
+                        : <MsgBox emoji="📓">You haven't created any notes!</MsgBox>
                 }
             </Card>
         </Wrapper>

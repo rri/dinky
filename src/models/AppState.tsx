@@ -5,6 +5,7 @@ import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
+import { Work } from "./Work"
 import { Item } from "./Item"
 
 export interface AppState {
@@ -70,6 +71,7 @@ export const empty = (): AppState => ({
         tasks: {},
         topics: {},
         notes: {},
+        works: {},
     },
 })
 
@@ -152,6 +154,19 @@ export const mergeNote = (state: AppState, id: string, item: Note): AppState => 
     })
 }
 
+export const mergeWork = (state: AppState, id: string, item: Work): AppState => {
+    return ({
+        ...state,
+        contents: {
+            ...state.contents,
+            works: {
+                ...state.contents.works,
+                [id]: item,
+            },
+        }
+    })
+}
+
 export const mergeData = (curr: AppState, data: AppState): AppState => {
 
     const mergeRecordsByUpdated = <T extends Item>(arr1: Record<string, T>, arr2: Record<string, T>) => {
@@ -183,6 +198,7 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
             tasks: mergeRecordsByUpdated(curr.contents.tasks, data.contents.tasks),
             topics: makeUnique(mergeRecordsByUpdated(curr.contents.topics, data.contents.topics)),
             notes: mergeRecordsByUpdated(curr.contents.notes, data.contents.notes),
+            works: mergeRecordsByUpdated(curr.contents.works, data.contents.works),
         }
     }
 }

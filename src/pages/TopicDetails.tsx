@@ -8,16 +8,19 @@ import { Wrapper } from "../views/Wrapper"
 import { ViewTopic } from "../views/ViewTopic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes, Note } from "../models/Note"
+import { fetchWorks, Work } from "../models/Work"
 import { sortByReminder, sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
-import { ViewTask } from "../views/ViewTask"
-import { icons } from "../views/Icon"
 import { ViewNote } from "../views/ViewNote"
+import { ViewTask } from "../views/ViewTask"
+import { ViewWork } from "../views/ViewWork"
+import { icons } from "../views/Icon"
 
 interface Props {
     tasks: Record<string, Task>,
     notes: Record<string, Note>,
     topics: Record<string, Topic>,
+    works: Record<string, Work>,
     topAction: Action,
     clear: Action,
     today: {
@@ -27,6 +30,7 @@ interface Props {
     newNote: (template?: string) => string,
     putTopic: (id: string, item: Topic) => boolean,
     putTask: (id: string, item: Task) => boolean,
+    putWork: (id: string, item: Work) => boolean,
 }
 
 export function TopicDetails(props: Props) {
@@ -48,6 +52,18 @@ export function TopicDetails(props: Props) {
         sortBy: [sortByUpdated(true)],
         term,
     })
+    const w1 = fetchWorks({
+        works: props.works,
+        archive: false,
+        sortBy: [sortByUpdated(true), sortByReminder()],
+        term,
+    })
+    const w2 = fetchWorks({
+        works: props.works,
+        archive: true,
+        sortBy: [sortByUpdated(true)],
+        term,
+    })
     const z1 = fetchNotes({
         notes: props.notes,
         archive: false,
@@ -61,7 +77,7 @@ export function TopicDetails(props: Props) {
         term,
     })
 
-    const results = y1.length + y2.length + z1.length + z2.length
+    const results = y1.length + y2.length + w1.length + w2.length + z1.length + z2.length
 
     return (
         <Wrapper layout="col">
@@ -99,6 +115,18 @@ export function TopicDetails(props: Props) {
                                     />)
                                 }
                                 {
+                                    w1.map(item => <ViewWork
+                                        key={item.id}
+                                        item={item}
+                                        readonly={true}
+                                        highlight={term}
+                                        today={props.today}
+                                        icon={icons.works}
+                                        clear={props.clear}
+                                        putWork={props.putWork}
+                                    />)
+                                }
+                                {
                                     z1.map(item => <ViewNote
                                         key={item.id}
                                         item={item}
@@ -119,6 +147,18 @@ export function TopicDetails(props: Props) {
                                         icon={icons.tasks}
                                         clear={props.clear}
                                         putTask={props.putTask}
+                                    />)
+                                }
+                                {
+                                    w2.map(item => <ViewWork
+                                        key={item.id}
+                                        item={item}
+                                        readonly={true}
+                                        highlight={term}
+                                        today={props.today}
+                                        icon={icons.works}
+                                        clear={props.clear}
+                                        putWork={props.putWork}
                                     />)
                                 }
                                 {

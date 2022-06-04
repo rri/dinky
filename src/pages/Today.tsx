@@ -1,22 +1,26 @@
 import React from "react"
 import { NavLink, useNavigate } from "react-router-dom"
-import { filterByToday, sortByReminder, sortByToday, sortByUpdated } from "../models/Item"
+import { filterByToday, sortByReminder, sortByToday } from "../models/Item"
 import { fetchTasks, Task } from "../models/Task"
+import { fetchWorks, Work } from "../models/Work"
 import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
 import { MsgBox } from "../views/MsgBox"
 import { ViewTask } from "../views/ViewTask"
+import { ViewWork } from "../views/ViewWork"
 import { Wrapper } from "../views/Wrapper"
 
 interface Props {
     tasks: Record<string, Task>,
+    works: Record<string, Work>,
     today: {
         eveningBufferHours: number,
         morningBufferHours: number,
     },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
-    delTasks: (makeIdList: () => string[]) => void,
+    newWork: (template?: string) => string,
+    putWork: (id: string, item: Work) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -27,6 +31,11 @@ export function Today(props: Props) {
     const newTask = () => {
         props.newTask()
         navigate("/tasks")
+    }
+
+    const newWork = () => {
+        props.newWork()
+        navigate("/works")
     }
 
     props.registerNewHandler((evt?: KeyboardEvent) => {
@@ -40,29 +49,29 @@ export function Today(props: Props) {
         sortBy: [sortByToday(), sortByReminder()],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
-    const doneTasks = fetchTasks({
-        tasks: props.tasks,
-        archive: true,
-        sortBy: [sortByUpdated(true)],
+    const openWorks = fetchWorks({
+        works: props.works,
+        archive: false,
+        sortBy: [sortByToday(), sortByReminder()],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
 
-    const newAction = {
+    const newTaskAction = {
         icon: icons.listadd,
         desc: "Add a new task to the backlog",
-        action: newTask
+        action: newTask,
     }
 
-    const delAction = {
-        icon: icons.trash,
-        desc: "Delete all completed tasks listed below",
-        action: () => props.delTasks(() => doneTasks.map(item => item.id))
+    const newWorkAction = {
+        icon: icons.listadd,
+        desc: "Add a new item to your library",
+        action: newWork,
     }
 
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda" action={newAction}>
+                <Card title="Agenda" action={newTaskAction}>
                     {
                         openTasks.length
                             ?
@@ -78,27 +87,26 @@ export function Today(props: Props) {
                                     />)
                                 }
                             </React.Fragment>
-                            : doneTasks.length
-                                ? < MsgBox emoji="🍷">All done for today (or find more <NavLink to="/tasks" title="Go to tasks">tasks</NavLink>)! </MsgBox>
-                                : < MsgBox emoji="🏄">Pick tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink> to get done today!</MsgBox>
+                            : <MsgBox>Pick tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink> to get done today!</MsgBox>
                     }
                 </Card>
-                <Card title="Done" action={delAction}>
+                <Card title="Today's Reading" action={newWorkAction}>
                     {
-                        doneTasks.length
+                        openWorks.length
                             ?
                             <React.Fragment>
                                 {
-                                    doneTasks.map(item => <ViewTask
+                                    openWorks.map(item => <ViewWork
                                         key={item.id}
                                         item={item}
                                         today={props.today}
-                                        putTask={props.putTask}
+                                        newWork={props.newWork}
+                                        putWork={props.putWork}
                                         readonly={true}
                                     />)
                                 }
                             </React.Fragment>
-                            : <MsgBox emoji="🤷">Waiting for you to get something done!</MsgBox>
+                            : <MsgBox>Find items in your <NavLink to="/works" title="Go to your library">library</NavLink> to read today!</MsgBox>
                     }
                 </Card>
             </Wrapper>
