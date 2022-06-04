@@ -193,10 +193,11 @@ export class LocalStore {
 
     delTasks(idList: string[]) {
         this.setData(prev => {
+            const prevTasks = prev.contents.tasks ? prev.contents.tasks : {}
             const items: Record<string, Task> = {}
             idList.forEach(id => {
                 items[id] = {
-                    ...prev.contents.tasks[id],
+                    ...prevTasks[id],
                     deleted: new Date().toISOString(),
                 }
             })

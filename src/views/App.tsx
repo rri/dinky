@@ -61,6 +61,9 @@ export function App() {
         const item = { data: template || "" }
         setData(prev => {
             const res = { ...prev }
+            if (!res.contents.tasks) {
+                res.contents.tasks = {}
+            }
             res.contents.tasks[id] = item
             return res
         })
@@ -72,6 +75,9 @@ export function App() {
         const item = { data: template || "" }
         setData(prev => {
             const res = { ...prev }
+            if (!res.contents.topics) {
+                res.contents.topics = {}
+            }
             res.contents.topics[id] = item
             return res
         })
@@ -83,6 +89,9 @@ export function App() {
         const item = { data: template || "" }
         setData(prev => {
             const res = { ...prev }
+            if (!res.contents.notes) {
+                res.contents.notes = {}
+            }
             res.contents.notes[id] = item
             return res
         })
@@ -94,6 +103,9 @@ export function App() {
         const item = { data: template || "" }
         setData(prev => {
             const res = { ...prev }
+            if (!res.contents.works) {
+                res.contents.works = {}
+            }
             res.contents.works[id] = item
             return res
         })
@@ -118,8 +130,9 @@ export function App() {
             const match = exp.exec(text)
             if (match != null) {
                 const newTopic = match[0]
+                const topics = data.contents.topics ? data.contents.topics : {}
                 if (Object
-                    .values(data.contents.topics)
+                    .values(topics)
                     .filter(topic => topic.data === newTopic)
                     .length === 0) {
                     putTopic(v4(), { data: newTopic })
@@ -146,7 +159,7 @@ export function App() {
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.tasks[id]
+                delete res.contents.tasks?.[id]
                 return res
             })
         } else {
@@ -163,7 +176,7 @@ export function App() {
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.topics[id]
+                delete res.contents.topics?.[id]
                 return res
             })
         } else {
@@ -177,7 +190,7 @@ export function App() {
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.notes[id]
+                delete res.contents.notes?.[id]
                 return res
             })
         } else {
@@ -192,7 +205,7 @@ export function App() {
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.works[id]
+                delete res.contents.works?.[id]
                 return res
             })
         } else {

@@ -31,49 +31,49 @@ type Props = Contents & {
 export function Search(props: Props) {
 
     const x1 = fetchTopics({
-        topics: props.topics,
+        topics: props.topics ? props.topics : {},
         archive: false,
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const x2 = fetchTopics({
-        topics: props.topics,
+        topics: props.topics ? props.topics : {},
         archive: true,
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const y1 = fetchTasks({
-        tasks: props.tasks,
+        tasks: props.tasks ? props.tasks : {},
         archive: false,
         sortBy: [sortByUpdated(true), sortByReminder()],
         term: props.term,
     })
     const y2 = fetchTasks({
-        tasks: props.tasks,
+        tasks: props.tasks ? props.tasks : {},
         archive: true,
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const w1 = fetchWorks({
-        works: props.works,
+        works: props.works ? props.works : {},
         archive: false,
         sortBy: [sortByUpdated(true), sortByReminder()],
         term: props.term,
     })
     const w2 = fetchWorks({
-        works: props.works,
+        works: props.works ? props.works : {},
         archive: true,
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const z1 = fetchNotes({
-        notes: props.notes,
+        notes: props.notes ? props.notes : {},
         archive: false,
         sortBy: [sortByUpdated(true)],
         term: props.term,
     })
     const z2 = fetchNotes({
-        notes: props.notes,
+        notes: props.notes ? props.notes : {},
         archive: true,
         sortBy: [sortByUpdated(true)],
         term: props.term,
