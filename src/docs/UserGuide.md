@@ -88,7 +88,7 @@ Finally, enter the information collected above into your sync settings on the [p
 
 You may export all of your data from the [profile](/profile/#manage-your-data) page. You'll be prompted for the download of a [JSON](https://www.json.org) file with your data. Sensitive settings (such as credentials) are **not** exported. You may import previously exported data from the same page. Any data you import is merged into the existing data based on individual item timestamps, overwriting older entries (where they exist) with newer ones.
 
-For tasks and topics, there's another way to bulk-import items. You may create a new task or topic, and copy-and-paste a newline-separated *list* of items into the input text area. This automatically creates individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new topic, you end up with three individual topics: `#home-improvement`, `#reading`, and `#action-item`. Note that this method of bulk import does **not** apply to notes, as a single note may itself consist of multiple lines.
+For tasks, topics and library items, there's another way to bulk-import items. You may create a new task, topic or library item, and copy-and-paste a newline-separated *list* of items into the input text area. This automatically creates individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new topic, you end up with three individual topics: `#home-improvement`, `#reading`, and `#action-item`. Note that this method of bulk import does **not** apply to notes, as a single note may itself consist of multiple lines.
 
 ```
 home-improvement
