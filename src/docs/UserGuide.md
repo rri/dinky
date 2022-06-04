@@ -12,7 +12,7 @@ Everyday, you can pick tasks in your backlog to be completed, by adding them to 
 
 # Library
 
-You can use your personalized [library](/library) to manage information about your books, papers, articles, journals, blog posts, and other reading material. You can track metadata such as title, author, number of pages, number of chapters and progress towards completion.
+You can use your personalized [library](/library) to manage information about your books, papers, articles, journals, blog posts, and other reading material.
 
 # Reminders
 
