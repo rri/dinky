@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import moment from 'moment'
-import { useState } from "react"
+import React, { useState } from "react"
 import { Action } from '../models/Action'
 import { Note } from '../models/Note'
 import { Topic } from '../models/Topic'
@@ -83,6 +83,16 @@ export function ViewItem(props: Props) {
         }
     }
 
+    const formatData = (data: string): [string, string[]] => {
+        const [main, xtra] = data.split(/\s*\|\s*/, 2)
+        if (xtra) {
+            const [...bits] = xtra.split(/\s*;\s*/)
+            return [main, bits]
+        } else {
+            return [main, []]
+        }
+    }
+
     const updateItem = (update: string, more: boolean) => {
         const drafting = !props.item.created
         if (dirty && (!update || (update !== props.item.data))) {
@@ -101,6 +111,8 @@ export function ViewItem(props: Props) {
         dirty = false
         setEdit(false)
     }
+
+    const [main, bits] = formatData(props.item.data)
 
     const item = edit || !props.item.created
         ? <textarea
@@ -135,10 +147,9 @@ export function ViewItem(props: Props) {
                 props.oneline ? styles.oneline : "",
                 props.details ? styles.link : "",
                 props.item.today && moment(props.item.today).isAfter(moment()) ? styles.reminder : ""
-            ].join(" ")}
-            onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
+            ].join(" ")}>
             <ReactMarkdown
-                children={props.item.data}
+                children={main}
                 remarkPlugins={[remarkGfm]}
                 disallowedElements={props.oneline ? ["hr"] : []}
                 components={{
@@ -149,10 +160,28 @@ export function ViewItem(props: Props) {
         </div>
 
     return (
-        <Wrapper layout="row" className={[styles.main, props.strikethru ? styles.strikethru : ""].join(" ")}>
-            {props.icon && <Icon icon={props.icon} />}
-            {item}
-            {props.actions.map(action => <Button key={action.icon} {...action} />)}
-        </Wrapper >
+        <React.Fragment>
+            <Wrapper layout="col"
+                className={[styles.main, props.strikethru ? styles.strikethru : ""].join(" ")}
+                onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
+                <Wrapper layout="row">
+                    {props.icon && <Icon icon={props.icon} />}
+                    {item}
+                    {props.actions.map(action => <Button key={action.icon} {...action} />)}
+                </Wrapper>
+                {
+                    !(edit || !props.item.created) &&
+                    bits &&
+                    bits.length > 0 &&
+                    <Wrapper layout="row" className={[
+                        styles.bits,
+                        styles.data,
+                        props.readonly ? styles.readonly : "",
+                        props.oneline ? styles.oneline : "",
+                        props.details ? styles.link : "",
+                    ].join(" ")}>{bits.map((bit, i) => <div key={bit + i} className={styles.bit}>{bit}</div>)}</Wrapper>
+                }
+            </Wrapper>
+        </React.Fragment>
     )
 }

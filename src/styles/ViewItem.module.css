@@ -8,6 +8,23 @@
     background-color: var(--color-bg-highlight);
 }
 
+.bits {
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    column-gap: var(--spacing);
+    font-size: x-small;
+    padding: calc(var(--spacing) / 2) var(--spacing);
+}
+
+.bits .bit {
+    background-color: var(--color-bg-highlight);
+    display: inline-block;
+    font-size: x-small;
+    line-height: 1em;
+    padding: calc(var(--spacing) / 2);
+}
+
 .main img {
     height: 24px;
     width: 24px;
