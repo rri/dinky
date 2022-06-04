@@ -7,6 +7,7 @@ import { AppState, empty } from "../models/AppState"
 import { Item } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
+import { Work } from "../models/Work"
 import { Topic } from "../models/Topic"
 import { LocalStore } from "../models/Store"
 import { StorageSettings } from "../models/StorageSettings"
@@ -83,6 +84,17 @@ export function App() {
         setData(prev => {
             const res = { ...prev }
             res.contents.notes[id] = item
+            return res
+        })
+        return id
+    }
+
+    const newWork = (template?: string): string => {
+        const id = v4()
+        const item = { data: template || "" }
+        setData(prev => {
+            const res = { ...prev }
+            res.contents.works[id] = item
             return res
         })
         return id
@@ -175,6 +187,21 @@ export function App() {
         return !!data
     }
 
+    const putWork = (id: string, item: Work): boolean => {
+        const data = item.data?.trim()
+        if (!data && !item.created) {
+            setData(prev => {
+                const res = { ...prev }
+                delete res.contents.works[id]
+                return res
+            })
+        } else {
+            data && createTopics(data)
+            store.putWork(id, enrich(item))
+        }
+        return !!data
+    }
+
     const delTasks = (makeIdList: () => string[]) => {
         const idList = makeIdList()
         store.delTasks(idList)
@@ -247,6 +274,7 @@ export function App() {
         LINK_1: "1",
         LINK_2: "2",
         LINK_3: "3",
+        LINK_L: "l",
         COMMA: ",",
         QUESTION: "shift+?",
         NEW: "n",
@@ -281,6 +309,10 @@ export function App() {
         LINK_3: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
             navigate("/notes")
+        },
+        LINK_L: (evt?: KeyboardEvent) => {
+            evt?.preventDefault()
+            navigate("/works")
         },
         COMMA: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
@@ -325,11 +357,13 @@ export function App() {
                 newTask={newTask}
                 newTopic={newTopic}
                 newNote={newNote}
+                newWork={newWork}
                 putTodaySettings={putTodaySettings}
                 putStorageSettings={putStorageSettings}
                 putTask={putTask}
                 putTopic={putTopic}
                 putNote={putNote}
+                putWork={putWork}
                 delTasks={delTasks}
                 exportData={exportData}
                 importData={importData}

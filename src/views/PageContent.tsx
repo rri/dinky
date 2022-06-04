@@ -4,6 +4,7 @@ import { Action } from "../models/Action"
 import { Task } from "../models/Task"
 import { Topic } from "../models/Topic"
 import { Note } from "../models/Note"
+import { Work } from "../models/Work"
 import { Term } from "../models/Term"
 import { Contents } from "../models/Contents"
 import { Settings } from "../models/Settings"
@@ -16,6 +17,8 @@ import { Tasks } from "../pages/Tasks"
 import { Today } from "../pages/Today"
 import { Topics } from "../pages/Topics"
 import { TopicDetails } from "../pages/TopicDetails"
+import { Works } from "../pages/Works"
+import { WorkDetails } from "../pages/WorkDetails"
 import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
@@ -33,11 +36,13 @@ interface Props {
     newTask: (template?: string) => string,
     newTopic: (template?: string) => string,
     newNote: (template?: string) => string,
+    newWork: (template?: string) => string,
     putTodaySettings: (value: TodaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     putTask: (id: string, item: Task) => boolean,
     putTopic: (id: string, item: Topic) => boolean,
     putNote: (id: string, item: Note) => boolean,
+    putWork: (id: string, item: Work) => boolean,
     delTasks: (makeIdList: () => string[]) => void,
     exportData: () => void,
     importData: () => void,
@@ -63,10 +68,12 @@ export function PageContent(props: Props) {
             tasks={props.contents.tasks}
             notes={props.contents.notes}
             topics={props.contents.topics}
+            works={props.contents.works}
             term={props.term}
             clear={props.clear}
             newNote={props.newNote}
             putTask={props.putTask}
+            putWork={props.putWork}
         />
     )
 
@@ -77,9 +84,11 @@ export function PageContent(props: Props) {
                 element={<Today
                     today={props.settings.today}
                     tasks={props.contents.tasks}
+                    works={props.contents.works}
                     newTask={props.newTask}
+                    newWork={props.newWork}
                     putTask={props.putTask}
-                    delTasks={props.delTasks}
+                    putWork={props.putWork}
                     registerNewHandler={props.registerNewHandler}
                 />}
             />
@@ -136,12 +145,33 @@ export function PageContent(props: Props) {
                     today={props.settings.today}
                     tasks={props.contents.tasks}
                     notes={props.contents.notes}
+                    works={props.contents.works}
                     topics={props.contents.topics}
                     topAction={props.back}
                     clear={props.clear}
                     newNote={props.newNote}
                     putTopic={props.putTopic}
                     putTask={props.putTask}
+                    putWork={props.putWork}
+                />}
+            />
+            <Route
+                path="/works/*"
+                element={<Works
+                    today={props.settings.today}
+                    works={props.contents.works}
+                    newWork={props.newWork}
+                    putWork={props.putWork}
+                    registerNewHandler={props.registerNewHandler}
+                />}
+            />
+            <Route
+                path="/works/:id"
+                element={<WorkDetails
+                    today={props.settings.today}
+                    works={props.contents.works}
+                    topAction={props.back}
+                    putWork={props.putWork}
                 />}
             />
             <Route
