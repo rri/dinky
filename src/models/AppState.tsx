@@ -169,15 +169,15 @@ export const mergeWork = (state: AppState, id: string, item: Work): AppState => 
 
 export const mergeData = (curr: AppState, data: AppState): AppState => {
 
-    const mergeRecordsByUpdated = <T extends Item>(arr1: Record<string, T>, arr2: Record<string, T>) => {
+    const mergeRecordsByUpdated = <T extends Item>(arr1?: Record<string, T>, arr2?: Record<string, T>) => {
         const res: Record<string, T> = {}
         Object
-            .entries(arr1)
+            .entries(arr1 ? arr1 : {})
             .forEach((val: [id: string, obj: T]) => {
                 res[val[0]] = val[1]
             })
         Object
-            .entries(arr2)
+            .entries(arr2 ? arr2 : {})
             .forEach((val: [id: string, obj: T]) => {
                 res[val[0]] = mergeByUpdated(res[val[0]], val[1])
             })
