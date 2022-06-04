@@ -87,7 +87,7 @@ export function Today(props: Props) {
                                     />)
                                 }
                             </React.Fragment>
-                            : <MsgBox>Pick tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink> to get done today!</MsgBox>
+                            : <MsgBox>Add tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink>!</MsgBox>
                     }
                 </Card>
                 <Card title="Today's Reading" action={newWorkAction}>
