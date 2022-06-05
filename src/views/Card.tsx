@@ -10,27 +10,29 @@ interface Props {
     action?: Action,
     id?: string,
     defaultCollapsed?: boolean,
-    collapsable?: boolean,
+    collapsible?: boolean,
 }
 
 export function Card(props: PropsWithChildren<Props>) {
 
-    const [collapsed, setCollapsed] = useState(props.collapsable && props.defaultCollapsed ? true : false)
+    const [collapsed, setCollapsed] = useState(props.collapsible && props.defaultCollapsed ? true : false)
 
-    const toggleCollapseAction: Action = {
+    const toggleCollapseAction = {
         icon: collapsed ? icons.arrowLeft : icons.arrowDown,
         desc: collapsed ? "Click to open" : "Click to close",
         action: () => collapsed ? setCollapsed(false) : setCollapsed(true),
     }
 
+    const useToggleAction = !props.action && props.collapsible
+
     return (
         <Wrapper layout="col" className={styles.main}>
             {props.title &&
-                <div className={styles.titlebar} id={props.id}>
+                <div className={[styles.titlebar, useToggleAction ? styles.link : ""].join(" ")} id={props.id} onClick={useToggleAction ? toggleCollapseAction.action : undefined}>
                     <div className={styles.title}>{props.title}</div>
                     {props.action
                         && <div className={styles.button}><Button {...props.action} /></div>}
-                    {!props.action && props.collapsable
+                    {useToggleAction
                         && <div className={styles.button}><Button {...toggleCollapseAction} /></div>}
                 </div>}
             {
