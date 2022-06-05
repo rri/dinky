@@ -147,7 +147,8 @@ export function ViewItem(props: Props) {
                 props.oneline ? styles.oneline : "",
                 props.details ? styles.link : "",
                 props.item.today && moment(props.item.today).isAfter(moment()) ? styles.reminder : ""
-            ].join(" ")}>
+            ].join(" ")}
+            onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
             <ReactMarkdown
                 children={main}
                 remarkPlugins={[remarkGfm]}
@@ -162,8 +163,7 @@ export function ViewItem(props: Props) {
     return (
         <React.Fragment>
             <Wrapper layout="col"
-                className={[styles.main, props.strikethru ? styles.strikethru : ""].join(" ")}
-                onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
+                className={[styles.main, props.strikethru ? styles.strikethru : ""].join(" ")}>
                 <Wrapper layout="row">
                     {props.icon && <Icon icon={props.icon} />}
                     {item}
@@ -179,7 +179,9 @@ export function ViewItem(props: Props) {
                         props.readonly ? styles.readonly : "",
                         props.oneline ? styles.oneline : "",
                         props.details ? styles.link : "",
-                    ].join(" ")}>{bits.map((bit, i) => <div key={bit + i} className={styles.bit}>{bit}</div>)}</Wrapper>
+                    ].join(" ")}
+                        onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}
+                    >{bits.map((bit, i) => <div key={bit + i} className={styles.bit}>{bit}</div>)}</Wrapper>
                 }
             </Wrapper>
         </React.Fragment>
