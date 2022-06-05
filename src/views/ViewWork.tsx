@@ -35,13 +35,18 @@ export function ViewWork(props: Props) {
 
     const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
 
+    if (!item.archive) {
+        actions.push(
+            {
+                icon: icons.today,
+                desc: today ? "Remove this item from today's agenda" : "Add this item to today's agenda",
+                gray: !today,
+                action: () => props.putWork(id, { ...item, today: today ? undefined : new Date().toISOString() }),
+            },
+        )
+    }
+
     actions.push(
-        {
-            icon: icons.today,
-            desc: today ? "Remove this item from today's agenda" : "Add this item to today's agenda",
-            gray: !today,
-            action: () => props.putWork(id, { ...item, today: today ? undefined : new Date().toISOString() }),
-        },
         {
             icon: icons.tick,
             desc: !props.item.archive ? "Mark this item as done" : "Re-open this item",

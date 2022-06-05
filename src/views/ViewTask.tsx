@@ -35,13 +35,17 @@ export function ViewTask(props: Props) {
 
     const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
 
+    if (!item.archive) {
+        actions.push(
+            {
+                icon: icons.today,
+                desc: today ? "Remove this task from today's agenda" : "Add this task to today's agenda",
+                gray: !today,
+                action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
+            },
+        )
+    }
     actions.push(
-        {
-            icon: icons.today,
-            desc: today ? "Remove this task from today's agenda" : "Add this task to today's agenda",
-            gray: !today,
-            action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
-        },
         {
             icon: icons.tick,
             desc: !props.item.archive ? "Mark this task as done" : "Re-open this task",
