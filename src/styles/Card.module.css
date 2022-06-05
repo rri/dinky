@@ -28,3 +28,7 @@
 .content {
     margin-bottom: var(--spacing);
 }
+
+.empty {
+    margin-bottom: var(--spacing);
+}
