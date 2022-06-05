@@ -12,7 +12,19 @@ Everyday, you can pick tasks in your backlog to be completed, by adding them to 
 
 # Library
 
-You can use your personalized [library](/library) to manage information about your books, papers, articles, journals, blog posts, and other reading material.
+You can use your personalized [library](/library) to manage information about your books, papers, articles, journals, blog posts, and other reading material. When you add items to your library you can use the following special format to capture the title and authors separately. Of course, authors are optional, and you can add as many as you like.
+
+```
+<title> | <primary-author>; <secondary-author>; ...
+```
+
+Here are some real examples of items you might add to your library:
+
+```
+Blog post about [dinky.dev](https://optimix.dev/2022/05/07/dinky-dev/)
+An Equal Music | Vikram Seth
+Calculus | Ron Larson; Bruce H Edwards
+```
 
 # Reminders
 
