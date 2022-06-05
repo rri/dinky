@@ -76,7 +76,7 @@ export function ViewWork(props: Props) {
             oneline={true}
             actions={actions}
             strikethru={false}
-            placeholder={"Enter the title of your reading material..."}
+            placeholder={"Describe your item as <title> | <primary-author>; <secondary-author>; ..."}
             highlight={props.highlight}
             actionOnDelete={props.actionOnDelete ? () => navigate("/" + slug) : undefined}
             autoNew={props.autoNew}
