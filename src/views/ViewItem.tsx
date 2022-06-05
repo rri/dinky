@@ -181,7 +181,7 @@ export function ViewItem(props: Props) {
                         props.details ? styles.link : "",
                     ].join(" ")}
                         onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}
-                    >{bits.map((bit, i) => <div key={bit + i} className={styles.bit}>{bit}</div>)}</Wrapper>
+                    >{bits.map((bit, i) => bit ? <div key={bit + i} className={styles.bit}>{bit}</div> : null)}</Wrapper>
                 }
             </Wrapper>
         </React.Fragment>
