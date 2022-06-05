@@ -125,7 +125,7 @@ export function App() {
     }
 
     const createTopics = (text: string) => {
-        const exp = /#([^\s]+\w)/g
+        const exp = /#([a-zA-Z][a-zA-Z0-9-]*\w)/g
         while (true) {
             const match = exp.exec(text)
             if (match != null) {
@@ -170,9 +170,11 @@ export function App() {
     }
 
     const putTopic = (id: string, item: Topic): boolean => {
-        const data = item.data?.trim()
+        const regx = /^([a-zA-Z][a-zA-Z0-9-]*)/g
+        const cand = item.data?.trim()
             .replaceAll(/^[# ]+/g, "")
-            .replaceAll(/[^a-zA-Z_-]+/g, "-")
+            .replaceAll(/[^a-zA-Z0-9-]+/g, "-")
+        const data = regx.exec(cand) ? cand : ""
         if (!data && !item.created) {
             setData(prev => {
                 const res = { ...prev }
