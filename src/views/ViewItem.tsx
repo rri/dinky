@@ -150,7 +150,7 @@ export function ViewItem(props: Props) {
             ].join(" ")}
             onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
             <ReactMarkdown
-                children={main}
+                children={props.oneline ? main : props.item.data}
                 remarkPlugins={[remarkGfm]}
                 disallowedElements={props.oneline ? ["hr"] : []}
                 components={{
@@ -171,13 +171,14 @@ export function ViewItem(props: Props) {
                 </Wrapper>
                 {
                     !(edit || !props.item.created) &&
+                    props.oneline &&
                     bits &&
                     bits.length > 0 &&
                     <Wrapper layout="row" className={[
                         styles.bits,
                         styles.data,
+                        styles.oneline,
                         props.readonly ? styles.readonly : "",
-                        props.oneline ? styles.oneline : "",
                         props.details ? styles.link : "",
                     ].join(" ")}
                         onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}
