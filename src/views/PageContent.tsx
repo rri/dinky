@@ -205,7 +205,7 @@ export function PageContent(props: Props) {
 
     return (
         <Wrapper layout="col" className={styles.main}>
-            {props.term.source() ? search : routes}
+            {props.term.source().length >= 3 ? search : routes}
         </Wrapper>
     )
 }
