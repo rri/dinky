@@ -53,7 +53,7 @@ export function Profile(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Agenda Preferences" id="agenda-preferences" collapsable={true} defaultCollapsed={true}>
+            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true} defaultCollapsed={true}>
                 <SettingList>
                     <Setting
                         label="Evening buffer (hours)"
@@ -79,7 +79,7 @@ export function Profile(props: Props) {
                     />
                 </SettingList>
             </Card>
-            <Card title="Cloud Sync" id="cloud-sync" collapsable={true} defaultCollapsed={true}>
+            <Card title="Cloud Sync" id="cloud-sync" collapsible={true} defaultCollapsed={true}>
                 <SettingList>
                     <LastSynced>Last sync: <LastSyncedDateTime>{lastSynced}</LastSyncedDateTime></LastSynced>
                     <ActionLink
@@ -125,7 +125,7 @@ export function Profile(props: Props) {
                     />
                 </SettingList>
             </Card>
-            <Card title="Manage Your Data" id="manage-your-data" collapsable={true} defaultCollapsed={true}>
+            <Card title="Manage Your Data" id="manage-your-data" collapsible={true} defaultCollapsed={true}>
                 <SettingList>
                     <ActionLink
                         icon={icons.download}

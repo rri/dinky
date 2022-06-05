@@ -65,7 +65,7 @@ export function Works(props: Props) {
                             : <MsgBox emoji="📚">No items in your library!</MsgBox>
                     }
                 </Card>
-                <Card title="Archives" collapsable={true} defaultCollapsed={true}>
+                <Card title="Archives" collapsible={true} defaultCollapsed={true}>
                     {
                         doneWorks.length
                             ?
