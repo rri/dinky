@@ -42,17 +42,23 @@ const makeUnique = (topics: Record<string, Topic>) => {
             const newTopic = value[1]
             const oldId = chk[newTopic.data]
 
-            if (oldId) {
-                const oldTopic = res[oldId]
-                if (!oldTopic.updated
-                    || (newTopic.updated
-                        && oldTopic.updated < newTopic.updated)) {
-                    delete res[oldId]
-                    res[newId] = newTopic
+            if (newTopic.data) {
+                if (oldId) {
+                    const oldTopic = res[oldId]
+                    if (!oldTopic.updated
+                        || (newTopic.updated
+                            && oldTopic.updated < newTopic.updated)) {
+                        delete res[oldId]
+                        res[newId] = newTopic
+                        chk[newTopic.data] = newId
+                    }
+                } else {
                     chk[newTopic.data] = newId
+                    res[newId] = newTopic
                 }
             } else {
-                chk[newTopic.data] = newId
+                // Skip uniqueness checking altogether, as
+                // this is an empty(that is, deleted) item.
                 res[newId] = newTopic
             }
         })
