@@ -53,33 +53,7 @@ export function Profile(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true} defaultCollapsed={true}>
-                <SettingList>
-                    <Setting
-                        label="Evening buffer (hours)"
-                        onChange={evt => props.putTodaySettings({
-                            ...props.settings.today,
-                            eveningBufferHours: parseInt(evt.currentTarget.value),
-                        })}
-                        type="number"
-                        min={0}
-                        max={24}
-                        value={props.settings.today.eveningBufferHours || 0}
-                    />
-                    <Setting
-                        label="Morning buffer (hours)"
-                        onChange={evt => props.putTodaySettings({
-                            ...props.settings.today,
-                            morningBufferHours: parseInt(evt.currentTarget.value),
-                        })}
-                        type="number"
-                        min={0}
-                        max={24}
-                        value={props.settings.today.morningBufferHours || 0}
-                    />
-                </SettingList>
-            </Card>
-            <Card title="Cloud Sync" id="cloud-sync" collapsible={true} defaultCollapsed={true}>
+            <Card title="Cloud Sync" id="cloud-sync" collapsible={true}>
                 <SettingList>
                     <LastSynced>Last sync: <LastSyncedDateTime>{lastSynced}</LastSyncedDateTime></LastSynced>
                     <ActionLink
@@ -122,6 +96,32 @@ export function Profile(props: Props) {
                         onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value)}
                         onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                    />
+                </SettingList>
+            </Card>
+            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true} defaultCollapsed={true}>
+                <SettingList>
+                    <Setting
+                        label="Evening buffer (hours)"
+                        onChange={evt => props.putTodaySettings({
+                            ...props.settings.today,
+                            eveningBufferHours: parseInt(evt.currentTarget.value),
+                        })}
+                        type="number"
+                        min={0}
+                        max={24}
+                        value={props.settings.today.eveningBufferHours || 0}
+                    />
+                    <Setting
+                        label="Morning buffer (hours)"
+                        onChange={evt => props.putTodaySettings({
+                            ...props.settings.today,
+                            morningBufferHours: parseInt(evt.currentTarget.value),
+                        })}
+                        type="number"
+                        min={0}
+                        max={24}
+                        value={props.settings.today.morningBufferHours || 0}
                     />
                 </SettingList>
             </Card>
