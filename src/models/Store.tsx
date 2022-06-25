@@ -198,6 +198,7 @@ export class LocalStore {
             idList.forEach(id => {
                 items[id] = {
                     ...prevTasks[id],
+                    updated: new Date().toISOString(),
                     deleted: new Date().toISOString(),
                 }
             })
