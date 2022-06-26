@@ -88,3 +88,7 @@ p em,
 li em {
     font-family: var(--font-decorative);
 }
+
+pre {
+    overflow: scroll;
+}
