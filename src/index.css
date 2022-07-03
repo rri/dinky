@@ -1,29 +1,64 @@
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-rgb-fg-notify-box: 53, 56, 57;
+        --color-rgb-bg-notify-box: 255, 255, 255;
+        --color-alpha-bg-notify-box: 1.0;
+        --color-bg-banner: #353839;
+        --color-fg-banner: #ffffff;
+        --color-rgb-fg-text: 202, 209, 216;
+        --color-rgb-bg-text: 55, 56, 57;
+        --color-bg: #404040;
+        --color-alpha-bg: 1.0;
+        --color-fg-text: rgb(var(--color-rgb-fg-text));
+        --color-bg-text: rgb(var(--color-rgb-bg-text));
+        --color-fg-kbd: rgb(var(--color-rgb-fg-text));
+        --color-bg-highlight: rgb(var(--color-rgb-fg-text), 0.15);
+        --color-rgb-link: 0, 191, 255;
+        --color-alpha-link: 0.1;
+        --color-line-1: var(--color-bg-banner);
+        --color-line-2: #dddddd;
+        --color-line-3: #777777;
+        --color-topic: #ff8080;
+        --color-highlight: #ffdf65;
+        --image-gradient-heading: linear-gradient(to bottom, #020202 0%, var(--color-bg-banner) 50%, #121212 100%);
+        --image-gradient-default-light: linear-gradient(to bottom, var(--color-bg-banner), #222222, var(--color-bg-banner));
+        --image-gradient-reverse-light: linear-gradient(to bottom, #222222, var(--color-bg-banner), #222222);
+        --image-gradient-kbd: linear-gradient(to bottom, #828282 0%, #000000 50%, #121212 100%);
+        --filter-icon: invert(80%);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-rgb-bg-notify-box: 53, 56, 57;
+        --color-rgb-fg-notify-box: 255, 255, 255;
+        --color-alpha-bg-notify-box: 0.9;
+        --color-bg-banner: #353839;
+        --color-fg-banner: #ffffff;
+        --color-rgb-fg-text: 51, 51, 51;
+        --color-rgb-bg-text: 255, 255, 255;
+        --color-bg: #f0f0f0;
+        --color-alpha-bg: 0.3;
+        --color-fg-text: rgb(var(--color-rgb-fg-text));
+        --color-bg-text: rgb(var(--color-rgb-bg-text));
+        --color-fg-kbd: rgb(var(--color-rgb-fg-text));
+        --color-bg-highlight: rgb(var(--color-rgb-fg-text), 0.15);
+        --color-rgb-link: 0, 191, 255;
+        --color-alpha-link: 0.1;
+        --color-line-1: var(--color-bg-banner);
+        --color-line-2: #777777;
+        --color-line-3: #999999;
+        --color-topic: #ff0000;
+        --color-highlight: #ffdf65;
+        --image-gradient-heading: linear-gradient(to bottom, #c2c2c2 0%, #d2d2d2 50%, #e2e2e2 100%);
+        --image-gradient-default-light: linear-gradient(to bottom, #dddddd, #ffffff, #dddddd);
+        --image-gradient-reverse-light: linear-gradient(to bottom, #ffffff, #dddddd, #ffffff);
+        --image-gradient-kbd: linear-gradient(to bottom, #f9f9f9 0%, #ffffff 50%, #c0c0c0 100%);
+        --filter-icon: none;
+    }
+}
+
 :root {
-    --color-rgb-bg-notify-box: 53, 56, 57;
-    --color-rgb-fg-notify-box: 255, 255, 255;
-    --color-alpha-bg-notify-box: 0.9;
-    --color-bg-banner: #353839;
-    --color-fg-banner: #ffffff;
-    --color-rgb-fg-text: 51, 51, 51;
-    --color-rgb-bg-text: 255, 255, 255;
-    --color-bg: #f0f0f0;
-    --color-alpha-bg: 0.3;
-    --color-fg-text: rgb(var(--color-rgb-fg-text));
-    --color-bg-text: rgb(var(--color-rgb-bg-text));
-    --color-fg-kbd: rgb(var(--color-rgb-fg-text));
-    --color-bg-highlight: rgb(var(--color-rgb-fg-text), 0.15);
-    --color-rgb-link: 0, 191, 255;
-    --color-alpha-link: 0.1;
-    --color-line-1: var(--color-bg-banner);
-    --color-line-2: #777777;
-    --color-line-3: #999999;
-    --color-topic: #ff0000;
-    --color-highlight: #ffdf65;
-    --image-gradient-heading: linear-gradient(to bottom, #c2c2c2 0%, #d2d2d2 50%, #e2e2e2 100%);
-    --image-gradient-default-light: linear-gradient(to bottom, #dddddd, #ffffff, #dddddd);
-    --image-gradient-reverse-light: linear-gradient(to bottom, #ffffff, #dddddd, #ffffff);
-    --image-gradient-kbd: linear-gradient(to bottom, #f9f9f9 0%, #ffffff 50%, #c0c0c0 100%);
-    --filter-icon: none;
     --font-content: sans-serif;
     --font-code: monospace;
     --font-decorative: serif;
