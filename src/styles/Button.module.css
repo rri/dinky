@@ -1,5 +1,6 @@
 .icon {
     cursor: pointer;
+    filter: var(--filter-icon);
     padding: calc(var(--spacing) / 4);
 }
 
@@ -8,7 +9,7 @@
 }
 
 .gray {
-    opacity: 0.1;
+    opacity: 0.3;
 }
 
 .gray:hover {

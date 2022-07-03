@@ -4,5 +4,6 @@
 
 .main {
     background: var(--image-gradient-default-light);
+    border: none;
     padding: var(--spacing);
 }
