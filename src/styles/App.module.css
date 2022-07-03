@@ -4,5 +4,6 @@
 }
 
 .main {
+    background-color: rgb(var(--color-rgb-bg-text), var(--color-alpha-bg));
     font-family: var(--font-content);
 }

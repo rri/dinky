@@ -1,6 +1,4 @@
 .main {
-    background-color: var(--color-bg-text);
-    color: var(--color-fg-text);
     column-gap: var(--spacing);
     font-size: 1em;
     justify-content: center;

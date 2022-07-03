@@ -1,6 +1,6 @@
 .main {
-    border-top: var(--width-line) solid var(--color-line-2);
-    border-bottom: var(--width-line) solid var(--color-line-2);
+    border-top: var(--width-line) solid var(--color-line-3);
+    border-bottom: var(--width-line) solid var(--color-line-3);
     font-family: var(--font-decorative);
     font-style: italic;
     margin-bottom: var(--spacing);

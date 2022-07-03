@@ -9,7 +9,7 @@
 .main.active,
 .main:hover,
 .main:active {
-    border-color: var(--color-line-2);
+    border-color: var(--color-line-3);
     border-bottom-color: var(--color-bg-text);
     z-index: 100;
 }
@@ -19,6 +19,7 @@
 }
 
 .main .icon {
+    filter: var(--filter-icon);
     height: var(--width-icon);
     width: var(--width-icon);
 }

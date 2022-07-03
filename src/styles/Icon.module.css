@@ -1,4 +1,4 @@
 .icon {
+    filter: var(--filter-icon);
     padding: calc(var(--spacing) / 4);
 }
-

@@ -134,12 +134,6 @@ div.data.oneline {
     margin-top: calc(var(--spacing) * 2);
 }
 
-.data p em>code {
-    background-color: var(--color-highlight);
-    font-style: normal;
-    font-family: inherit;
-}
-
 .data.oneline h1,
 .data.oneline h2,
 .data.oneline h3,
