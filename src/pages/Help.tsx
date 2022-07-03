@@ -27,7 +27,7 @@ export function Help(props: Props) {
                     <Shortcut codes={["/"]}>Start type-to-search</Shortcut>
                 </ShortcutList>
                 <ShortcutList group="Content">
-                    <Shortcut codes={["n"]}>New task (on <NavLink to="/tasks" title="Go to tasks">tasks</NavLink> page)</Shortcut>
+                    <Shortcut codes={["n"]}>New task (on <NavLink to="/tasks" title="Go to tasks">tasks</NavLink> and <NavLink to="/" title="Go to today's agenda">agenda</NavLink> pages)</Shortcut>
                     <Shortcut codes={["n"]}>New topic (on <NavLink to="/topics" title="Go to topics">topics</NavLink> page)</Shortcut>
                     <Shortcut codes={["n"]}>New note (on <NavLink to="/notes" title="Go to notes">notes</NavLink> page)</Shortcut>
                     <Shortcut codes={["n"]}>New library item (on <NavLink to="/works" title="Go to library">library</NavLink> page)</Shortcut>
