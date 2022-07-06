@@ -17,7 +17,7 @@
         --color-alpha-link: 0.1;
         --color-line-1: var(--color-bg-banner);
         --color-line-2: #dddddd;
-        --color-line-3: #777777;
+        --color-line-3: #444444;
         --color-topic: #ff8080;
         --color-highlight: #ffdf65;
         --image-gradient-heading: linear-gradient(to bottom, #020202 0%, var(--color-bg-banner) 50%, #121212 100%);
