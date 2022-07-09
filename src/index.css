@@ -43,7 +43,7 @@
         --color-bg-text: rgb(var(--color-rgb-bg-text));
         --color-fg-kbd: rgb(var(--color-rgb-fg-text));
         --color-bg-highlight: rgb(var(--color-rgb-fg-text), 0.15);
-        --color-rgb-link: 0, 191, 255;
+        --color-rgb-link: 1, 111, 222;
         --color-alpha-link: 0.1;
         --color-line-1: var(--color-bg-banner);
         --color-line-2: #777777;
