@@ -50,7 +50,7 @@ export function Notes(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Notes" action={action}>
+            <Card title="Notes" action={action} count={results.length ? results.length : undefined}>
                 {
                     results.length
                         ?

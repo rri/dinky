@@ -19,6 +19,12 @@
     padding: var(--spacing);
 }
 
+.info {
+    display: flex;
+    font-size: small;
+    align-items: center;
+}
+
 .button {
     display: flex;
 }

@@ -71,7 +71,7 @@ export function Today(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda" action={newTaskAction}>
+                <Card title="Agenda" action={newTaskAction} count={openTasks.length ? openTasks.length : undefined}>
                     {
                         openTasks.length
                             ?
@@ -90,7 +90,7 @@ export function Today(props: Props) {
                             : <MsgBox>Add tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink>!</MsgBox>
                     }
                 </Card>
-                <Card title="Today's Reading" action={newWorkAction}>
+                <Card title="Today's Reading" action={newWorkAction} count={openWorks.length ? openWorks.length : undefined}>
                     {
                         openWorks.length
                             ?

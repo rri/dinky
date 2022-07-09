@@ -52,7 +52,7 @@ export function Tasks(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Backlog" action={newAction}>
+                <Card title="Backlog" action={newAction} count={openTasks.length ? openTasks.length : undefined}>
                     {
                         openTasks.length
                             ?
@@ -72,7 +72,7 @@ export function Tasks(props: Props) {
                             : <MsgBox emoji="🔨">No tasks in your backlog!</MsgBox>
                     }
                 </Card>
-                <Card title="Done" action={delAction}>
+                <Card title="Done" action={delAction} count={doneTasks.length ? doneTasks.length : undefined}>
                     {
                         doneTasks.length
                             ?
