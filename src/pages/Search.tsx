@@ -83,7 +83,7 @@ export function Search(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Search Results" action={props.clear}>
+            <Card title="Search Results" action={props.clear} count={results ? results : undefined}>
                 {
                     results
                         ?

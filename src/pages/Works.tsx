@@ -45,7 +45,7 @@ export function Works(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Library" action={newAction}>
+                <Card title="Library" action={newAction} count={openWorks.length ? openWorks.length : undefined}>
                     {
                         openWorks.length
                             ?
@@ -65,7 +65,7 @@ export function Works(props: Props) {
                             : <MsgBox emoji="📚">No items in your library!</MsgBox>
                     }
                 </Card>
-                <Card title="Archives" collapsible={true} defaultCollapsed={true}>
+                <Card title="Archives" collapsible={true} defaultCollapsed={true} count={doneWorks.length ? doneWorks.length : undefined}>
                     {
                         doneWorks.length
                             ?

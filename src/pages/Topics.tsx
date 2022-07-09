@@ -43,7 +43,7 @@ export function Topics(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Topics" action={action}>
+            <Card title="Topics" action={action} count={results.length ? results.length : undefined}>
                 {
                     results.length
                         ?

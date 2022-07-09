@@ -97,7 +97,7 @@ export function TopicDetails(props: Props) {
             {
                 item && found
                 &&
-                <Card title="Related">
+                <Card title="Related" count={results ? results : undefined}>
                     {
                         results
                             ?

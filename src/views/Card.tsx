@@ -4,10 +4,12 @@ import { Button } from "./Button"
 import { Wrapper } from "./Wrapper"
 import styles from "../styles/Card.module.css"
 import { icons } from "./Icon"
+import pluralize from "pluralize"
 
 interface Props {
     title?: string,
     action?: Action,
+    count?: number,
     id?: string,
     defaultCollapsed?: boolean,
     collapsible?: boolean,
@@ -30,6 +32,8 @@ export function Card(props: PropsWithChildren<Props>) {
             {props.title &&
                 <div className={[styles.titlebar, useToggleAction ? styles.link : ""].join(" ")} id={props.id} onClick={useToggleAction ? toggleCollapseAction.action : undefined}>
                     <div className={styles.title}>{props.title}</div>
+                    {props.count
+                        && <div className={styles.info}>({pluralize("items", props.count, true)})</div>}
                     {props.action
                         && <div className={styles.button}><Button {...props.action} /></div>}
                     {useToggleAction

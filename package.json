@@ -45,6 +45,8 @@
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.94.0",
+        "@types/pluralize": "^0.0.29",
+        "pluralize": "^8.0.0",
         "react-string-replace": "^1.1.0"
     }
 }
