@@ -9,7 +9,7 @@ import { ViewTopic } from "../views/ViewTopic"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchNotes, Note } from "../models/Note"
 import { fetchWorks, Work } from "../models/Work"
-import { sortByReminder, sortByUpdated } from "../models/Item"
+import { sortByReminder, sortByCreated, sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
 import { ViewNote } from "../views/ViewNote"
 import { ViewTask } from "../views/ViewTask"
@@ -43,25 +43,25 @@ export function TopicDetails(props: Props) {
     const y1 = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: [sortByUpdated(true), sortByReminder()],
+        sortBy: [sortByCreated(true), sortByReminder()],
         term,
     })
     const y2 = fetchTasks({
         tasks: props.tasks,
         archive: true,
-        sortBy: [sortByUpdated(true)],
+        sortBy: [sortByCreated(true)],
         term,
     })
     const w1 = fetchWorks({
         works: props.works,
         archive: false,
-        sortBy: [sortByUpdated(true), sortByReminder()],
+        sortBy: [sortByCreated(true), sortByReminder()],
         term,
     })
     const w2 = fetchWorks({
         works: props.works,
         archive: true,
-        sortBy: [sortByUpdated(true)],
+        sortBy: [sortByCreated(true)],
         term,
     })
     const z1 = fetchNotes({
