@@ -5,3 +5,11 @@
     letter-spacing: 0.05em;
     padding: calc(var(--spacing) * 2);
 }
+
+.reload {
+    cursor: pointer;
+}
+
+.reload:hover {
+    transform: scale(1.2);
+}
