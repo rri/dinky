@@ -23,6 +23,7 @@
     display: flex;
     font-size: small;
     align-items: center;
+    padding: 0 calc(var(--spacing) / 4);
 }
 
 .button {
