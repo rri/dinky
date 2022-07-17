@@ -1,5 +1,7 @@
-import { filterByArchive, filterByDeleted, reduceByTerm, Item, Sorter } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, DataObj, Deletable, Updatable } from "./Item"
 import { Term } from "./Term"
+
+export type Note = DataObj & Creatable & Deletable & Updatable
 
 interface Props {
     notes: Record<string, Note>,
@@ -7,8 +9,6 @@ interface Props {
     sortBy: Sorter[],
     term?: Term,
 }
-
-export interface Note extends Item {}
 
 export function fetchNotes(props: Props) {
     const res = Object

@@ -1,7 +1,7 @@
-import { Archivable, filterByArchive, filterByDeleted, reduceByTerm, Item, Sorter } from "./Item"
+import { Archivable, filterByArchive, filterByDeleted, reduceByTerm, Schedulable, Sorter, Creatable, Deletable, Updatable, DataObj } from "./Item"
 import { Term } from "./Term"
 
-export interface Work extends Item, Archivable { }
+export type Work = DataObj & Creatable & Deletable & Updatable & Schedulable & Archivable
 
 interface Props {
     works: Record<string, Work>,

@@ -7,7 +7,7 @@ import { Note } from '../models/Note'
 import { Topic } from '../models/Topic'
 import { Task } from '../models/Task'
 import { Work } from '../models/Work'
-import { Id, Item } from "../models/Item"
+import { Creatable, DataObj, Deletable, Id, Schedulable, Updatable } from "../models/Item"
 import { Term } from '../models/Term'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -19,7 +19,7 @@ import styles from "../styles/ViewItem.module.css"
 
 interface Props {
     slug: string,
-    item: Id & Item,
+    item: Id & DataObj & Creatable & Deletable & Updatable & Schedulable,
     placeholder: string,
     strikethru?: boolean,
     readonly?: boolean,
@@ -47,7 +47,7 @@ export function ViewItem(props: Props) {
 
     const [edit, setEdit] = useState(false)
 
-    const putItem = (id: string, item: Item, update: string, slug: string, more?: boolean, autoNew?: boolean, drafting?: boolean, bulkAdd?: boolean, actionOnDelete?: () => void) => {
+    const putItem = (id: string, item: any, update: string, slug: string, more?: boolean, autoNew?: boolean, drafting?: boolean, bulkAdd?: boolean, actionOnDelete?: () => void) => {
         const putAction = {
             "tasks": props.putTask,
             "topics": props.putTopic,
