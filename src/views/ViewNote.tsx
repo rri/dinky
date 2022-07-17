@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Note } from "../models/Note"
-import { Creatable, DataObj, Deletable, Id, Updatable } from "../models/Item"
+import { Id } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: Id & DataObj & Creatable & Deletable & Updatable,
+    item: Id & Note,
     hideDetails?: boolean,
     icon?: string,
     oneline?: boolean,

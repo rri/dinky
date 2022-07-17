@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Work } from "../models/Work"
-import { belongsToToday, Id, Schedulable, Archivable, Creatable, Deletable, Updatable, DataObj } from "../models/Item"
+import { belongsToToday, Id } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: Id & DataObj & Creatable & Deletable & Updatable & Schedulable & Archivable,
+    item: Id & Work,
     hideDetails?: boolean,
     today: {
         eveningBufferHours: number,
