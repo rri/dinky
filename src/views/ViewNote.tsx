@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Note } from "../models/Note"
-import { IdItem } from "../models/Item"
+import { Id, Item } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: IdItem,
+    item: Id & Item,
     hideDetails?: boolean,
     icon?: string,
     oneline?: boolean,
@@ -35,7 +35,6 @@ export function ViewNote(props: Props) {
 
     props.hideDetails
         || props.readonly
-        || props.item.archive
         || actions.push(
             {
                 icon: icons.more,
@@ -48,7 +47,7 @@ export function ViewNote(props: Props) {
             key={props.item.id}
             slug={slug}
             item={props.item}
-            strikethru={props.item.archive}
+            strikethru={false}
             icon={props.icon}
             rows={10}
             oneline={props.oneline}

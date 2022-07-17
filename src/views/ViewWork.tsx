@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Work } from "../models/Work"
-import { belongsToToday, IdItem } from "../models/Item"
+import { belongsToToday, Id, Item, Archivable } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: IdItem,
+    item: Id & Item & Archivable,
     hideDetails?: boolean,
     today: {
         eveningBufferHours: number,
@@ -29,19 +29,19 @@ export function ViewWork(props: Props) {
 
     const slug = "works"
 
-    const { id, ...item } = props.item
+    const { id, archive, ...item } = props.item
 
     const actions: Action[] = []
 
     const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
 
-    if (!item.archive) {
+    if (!archive) {
         actions.push(
             {
                 icon: icons.today,
                 desc: today ? "Remove this item from today's agenda" : "Add this item to today's agenda",
                 gray: !today,
-                action: () => props.putWork(id, { ...item, today: today ? undefined : new Date().toISOString() }),
+                action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
             },
         )
     }
@@ -51,7 +51,7 @@ export function ViewWork(props: Props) {
             icon: icons.tick,
             desc: !props.item.archive ? "Mark this item as done" : "Re-open this item",
             gray: !props.item.archive,
-            action: () => props.putWork(id, { ...item, archive: !props.item.archive }),
+            action: () => props.putWork(id, { ...item, archive: !archive }),
         },
     )
 
@@ -76,7 +76,7 @@ export function ViewWork(props: Props) {
             key={id}
             slug={slug}
             item={props.item}
-            readonly={props.readonly ? props.readonly : item.archive}
+            readonly={props.readonly ? props.readonly : archive}
             icon={props.icon}
             oneline={true}
             actions={actions}

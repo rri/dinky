@@ -1,4 +1,4 @@
-import { filterByArchive, filterByDeleted, Item, reduceByTerm, Sorter } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Item, Sorter } from "./Item"
 import { Term } from "./Term"
 
 interface Props {

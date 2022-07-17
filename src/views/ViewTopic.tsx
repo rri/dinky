@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
-import { IdItem } from "../models/Item"
+import { Id, Item } from "../models/Item"
 import { Topic } from "../models/Topic"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: IdItem,
+    item: Id & Item,
     hideDetails?: boolean,
     autoNew?: boolean,
     clear?: Action,
@@ -43,7 +43,6 @@ export function ViewTopic(props: Props) {
 
     props.hideDetails
         || props.readonly
-        || props.item.archive
         || actions.push(
             {
                 icon: icons.more,
@@ -59,7 +58,7 @@ export function ViewTopic(props: Props) {
             oneline={true}
             readonly={props.readonly}
             actions={actions}
-            strikethru={props.item.archive}
+            strikethru={false}
             placeholder={"Describe your topic..."}
             highlight={props.highlight}
             actionOnDelete={props.actionOnDelete ? () => navigate("/" + slug) : undefined}
