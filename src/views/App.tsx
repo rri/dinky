@@ -272,8 +272,7 @@ export function App() {
     const sync = () => {
         notify("Syncing to the cloud...")
         store
-            .sync(data)
-            .then((res: boolean) => notify(res ? "Sync complete!" : "Sync not set up!"))
+            .sync(notify, data)
             .catch(e => notify("Sync failed: " + e.desc))
     }
 
