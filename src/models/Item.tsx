@@ -5,14 +5,23 @@ export interface Id {
     id: string,
 }
 
+export interface Creatable {
+    created?: string,
+}
+
+export interface Deletable {
+    deleted?: string,
+}
+
 export interface Updatable {
     updated?: string,
 }
 
-export interface Item extends Updatable {
+export interface DataObj {
     data: string,
-    created?: string,
-    deleted?: string,
+}
+
+export interface Schedulable {
     today?: string,
 }
 
@@ -20,13 +29,13 @@ export interface Archivable {
     archive?: boolean,
 }
 
-export type Sorter = <T extends Item>(x: T, y: T) => 1 | -1 | 0
+export type Sorter = (x: any, y: any) => 1 | -1 | 0
 
 function filterByStatus(extractor: (obj: any) => any, status: boolean) {
     return (obj: any) => extractor(obj) ? status : !status
 }
 
-function sortByChronology<T extends Item>(extractor: (item: T) => Date, reverse?: boolean) {
+function sortByChronology<T extends Creatable | Deletable | Updatable | Schedulable>(extractor: (item: T) => Date, reverse?: boolean) {
     return (x: T, y: T) => {
         const a = extractor(x)
         const b = extractor(y)
@@ -76,7 +85,7 @@ export function filterByArchive(archive: boolean) {
     return filterByStatus(item => item.archive, archive)
 }
 
-export function filterByToday<T extends Item>(eveningBufferHours: number, morningBufferHours: number) {
+export function filterByToday<T extends Schedulable>(eveningBufferHours: number, morningBufferHours: number) {
     return (item: T) => {
         const referencePoint = Number.parseInt(moment().format("H")) >= morningBufferHours
             ? moment()
@@ -113,26 +122,26 @@ export function sortByData<T extends { data: string }>(reverse?: boolean) {
 }
 
 export function sortByCreated(reverse?: boolean) {
-    return sortByChronology(item => withDefaultDate(item.created, new Date()), reverse)
+    return sortByChronology((item: Creatable) => withDefaultDate(item.created, new Date()), reverse)
 }
 
 export function sortByUpdated(reverse?: boolean) {
-    return sortByChronology(item => withDefaultDate(item.updated, new Date()), reverse)
+    return sortByChronology((item: Updatable) => withDefaultDate(item.updated, new Date()), reverse)
 }
 
 export function sortByDeleted(reverse?: boolean) {
-    return sortByChronology(item => withDefaultDate(item.deleted, new Date()), reverse)
+    return sortByChronology((item: Deletable) => withDefaultDate(item.deleted, new Date()), reverse)
 }
 
 export function sortByToday(reverse?: boolean) {
-    return sortByChronology(item => withDefaultDate(item.today, new Date()), reverse)
+    return sortByChronology((item: Schedulable) => withDefaultDate(item.today, new Date()), reverse)
 }
 
-export function belongsToToday<T extends Item>(item: T, eveningBufferHours: number, morningBufferHours: number) {
+export function belongsToToday<T extends Schedulable>(item: T, eveningBufferHours: number, morningBufferHours: number) {
     return filterByToday(eveningBufferHours, morningBufferHours)(item)
 }
 
-export function sortByReminder<T extends Item>() {
+export function sortByReminder<T extends Schedulable>() {
     return (x: T, y: T) => {
         const a = x.today
         const b = y.today

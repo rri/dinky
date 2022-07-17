@@ -6,7 +6,6 @@ import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 import { Work } from "./Work"
-import { Item } from "./Item"
 
 export interface AppState {
     error?: string,
@@ -175,16 +174,16 @@ export const mergeWork = (state: AppState, id: string, item: Work): AppState => 
 
 export const mergeData = (curr: AppState, data: AppState): AppState => {
 
-    const mergeRecordsByUpdated = <T extends Item>(arr1?: Record<string, T>, arr2?: Record<string, T>) => {
-        const res: Record<string, T> = {}
+    const mergeRecordsByUpdated = (arr1?: Record<string, any>, arr2?: Record<string, any>) => {
+        const res: Record<string, any> = {}
         Object
             .entries(arr1 ? arr1 : {})
-            .forEach((val: [id: string, obj: T]) => {
+            .forEach((val: [id: string, obj: any]) => {
                 res[val[0]] = val[1]
             })
         Object
             .entries(arr2 ? arr2 : {})
-            .forEach((val: [id: string, obj: T]) => {
+            .forEach((val: [id: string, obj: any]) => {
                 res[val[0]] = mergeByUpdated(res[val[0]], val[1])
             })
         return res

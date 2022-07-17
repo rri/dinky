@@ -4,7 +4,7 @@ import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
 import { AppState, empty } from "../models/AppState"
-import { Item } from "../models/Item"
+import { Creatable, DataObj, Deletable, Updatable } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
 import { Work } from "../models/Work"
@@ -112,7 +112,7 @@ export function App() {
         return id
     }
 
-    const enrich = <T extends Item,>(item: T): T => {
+    const enrich = <T extends DataObj & Creatable & Deletable & Updatable,>(item: T): T => {
         return {
             ...item,
             created: item.created ? item.created : moment().toISOString(),
