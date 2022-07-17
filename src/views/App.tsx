@@ -152,18 +152,18 @@ export function App() {
     }
 
     const putTask = (id: string, item: Task): boolean => {
-        const data = item.data?.trim()
-        if (!data && !item.created) {
+        const itemData = item.data?.trim()
+        if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
                 delete res.contents.tasks?.[id]
                 return res
             })
         } else {
-            data && createTopics(data)
-            store.putTask(id, enrich(item))
+            itemData && createTopics(itemData)
+            store.putTask(data.settings.storage, id, enrich(item))
         }
-        return !!data
+        return !!itemData
     }
 
     const putTopic = (id: string, item: Topic): boolean => {
@@ -171,47 +171,47 @@ export function App() {
         const cand = item.data?.trim()
             .replaceAll(/^[# ]+/g, "")
             .replaceAll(/[^a-zA-Z0-9-]+/g, "-")
-        const data = regx.exec(cand) ? cand : ""
-        if (!data && !item.created) {
+        const itemData = regx.exec(cand) ? cand : ""
+        if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
                 delete res.contents.topics?.[id]
                 return res
             })
         } else {
-            store.putTopic(id, { ...enrich(item), data: data ? `#${data}` : "" })
+            store.putTopic(data.settings.storage, id, { ...enrich(item), data: itemData ? `#${itemData}` : "" })
         }
-        return !!data
+        return !!itemData
     }
 
     const putNote = (id: string, item: Note): boolean => {
-        const data = item.data?.trim()
-        if (!data && !item.created) {
+        const itemData = item.data?.trim()
+        if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
                 delete res.contents.notes?.[id]
                 return res
             })
         } else {
-            data && createTopics(data)
-            store.putNote(id, enrich(item))
+            itemData && createTopics(itemData)
+            store.putNote(data.settings.storage, id, enrich(item))
         }
-        return !!data
+        return !!itemData
     }
 
     const putWork = (id: string, item: Work): boolean => {
-        const data = item.data?.trim()
-        if (!data && !item.created) {
+        const itemData = item.data?.trim()
+        if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
                 delete res.contents.works?.[id]
                 return res
             })
         } else {
-            data && createTopics(data)
-            store.putWork(id, enrich(item))
+            itemData && createTopics(itemData)
+            store.putWork(data.settings.storage, id, enrich(item))
         }
-        return !!data
+        return !!itemData
     }
 
     const delTasks = (makeIdList: () => string[]) => {

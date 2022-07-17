@@ -5,6 +5,10 @@ export interface Id {
     id: string,
 }
 
+export interface Event {
+    evt: string,
+}
+
 export interface Creatable {
     created?: string,
 }
@@ -28,6 +32,11 @@ export interface Schedulable {
 export interface Archivable {
     archive?: boolean,
 }
+export interface Typed {
+    type: "task" | "topic" | "note" | "work"
+}
+
+export type Writable = Event & Id & Typed & Updatable
 
 export type Sorter = (x: any, y: any) => 1 | -1 | 0
 

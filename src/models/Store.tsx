@@ -6,13 +6,141 @@ import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 import { Work } from "./Work"
+import { Writable } from "./Item"
+import { v4 } from "uuid"
 
-const updateLocalStorage = (key: string, val: string) => {
+const putIntoLocalStorage = (key: string, val: string) => {
     localStorage.setItem(key, val)
 }
 
-const reloadLocalStorage = (key: string): string | null => {
+const getFromLocalStorage = (key: string): string | null => {
     return localStorage.getItem(key)
+}
+
+const validateStorageSettings = (storageSettings: StorageSettings) => {
+    if (!storageSettings.s3Bucket
+        || !storageSettings.awsAccessKey
+        || !storageSettings.awsSecretKey
+        || !storageSettings.awsRegion) {
+        return false
+    }
+    return true
+}
+
+const checkHttpStatusCode = (err: any, httpStatusCode?: number) => {
+    if (httpStatusCode) {
+        if (httpStatusCode < 200 || httpStatusCode >= 500) {
+            err.desc = "unexpected server error"
+            throw err
+        }
+        if (httpStatusCode < 400 && httpStatusCode >= 300) {
+            if (httpStatusCode !== 304) {
+                err.desc = "unexpected redirect"
+                throw err
+            }
+        }
+        if (httpStatusCode < 500 && httpStatusCode >= 400) {
+            if (httpStatusCode === 401) {
+                err.desc = "missing authentication credentials"
+                throw err
+            }
+            if (httpStatusCode === 403) {
+                err.desc = "invalid authentication credentials"
+                throw err
+            }
+        }
+    } else {
+        err.desc = "unexpected error"
+        throw err
+    }
+}
+
+const flush = (storageSettings: StorageSettings) => flushAsync(storageSettings)
+    .catch(() => {
+        setTimeout(() => flush(storageSettings), 60000)
+    })
+
+const flushAsync = async (storageSettings: StorageSettings) => {
+    if (!validateStorageSettings(storageSettings)) {
+        return
+    }
+
+    const client = new S3Client({
+        credentials: {
+            accessKeyId: storageSettings.awsAccessKey || "",
+            secretAccessKey: storageSettings.awsSecretKey || "",
+        },
+        region: storageSettings.awsRegion,
+        maxAttempts: 1,
+    })
+
+    const res = getFromLocalStorage("redo")
+    let cnt = 0
+
+    if (res) {
+        const redo: Writable[] = JSON.parse(res)
+        redo
+            .sort((a, b): 1 | -1 | 0 => {
+                if (!a.updated && !b.updated) {
+                    return 0
+                }
+                if (!a.updated) {
+                    return -1
+                }
+                if (!b.updated) {
+                    return 1
+                }
+                return a.updated > b.updated ? 1 : a.updated < b.updated ? -1 : 0
+            })
+
+        for (let i = 0; i < redo.length; i++) {
+            try {
+                const { evt, ...item } = redo[i]
+                const put = new PutObjectCommand({
+                    Bucket: storageSettings.s3Bucket,
+                    Key: "redo/" + evt,
+                    Body: JSON.stringify(item),
+                    ContentType: "application/json",
+                })
+
+                await client
+                    .send(put)
+                    .catch(err => {
+                        const { $metadata: { httpStatusCode } } = err
+                        checkHttpStatusCode(err, httpStatusCode)
+                    })
+
+                cnt += 1
+            } catch (e) {
+                break
+            }
+        }
+
+        for (let i = 0; i < cnt; i++) {
+            redo.shift()
+        }
+
+        if (cnt > 0) {
+            putIntoLocalStorage("redo", JSON.stringify(redo))
+        }
+    }
+}
+
+const logDeltaToLocalStorage = (storageSettings: StorageSettings, delta: Writable) => {
+    if (!validateStorageSettings(storageSettings)) {
+        return
+    }
+
+    const res = getFromLocalStorage("redo")
+    const redo = [] as Writable[]
+
+    if (res) {
+        const data: Writable[] = JSON.parse(res)
+        data.forEach(i => redo.push(i))
+    }
+    redo.push(delta)
+    putIntoLocalStorage("redo", JSON.stringify(redo))
+    flush(storageSettings)
 }
 
 export class LocalStore {
@@ -25,10 +153,7 @@ export class LocalStore {
 
     async sync(notify: (note?: string) => void, data: AppState) {
 
-        if (!data.settings.storage.s3Bucket
-            || !data.settings.storage.awsAccessKey
-            || !data.settings.storage.awsSecretKey
-            || !data.settings.storage.awsRegion) {
+        if (!validateStorageSettings(data.settings.storage)) {
             notify("Sync not set up!")
             return
         }
@@ -47,38 +172,10 @@ export class LocalStore {
             this.setData(prev => {
                 const res = mergeData(prev, JSON.parse(body))
                 res.settings.storage.eTag = ETag
-                updateLocalStorage("data", JSON.stringify(res))
+                putIntoLocalStorage("data", JSON.stringify(res))
                 uploadData(notify, res)
                 return res
             })
-        }
-
-        const checkHttpStatusCode = (err: any, httpStatusCode?: number) => {
-            if (httpStatusCode) {
-                if (httpStatusCode < 200 || httpStatusCode >= 500) {
-                    err.desc = "unexpected server error"
-                    throw err
-                }
-                if (httpStatusCode < 400 && httpStatusCode >= 300) {
-                    if (httpStatusCode !== 304) {
-                        err.desc = "unexpected redirect"
-                        throw err
-                    }
-                }
-                if (httpStatusCode < 500 && httpStatusCode >= 400) {
-                    if (httpStatusCode === 401) {
-                        err.desc = "missing authentication credentials"
-                        throw err
-                    }
-                    if (httpStatusCode === 403) {
-                        err.desc = "invalid authentication credentials"
-                        throw err
-                    }
-                }
-            } else {
-                err.desc = "unexpected error"
-                throw err
-            }
         }
 
         const setMetadata = (lastSynced?: string, eTag?: string) => {
@@ -94,7 +191,7 @@ export class LocalStore {
                         }
                     }
                 }
-                updateLocalStorage("data", JSON.stringify(updated))
+                putIntoLocalStorage("data", JSON.stringify(updated))
                 return updated
             })
         }
@@ -147,7 +244,7 @@ export class LocalStore {
     putTodaySettings(value: TodaySettings) {
         this.setData(prev => {
             const updated = mergeTodaySettings(prev, value)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
 
@@ -156,39 +253,43 @@ export class LocalStore {
     putStorageSettings(value: StorageSettings) {
         this.setData(prev => {
             const updated = mergeStorageSettings(prev, value)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
 
-    putTask(id: string, item: Task) {
+    putTask(storageSettings: StorageSettings, id: string, item: Task) {
+        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "task" })
         this.setData(prev => {
             const updated = mergeTask(prev, id, item)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
 
-    putTopic(id: string, item: Topic) {
+    putTopic(storageSettings: StorageSettings, id: string, item: Topic) {
+        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "topic" })
         this.setData(prev => {
             const updated = mergeTopic(prev, id, item)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
 
-    putNote(id: string, item: Note) {
+    putNote(storageSettings: StorageSettings, id: string, item: Note) {
+        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "note" })
         this.setData(prev => {
             const updated = mergeNote(prev, id, item)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
 
-    putWork(id: string, item: Work) {
+    putWork(storageSettings: StorageSettings, id: string, item: Work) {
+        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "work" })
         this.setData(prev => {
             const updated = mergeWork(prev, id, item)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
@@ -205,13 +306,13 @@ export class LocalStore {
                 }
             })
             const updated = mergeTasks(prev, items)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
 
     pull() {
-        const res = reloadLocalStorage("data")
+        const res = getFromLocalStorage("data")
         if (res) {
             const data: AppState = JSON.parse(res)
             this.setData(prev => mergeData(prev, data))
@@ -223,8 +324,9 @@ export class LocalStore {
     push(data: AppState) {
         this.setData(prev => {
             const updated = mergeData(prev, data)
-            updateLocalStorage("data", JSON.stringify(updated))
+            putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
     }
+
 }
