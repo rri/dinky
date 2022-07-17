@@ -1,27 +1,33 @@
 import moment from "moment"
 import { Term } from "./Term"
 
-export interface Item {
-    data: string,
-    created?: string,
-    updated?: string,
-    deleted?: string,
-    today?: string,
-    archive?: boolean,
-}
-
-export type Sorter = (x: IdItem, y: IdItem) => 1 | -1 | 0
-
-export type IdItem = Item & {
+export interface Id {
     id: string,
 }
 
-function filterByStatus(extractor: (item: Item) => any, status: boolean) {
-    return (item: Item) => extractor(item) ? status : !status
+export interface Updatable {
+    updated?: string,
 }
 
-function sortByChronology(extractor: (item: Item) => Date, reverse?: boolean) {
-    return (x: Item, y: Item) => {
+export interface Item extends Updatable {
+    data: string,
+    created?: string,
+    deleted?: string,
+    today?: string,
+}
+
+export interface Archivable {
+    archive?: boolean,
+}
+
+export type Sorter = <T extends Item>(x: T, y: T) => 1 | -1 | 0
+
+function filterByStatus(extractor: (obj: any) => any, status: boolean) {
+    return (obj: any) => extractor(obj) ? status : !status
+}
+
+function sortByChronology<T extends Item>(extractor: (item: T) => Date, reverse?: boolean) {
+    return (x: T, y: T) => {
         const a = extractor(x)
         const b = extractor(y)
         if (reverse) {
@@ -36,8 +42,8 @@ function withDefaultDate(obj: any, date: Date) {
     return obj ? new Date(obj) : date
 }
 
-export function reduceByTerm(term?: Term) {
-    return (result: IdItem[], value: IdItem) => {
+export function reduceByTerm<T extends { data: string },>(term?: Term) {
+    return (result: T[], value: T) => {
         if (term?.source()) {
             let count = 0
             const updated = value.data.replaceAll(term.value(), (match) => {
@@ -70,8 +76,8 @@ export function filterByArchive(archive: boolean) {
     return filterByStatus(item => item.archive, archive)
 }
 
-export function filterByToday(eveningBufferHours: number, morningBufferHours: number) {
-    return (item: Item) => {
+export function filterByToday<T extends Item>(eveningBufferHours: number, morningBufferHours: number) {
+    return (item: T) => {
         const referencePoint = Number.parseInt(moment().format("H")) >= morningBufferHours
             ? moment()
             : moment().subtract(1, "days")
@@ -85,8 +91,8 @@ export function filterByToday(eveningBufferHours: number, morningBufferHours: nu
     }
 }
 
-export function sortByData(reverse?: boolean) {
-    return (x: Item, y: Item) => {
+export function sortByData<T extends { data: string }>(reverse?: boolean) {
+    return (x: T, y: T) => {
         const a = x.data
         const b = y.data
         if (!a && b) {
@@ -122,12 +128,12 @@ export function sortByToday(reverse?: boolean) {
     return sortByChronology(item => withDefaultDate(item.today, new Date()), reverse)
 }
 
-export function belongsToToday(item: Item, eveningBufferHours: number, morningBufferHours: number) {
+export function belongsToToday<T extends Item>(item: T, eveningBufferHours: number, morningBufferHours: number) {
     return filterByToday(eveningBufferHours, morningBufferHours)(item)
 }
 
-export function sortByReminder() {
-    return (x: Item, y: Item) => {
+export function sortByReminder<T extends Item>() {
+    return (x: T, y: T) => {
         const a = x.today
         const b = y.today
         if (a && moment().isBefore(moment(a))) {

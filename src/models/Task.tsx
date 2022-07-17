@@ -1,14 +1,14 @@
-import { filterByArchive, filterByDeleted, IdItem, Item, reduceByTerm, Sorter } from "./Item"
+import { Archivable, filterByArchive, filterByDeleted, Item, reduceByTerm, Sorter } from "./Item"
 import { Term } from "./Term"
 
-export interface Task extends Item {}
+export interface Task extends Item, Archivable { }
 
 interface Props {
     tasks: Record<string, Task>,
     archive: boolean,
     sortBy: Sorter[],
     term?: Term,
-    filterMore?: (item: IdItem) => boolean,
+    filterMore?: (item: any) => boolean,
 }
 
 export function fetchTasks(props: Props) {

@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
-import { belongsToToday, IdItem } from "../models/Item"
+import { belongsToToday, Id, Item, Archivable } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: IdItem,
+    item: Id & Item & Archivable,
     hideDetails?: boolean,
     today: {
         eveningBufferHours: number,
@@ -29,13 +29,13 @@ export function ViewTask(props: Props) {
 
     const slug = "tasks"
 
-    const { id, ...item } = props.item
+    const { id, archive, ...item } = props.item
 
     const actions: Action[] = []
 
     const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
 
-    if (!item.archive) {
+    if (!archive) {
         actions.push(
             {
                 icon: icons.today,
@@ -75,11 +75,11 @@ export function ViewTask(props: Props) {
             key={id}
             slug={slug}
             item={props.item}
-            readonly={props.readonly ? props.readonly : item.archive}
+            readonly={props.readonly ? props.readonly : archive}
             icon={props.icon}
             oneline={true}
             actions={actions}
-            strikethru={item.archive}
+            strikethru={archive}
             placeholder={"Describe your task..."}
             highlight={props.highlight}
             actionOnDelete={props.actionOnDelete ? () => navigate("/" + slug) : undefined}

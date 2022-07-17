@@ -118,9 +118,6 @@ export function App() {
             created: item.created ? item.created : moment().toISOString(),
             updated: moment().toISOString(),
             deleted: item.data ? item.deleted : moment().toISOString(),
-            archive: item.archive,
-            data: item.data,
-            today: item.today,
         }
     }
 

@@ -7,7 +7,7 @@ import { Note } from '../models/Note'
 import { Topic } from '../models/Topic'
 import { Task } from '../models/Task'
 import { Work } from '../models/Work'
-import { IdItem, Item } from "../models/Item"
+import { Id, Item } from "../models/Item"
 import { Term } from '../models/Term'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -19,7 +19,7 @@ import styles from "../styles/ViewItem.module.css"
 
 interface Props {
     slug: string,
-    item: IdItem,
+    item: Id & Item,
     placeholder: string,
     strikethru?: boolean,
     readonly?: boolean,

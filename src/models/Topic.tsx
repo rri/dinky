@@ -1,7 +1,7 @@
-import { filterByArchive, filterByDeleted, Item, reduceByTerm, Sorter } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Item, Sorter } from "./Item"
 import { Term } from "./Term"
 
-export interface Topic extends Item {}
+export interface Topic extends Item { }
 
 interface Props {
     topics: Record<string, Topic>,
