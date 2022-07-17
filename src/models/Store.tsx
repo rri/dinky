@@ -23,13 +23,14 @@ export class LocalStore {
         this.setData = setData
     }
 
-    async sync(data: AppState): Promise<boolean> {
+    async sync(notify: (note?: string) => void, data: AppState) {
 
         if (!data.settings.storage.s3Bucket
             || !data.settings.storage.awsAccessKey
             || !data.settings.storage.awsSecretKey
             || !data.settings.storage.awsRegion) {
-            return false
+            notify("Sync not set up!")
+            return
         }
 
         const client = new S3Client({
@@ -41,13 +42,13 @@ export class LocalStore {
             maxAttempts: 1,
         })
 
-        const readMergeAndUploadData = async (Body: ReadableStream, ETag?: string) => {
+        const readMergeAndUploadData = async (notify: (note?: string) => void, Body: ReadableStream, ETag?: string) => {
             const body = await new Response(Body as ReadableStream).text()
             this.setData(prev => {
                 const res = mergeData(prev, JSON.parse(body))
                 res.settings.storage.eTag = ETag
                 updateLocalStorage("data", JSON.stringify(res))
-                uploadData(res)
+                uploadData(notify, res)
                 return res
             })
         }
@@ -104,7 +105,7 @@ export class LocalStore {
             IfNoneMatch: data.settings.storage.eTag,
         })
 
-        const uploadData = (data: AppState) => {
+        const uploadData = (notify: (note?: string) => void, data: AppState) => {
             const toExport: AppState = {
                 ...data,
                 settings: {
@@ -123,23 +124,24 @@ export class LocalStore {
             client.send(put).then(res => {
                 const { ETag } = res
                 setMetadata(new Date().toISOString(), ETag)
-            }).catch(err => {
-                const { $metadata: { httpStatusCode } } = err
-                checkHttpStatusCode(err, httpStatusCode)
-                setMetadata(new Date().toISOString())
             })
+                .then(() => notify("Sync completed!"))
+                .catch(err => {
+                    const { $metadata: { httpStatusCode } } = err
+                    checkHttpStatusCode(err, httpStatusCode)
+                    setMetadata(new Date().toISOString())
+                    notify("Sync completed!")
+                })
         }
 
         await client.send(get).then(res => {
             const { Body, ETag } = res
-            readMergeAndUploadData(Body as ReadableStream, ETag)
+            readMergeAndUploadData(notify, Body as ReadableStream, ETag)
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
-            uploadData(data)
+            uploadData(notify, data)
         })
-
-        return true
     }
 
     putTodaySettings(value: TodaySettings) {
