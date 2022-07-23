@@ -1,11 +1,14 @@
 import { Contents } from "./Contents"
 import { Note } from "./Note"
+import { RetentionSettings } from "./RetentionSettings"
 import { Settings } from "./Settings"
 import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 import { Work } from "./Work"
+import { Deletable } from "./Item"
+import moment from "moment"
 
 export interface AppState {
     error?: string,
@@ -64,21 +67,27 @@ const makeUnique = (topics: Record<string, Topic>) => {
     return res
 }
 
-export const empty = (): AppState => ({
-    settings: {
-        storage: {},
-        today: {
-            eveningBufferHours: 7,
-            morningBufferHours: 2,
+export const empty = (state?: AppState): AppState => {
+    const def = {
+        settings: {
+            storage: {},
+            today: {
+                eveningBufferHours: 7,
+                morningBufferHours: 2,
+            },
+            retention: {
+                periodDays: 30,
+            },
         },
-    },
-    contents: {
-        tasks: {},
-        topics: {},
-        notes: {},
-        works: {},
-    },
-})
+        contents: {
+            tasks: {},
+            topics: {},
+            notes: {},
+            works: {},
+        },
+    }
+    return { ...def, ...state }
+}
 
 export const mergeTodaySettings = (state: AppState, value: TodaySettings): AppState => {
     return ({
@@ -87,6 +96,19 @@ export const mergeTodaySettings = (state: AppState, value: TodaySettings): AppSt
             ...state.settings,
             today: {
                 ...state.settings.today,
+                ...value,
+            },
+        }
+    })
+}
+
+export const mergeRetentionSettings = (state: AppState, value: RetentionSettings): AppState => {
+    return ({
+        ...state,
+        settings: {
+            ...state.settings,
+            retention: {
+                ...state.settings.retention,
                 ...value,
             },
         }
@@ -197,6 +219,7 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
                 ...data.settings.storage,
             },
             today: mergeByUpdated(curr.settings.today, data.settings.today),
+            retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
         },
         contents: {
             ...curr.contents,
@@ -206,4 +229,36 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
             works: mergeRecordsByUpdated(curr.contents.works, data.contents.works),
         }
     }
+}
+
+export const purgeDeleted = (data: AppState): AppState => {
+    const purge = <T extends Deletable>(arr1?: Record<string, T>) => {
+        const res: Record<string, T> = {}
+        Object
+            .entries(arr1 ? arr1 : {})
+            .forEach((val: [id: string, obj: T]) => {
+                if (val[1].deleted) {
+                    const retentionPeriodDays = data.settings.retention.periodDays
+                    if (moment().subtract(retentionPeriodDays, "days").isBefore(moment(val[1].deleted))) {
+                        res[val[0]] = val[1]
+                    }
+                } else {
+                    res[val[0]] = val[1]
+                }
+            })
+        return res
+    }
+
+    const res = {
+        ...data,
+        contents: {
+            ...data.contents,
+            tasks: purge(data.contents.tasks),
+            topics: purge(data.contents.topics),
+            notes: purge(data.contents.notes),
+            works: purge(data.contents.works),
+        },
+    }
+
+    return res
 }

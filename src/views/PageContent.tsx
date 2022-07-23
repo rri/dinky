@@ -23,6 +23,7 @@ import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
 import { TodaySettings } from "../models/TodaySettings"
+import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import userguide from "../docs/UserGuide.md"
 import styles from "../styles/PageContent.module.css"
@@ -37,7 +38,9 @@ interface Props {
     newTopic: (template?: string) => string,
     newNote: (template?: string) => string,
     newWork: (template?: string) => string,
+
     putTodaySettings: (value: TodaySettings) => void,
+    putRetentionSettings: (value: RetentionSettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     putTask: (id: string, item: Task) => boolean,
     putTopic: (id: string, item: Topic) => boolean,
@@ -184,6 +187,7 @@ export function PageContent(props: Props) {
                 element={<Profile
                     settings={props.settings}
                     putTodaySettings={props.putTodaySettings}
+                    putRetentionSettings={props.putRetentionSettings}
                     putStorageSettings={props.putStorageSettings}
                     registerExportHandler={props.registerExportHandler}
                     registerImportHandler={props.registerImportHandler}

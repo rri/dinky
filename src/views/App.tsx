@@ -10,6 +10,7 @@ import { Note } from "../models/Note"
 import { Work } from "../models/Work"
 import { Topic } from "../models/Topic"
 import { LocalStore } from "../models/Store"
+import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
 import { TodaySettings } from "../models/TodaySettings"
@@ -147,6 +148,13 @@ export function App() {
         })
     }
 
+    const putRetentionSettings = (value: RetentionSettings) => {
+        store.putRetentionSettings({
+            ...value,
+            updated: moment().toISOString(),
+        })
+    }
+
     const putStorageSettings = (value: StorageSettings) => {
         store.putStorageSettings(value)
     }
@@ -252,7 +260,7 @@ export function App() {
                     reader.onload = (evt) => {
                         if (evt.target && evt.target.result) {
                             try {
-                                const toImport = JSON.parse(evt.target.result.toString())
+                                const toImport = empty(JSON.parse(evt.target.result.toString()))
                                 store.push(toImport)
                             } catch (e) {
                                 notify("File contents could not be read!")
@@ -370,6 +378,7 @@ export function App() {
                 newNote={newNote}
                 newWork={newWork}
                 putTodaySettings={putTodaySettings}
+                putRetentionSettings={putRetentionSettings}
                 putStorageSettings={putStorageSettings}
                 putTask={putTask}
                 putTopic={putTopic}
