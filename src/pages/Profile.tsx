@@ -1,5 +1,6 @@
 import moment from "moment"
 import { NavLink } from "react-router-dom"
+import { RetentionSettings } from "../models/RetentionSettings"
 import { Settings } from "../models/Settings"
 import { StorageSettings } from "../models/StorageSettings"
 import { TodaySettings } from "../models/TodaySettings"
@@ -13,6 +14,7 @@ import { Wrapper } from "../views/Wrapper"
 interface Props {
     settings: Settings,
     putTodaySettings: (value: TodaySettings) => void,
+    putRetentionSettings: (value: RetentionSettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     registerExportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
@@ -127,6 +129,16 @@ export function Profile(props: Props) {
             </Card>
             <Card title="Manage Your Data" id="manage-your-data" collapsible={true} defaultCollapsed={true}>
                 <SettingList>
+                    <Setting
+                        label="Retention period (days)"
+                        onChange={evt => props.putRetentionSettings({
+                            ...props.settings.retention,
+                            periodDays: parseInt(evt.currentTarget.value),
+                        })}
+                        type="number"
+                        min={0}
+                        value={props.settings.retention.periodDays || 0}
+                    />
                     <ActionLink
                         icon={icons.download}
                         shortcuts={["d"]}

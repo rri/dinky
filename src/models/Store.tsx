@@ -1,6 +1,7 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings, mergeTasks, mergeWork } from "./AppState"
+import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings, mergeTasks, mergeWork, mergeRetentionSettings, purgeDeleted } from "./AppState"
 import { Note } from "./Note"
+import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
@@ -170,7 +171,7 @@ export class LocalStore {
         const readMergeAndUploadData = async (notify: (note?: string) => void, Body: ReadableStream, ETag?: string) => {
             const body = await new Response(Body as ReadableStream).text()
             this.setData(prev => {
-                const res = mergeData(prev, JSON.parse(body))
+                const res = purgeDeleted(mergeData(prev, empty(JSON.parse(body))))
                 res.settings.storage.eTag = ETag
                 putIntoLocalStorage("data", JSON.stringify(res))
                 uploadData(notify, res)
@@ -237,7 +238,12 @@ export class LocalStore {
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
-            uploadData(notify, data)
+            this.setData(prev => {
+                const res = purgeDeleted(prev)
+                putIntoLocalStorage("data", JSON.stringify(res))
+                uploadData(notify, res)
+                return res
+            })
         })
     }
 
@@ -247,7 +253,14 @@ export class LocalStore {
             putIntoLocalStorage("data", JSON.stringify(updated))
             return updated
         })
+    }
 
+    putRetentionSettings(value: RetentionSettings) {
+        this.setData(prev => {
+            const updated = mergeRetentionSettings(prev, value)
+            putIntoLocalStorage("data", JSON.stringify(updated))
+            return updated
+        })
     }
 
     putStorageSettings(value: StorageSettings) {
@@ -314,7 +327,7 @@ export class LocalStore {
     pull() {
         const res = getFromLocalStorage("data")
         if (res) {
-            const data: AppState = JSON.parse(res)
+            const data: AppState = empty(JSON.parse(res))
             this.setData(prev => mergeData(prev, data))
         } else {
             this.setData(empty())

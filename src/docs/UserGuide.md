@@ -96,6 +96,10 @@ To set up your sync configuration:
 
 Finally, enter the information collected above into your sync settings on the [profile](/profile/#cloud-sync) page.
 
+# Retention Period
+
+You may specify a retention period (default: 30 days) on the [profile](/profile/#manage-your-data) page. Deleted items are retained in storage (but not directly visible to the user) for the period configured here, after which they are automatically purged on a best-effort basis. Currently, the ability to restore deleted-but-not-yet-purged items is not available.
+
 # Exporting & Importing Data
 
 You may export all of your data from the [profile](/profile/#manage-your-data) page. You'll be prompted for the download of a [JSON](https://www.json.org) file with your data. Sensitive settings (such as credentials) are **not** exported. You may import previously exported data from the same page. Any data you import is merged into the existing data based on individual item timestamps, overwriting older entries (where they exist) with newer ones.
