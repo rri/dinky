@@ -10,12 +10,23 @@ import { Work } from "./Work"
 import { Writable } from "./Item"
 import { v4 } from "uuid"
 
-const putIntoLocalStorage = (key: string, val: string) => {
-    localStorage.setItem(key, val)
+export const REDO_PATH = "redo"
+export const DATA_PATH = "data"
+
+const fetchData = (): string | null => {
+    return localStorage.getItem(DATA_PATH)
 }
 
-const getFromLocalStorage = (key: string): string | null => {
-    return localStorage.getItem(key)
+const fetchRedo = (): string | null => {
+    return localStorage.getItem(REDO_PATH)
+}
+
+const storeData = (data: AppState) => {
+    localStorage.setItem(DATA_PATH, JSON.stringify(data))
+}
+
+const storeRedo = <T extends Writable>(redo: T[]) => {
+    localStorage.setItem(REDO_PATH, JSON.stringify(redo))
 }
 
 const validateStorageSettings = (storageSettings: StorageSettings) => {
@@ -75,7 +86,7 @@ const flushAsync = async (storageSettings: StorageSettings) => {
         maxAttempts: 1,
     })
 
-    const res = getFromLocalStorage("redo")
+    const res = fetchRedo()
     let cnt = 0
 
     if (res) {
@@ -122,7 +133,7 @@ const flushAsync = async (storageSettings: StorageSettings) => {
         }
 
         if (cnt > 0) {
-            putIntoLocalStorage("redo", JSON.stringify(redo))
+            storeRedo(redo)
         }
     }
 }
@@ -132,7 +143,7 @@ const logDeltaToLocalStorage = (storageSettings: StorageSettings, delta: Writabl
         return
     }
 
-    const res = getFromLocalStorage("redo")
+    const res = fetchRedo()
     const redo = [] as Writable[]
 
     if (res) {
@@ -140,7 +151,7 @@ const logDeltaToLocalStorage = (storageSettings: StorageSettings, delta: Writabl
         data.forEach(i => redo.push(i))
     }
     redo.push(delta)
-    putIntoLocalStorage("redo", JSON.stringify(redo))
+    storeRedo(redo)
     flush(storageSettings)
 }
 
@@ -173,7 +184,7 @@ export class Store {
             this.setData(prev => {
                 const res = purgeDeleted(mergeData(prev, empty(JSON.parse(body))))
                 res.settings.storage.eTag = ETag
-                putIntoLocalStorage("data", JSON.stringify(res))
+                storeData(res)
                 uploadData(res, notify)
                 return res
             })
@@ -192,7 +203,7 @@ export class Store {
                         }
                     }
                 }
-                putIntoLocalStorage("data", JSON.stringify(updated))
+                storeData(updated)
                 return updated
             })
         }
@@ -240,7 +251,7 @@ export class Store {
             checkHttpStatusCode(err, httpStatusCode)
             this.setData(prev => {
                 const res = purgeDeleted(prev)
-                putIntoLocalStorage("data", JSON.stringify(res))
+                storeData(res)
                 uploadData(res, notify)
                 return res
             })
@@ -250,7 +261,7 @@ export class Store {
     putTodaySettings(value: TodaySettings) {
         this.setData(prev => {
             const updated = mergeTodaySettings(prev, value)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -258,7 +269,7 @@ export class Store {
     putRetentionSettings(value: RetentionSettings) {
         this.setData(prev => {
             const updated = mergeRetentionSettings(prev, value)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -266,7 +277,7 @@ export class Store {
     putStorageSettings(value: StorageSettings) {
         this.setData(prev => {
             const updated = mergeStorageSettings(prev, value)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -275,7 +286,7 @@ export class Store {
         logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "task" })
         this.setData(prev => {
             const updated = mergeTask(prev, id, item)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -284,7 +295,7 @@ export class Store {
         logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "topic" })
         this.setData(prev => {
             const updated = mergeTopic(prev, id, item)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -293,7 +304,7 @@ export class Store {
         logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "note" })
         this.setData(prev => {
             const updated = mergeNote(prev, id, item)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -302,7 +313,7 @@ export class Store {
         logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "work" })
         this.setData(prev => {
             const updated = mergeWork(prev, id, item)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
@@ -319,13 +330,13 @@ export class Store {
                 }
             })
             const updated = mergeTasks(prev, items)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
 
     pull() {
-        const res = getFromLocalStorage("data")
+        const res = fetchData()
         if (res) {
             const data: AppState = empty(JSON.parse(res))
             this.setData(prev => mergeData(prev, data))
@@ -337,7 +348,7 @@ export class Store {
     push(data: AppState) {
         this.setData(prev => {
             const updated = mergeData(prev, data)
-            putIntoLocalStorage("data", JSON.stringify(updated))
+            storeData(updated)
             return updated
         })
     }
