@@ -9,7 +9,7 @@ import { Task } from "../models/Task"
 import { Note } from "../models/Note"
 import { Work } from "../models/Work"
 import { Topic } from "../models/Topic"
-import { LocalStore } from "../models/Store"
+import { Store } from "../models/Store"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
@@ -34,7 +34,7 @@ export function App() {
     const [data, setData] = useState<AppState>(empty())
     const [note, setNotify] = useState<string>("")
 
-    const store = useMemo(() => new LocalStore(setData), [setData])
+    const store = useMemo(() => new Store(setData), [setData])
 
     const refs: Record<string, React.RefObject<HTMLInputElement>> = {
         search: React.createRef(),
@@ -280,7 +280,7 @@ export function App() {
     const sync = () => {
         notify("Syncing to the cloud...")
         store
-            .sync(notify, data)
+            .sync(data, notify)
             .catch(e => notify("Sync failed: " + e.desc))
     }
 
