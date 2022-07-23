@@ -144,7 +144,7 @@ const logDeltaToLocalStorage = (storageSettings: StorageSettings, delta: Writabl
     flush(storageSettings)
 }
 
-export class LocalStore {
+export class Store {
 
     private setData: (value: React.SetStateAction<AppState>) => void
 
@@ -152,10 +152,10 @@ export class LocalStore {
         this.setData = setData
     }
 
-    async sync(notify: (note?: string) => void, data: AppState) {
+    async sync(data: AppState, notify?: (note?: string) => void) {
 
         if (!validateStorageSettings(data.settings.storage)) {
-            notify("Sync not set up!")
+            notify && notify("Sync not set up!")
             return
         }
 
@@ -168,13 +168,13 @@ export class LocalStore {
             maxAttempts: 1,
         })
 
-        const readMergeAndUploadData = async (notify: (note?: string) => void, Body: ReadableStream, ETag?: string) => {
+        const readMergeAndUploadData = async (Body: ReadableStream, ETag?: string, notify?: (note?: string) => void) => {
             const body = await new Response(Body as ReadableStream).text()
             this.setData(prev => {
                 const res = purgeDeleted(mergeData(prev, empty(JSON.parse(body))))
                 res.settings.storage.eTag = ETag
                 putIntoLocalStorage("data", JSON.stringify(res))
-                uploadData(notify, res)
+                uploadData(res, notify)
                 return res
             })
         }
@@ -203,7 +203,7 @@ export class LocalStore {
             IfNoneMatch: data.settings.storage.eTag,
         })
 
-        const uploadData = (notify: (note?: string) => void, data: AppState) => {
+        const uploadData = (data: AppState, notify?: (note?: string) => void) => {
             const toExport: AppState = {
                 ...data,
                 settings: {
@@ -223,25 +223,25 @@ export class LocalStore {
                 const { ETag } = res
                 setMetadata(new Date().toISOString(), ETag)
             })
-                .then(() => notify("Sync completed!"))
+                .then(() => notify && notify("Sync completed!"))
                 .catch(err => {
                     const { $metadata: { httpStatusCode } } = err
                     checkHttpStatusCode(err, httpStatusCode)
                     setMetadata(new Date().toISOString())
-                    notify("Sync completed!")
+                    notify && notify("Sync completed!")
                 })
         }
 
         await client.send(get).then(res => {
             const { Body, ETag } = res
-            readMergeAndUploadData(notify, Body as ReadableStream, ETag)
+            readMergeAndUploadData(Body as ReadableStream, ETag, notify)
         }).catch(err => {
             const { $metadata: { httpStatusCode } } = err
             checkHttpStatusCode(err, httpStatusCode)
             this.setData(prev => {
                 const res = purgeDeleted(prev)
                 putIntoLocalStorage("data", JSON.stringify(res))
-                uploadData(notify, res)
+                uploadData(res, notify)
                 return res
             })
         })
