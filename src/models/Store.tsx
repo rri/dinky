@@ -1,356 +1,198 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { AppState, empty, mergeData, mergeNote, mergeStorageSettings, mergeTopic, mergeTask, mergeTodaySettings, mergeTasks, mergeWork, mergeRetentionSettings, purgeDeleted } from "./AppState"
+import { v4 } from "uuid"
+import { AppState, empty, mergeData, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTodaySettings, mergeTopic, mergeWork } from "./AppState"
+import { Cloud } from "./Cloud"
+import { sortByUpdated, Typed, Updatable, Writable } from "./Item"
 import { Note } from "./Note"
 import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
-import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
+import { Topic } from "./Topic"
 import { Work } from "./Work"
-import { Writable } from "./Item"
-import { v4 } from "uuid"
 
-export const REDO_PATH = "redo"
 export const DATA_PATH = "data"
-
-const fetchData = (): string | null => {
-    return localStorage.getItem(DATA_PATH)
-}
-
-const fetchRedo = (): string | null => {
-    return localStorage.getItem(REDO_PATH)
-}
-
-const storeData = (data: AppState) => {
-    localStorage.setItem(DATA_PATH, JSON.stringify(data))
-}
-
-const storeRedo = <T extends Writable>(redo: T[]) => {
-    localStorage.setItem(REDO_PATH, JSON.stringify(redo))
-}
-
-const validateStorageSettings = (storageSettings: StorageSettings) => {
-    if (!storageSettings.s3Bucket
-        || !storageSettings.awsAccessKey
-        || !storageSettings.awsSecretKey
-        || !storageSettings.awsRegion) {
-        return false
-    }
-    return true
-}
-
-const checkHttpStatusCode = (err: any, httpStatusCode?: number) => {
-    if (httpStatusCode) {
-        if (httpStatusCode < 200 || httpStatusCode >= 500) {
-            err.desc = "unexpected server error"
-            throw err
-        }
-        if (httpStatusCode < 400 && httpStatusCode >= 300) {
-            if (httpStatusCode !== 304) {
-                err.desc = "unexpected redirect"
-                throw err
-            }
-        }
-        if (httpStatusCode < 500 && httpStatusCode >= 400) {
-            if (httpStatusCode === 401) {
-                err.desc = "missing authentication credentials"
-                throw err
-            }
-            if (httpStatusCode === 403) {
-                err.desc = "invalid authentication credentials"
-                throw err
-            }
-        }
-    } else {
-        err.desc = "unexpected error"
-        throw err
-    }
-}
-
-const flush = (storageSettings: StorageSettings) => flushAsync(storageSettings)
-    .catch(() => {
-        setTimeout(() => flush(storageSettings), 60000)
-    })
-
-const flushAsync = async (storageSettings: StorageSettings) => {
-    if (!validateStorageSettings(storageSettings)) {
-        return
-    }
-
-    const client = new S3Client({
-        credentials: {
-            accessKeyId: storageSettings.awsAccessKey || "",
-            secretAccessKey: storageSettings.awsSecretKey || "",
-        },
-        region: storageSettings.awsRegion,
-        maxAttempts: 1,
-    })
-
-    const res = fetchRedo()
-    let cnt = 0
-
-    if (res) {
-        const redo: Writable[] = JSON.parse(res)
-        redo
-            .sort((a, b): 1 | -1 | 0 => {
-                if (!a.updated && !b.updated) {
-                    return 0
-                }
-                if (!a.updated) {
-                    return -1
-                }
-                if (!b.updated) {
-                    return 1
-                }
-                return a.updated > b.updated ? 1 : a.updated < b.updated ? -1 : 0
-            })
-
-        for (let i = 0; i < redo.length; i++) {
-            try {
-                const { evt, ...item } = redo[i]
-                const put = new PutObjectCommand({
-                    Bucket: storageSettings.s3Bucket,
-                    Key: "redo/" + evt,
-                    Body: JSON.stringify(item),
-                    ContentType: "application/json",
-                })
-
-                await client
-                    .send(put)
-                    .catch(err => {
-                        const { $metadata: { httpStatusCode } } = err
-                        checkHttpStatusCode(err, httpStatusCode)
-                    })
-
-                cnt += 1
-            } catch (e) {
-                break
-            }
-        }
-
-        for (let i = 0; i < cnt; i++) {
-            redo.shift()
-        }
-
-        if (cnt > 0) {
-            storeRedo(redo)
-        }
-    }
-}
-
-const logDeltaToLocalStorage = (storageSettings: StorageSettings, delta: Writable) => {
-    if (!validateStorageSettings(storageSettings)) {
-        return
-    }
-
-    const res = fetchRedo()
-    const redo = [] as Writable[]
-
-    if (res) {
-        const data: Writable[] = JSON.parse(res)
-        data.forEach(i => redo.push(i))
-    }
-    redo.push(delta)
-    storeRedo(redo)
-    flush(storageSettings)
-}
+export const LOGS_PATH = "redo"
 
 export class Store {
 
     private setData: (value: React.SetStateAction<AppState>) => void
+    private notify: (note?: string) => void
+    private cloud: Cloud
 
-    constructor(setData: (value: React.SetStateAction<AppState>) => void) {
+    constructor(setData: (value: React.SetStateAction<AppState>) => void, notify: (note?: string) => void) {
         this.setData = setData
+        this.notify = notify
+        this.cloud = new Cloud(this.notify)
     }
 
-    async sync(data: AppState, notify?: (note?: string) => void) {
-
-        if (!validateStorageSettings(data.settings.storage)) {
-            notify && notify("Sync not set up!")
-            return
-        }
-
-        const client = new S3Client({
-            credentials: {
-                accessKeyId: data.settings.storage.awsAccessKey || "",
-                secretAccessKey: data.settings.storage.awsSecretKey || "",
-            },
-            region: data.settings.storage.awsRegion,
-            maxAttempts: 1,
-        })
-
-        const readMergeAndUploadData = async (Body: ReadableStream, ETag?: string, notify?: (note?: string) => void) => {
-            const body = await new Response(Body as ReadableStream).text()
-            this.setData(prev => {
-                const res = purgeDeleted(mergeData(prev, empty(JSON.parse(body))))
-                res.settings.storage.eTag = ETag
-                storeData(res)
-                uploadData(res, notify)
-                return res
-            })
-        }
-
-        const setMetadata = (lastSynced?: string, eTag?: string) => {
-            this.setData(prev => {
-                const updated = {
-                    ...prev,
-                    settings: {
-                        ...prev.settings,
-                        storage: {
-                            ...prev.settings.storage,
-                            eTag: eTag ? eTag : prev.settings.storage.eTag,
-                            lastSynced,
-                        }
-                    }
-                }
-                storeData(updated)
-                return updated
-            })
-        }
-
-        const get = new GetObjectCommand({
-            Bucket: data.settings.storage.s3Bucket,
-            Key: "data",
-            IfNoneMatch: data.settings.storage.eTag,
-        })
-
-        const uploadData = (data: AppState, notify?: (note?: string) => void) => {
-            const toExport: AppState = {
-                ...data,
-                settings: {
-                    ...data.settings,
-                    storage: {},
-                }
-            } as const
-
-            const put = new PutObjectCommand({
-                Bucket: data.settings.storage.s3Bucket,
-                Key: "data",
-                Body: JSON.stringify(toExport),
-                ContentType: "application/json",
-            })
-
-            client.send(put).then(res => {
-                const { ETag } = res
-                setMetadata(new Date().toISOString(), ETag)
-            })
-                .then(() => notify && notify("Sync completed!"))
-                .catch(err => {
-                    const { $metadata: { httpStatusCode } } = err
-                    checkHttpStatusCode(err, httpStatusCode)
-                    setMetadata(new Date().toISOString())
-                    notify && notify("Sync completed!")
-                })
-        }
-
-        await client.send(get).then(res => {
-            const { Body, ETag } = res
-            readMergeAndUploadData(Body as ReadableStream, ETag, notify)
-        }).catch(err => {
-            const { $metadata: { httpStatusCode } } = err
-            checkHttpStatusCode(err, httpStatusCode)
-            this.setData(prev => {
-                const res = purgeDeleted(prev)
-                storeData(res)
-                uploadData(res, notify)
-                return res
-            })
-        })
-    }
-
-    putTodaySettings(value: TodaySettings) {
+    loadFromData(data: AppState) {
         this.setData(prev => {
-            const updated = mergeTodaySettings(prev, value)
-            storeData(updated)
+            const updated = mergeData(prev, data)
+            this.saveToDisk(updated)
             return updated
         })
     }
 
-    putRetentionSettings(value: RetentionSettings) {
+    loadFromDisk() {
         this.setData(prev => {
-            const updated = mergeRetentionSettings(prev, value)
-            storeData(updated)
+            const res = localStorage.getItem(DATA_PATH)
+            if (res) {
+                const data: AppState = empty(JSON.parse(res))
+                return mergeData(prev, data)
+            } else {
+                return empty()
+            }
+        })
+    }
+
+    flushQ(cfg: StorageSettings) {
+        this.flushQAsync(cfg).catch(() => setTimeout(() => this.flushQ(cfg), 60000))
+    }
+
+    cloudSyncData(data: AppState) {
+        this.cloud
+            .pullData(data, (data: AppState) => {
+                this.saveToDisk(data)
+                this.setData(data)
+                this.cloud
+                    .pushData(data, (data: AppState) => {
+                        this.saveToDisk(data)
+                        this.setData(data)
+                    })
+                    .catch(e => this.notify("Sync (put) failed: " + e.desc))
+            })
+            .catch(e => this.notify("Sync (get) failed: " + e.desc))
+    }
+
+    putStorageSettings(item: StorageSettings) {
+        this.setData(prev => {
+            const updated = mergeStorageSettings(prev, item)
+            this.saveToDisk(updated)
+            // Bypass potential cloud sync, as storage settings are local
             return updated
         })
     }
 
-    putStorageSettings(value: StorageSettings) {
+    putTodaySettings(item: TodaySettings) {
         this.setData(prev => {
-            const updated = mergeStorageSettings(prev, value)
-            storeData(updated)
+            const updated = mergeTodaySettings(prev, item)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, path: "settings.today" })
             return updated
         })
     }
 
-    putTask(storageSettings: StorageSettings, id: string, item: Task) {
-        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "task" })
+    putRetentionSettings(item: RetentionSettings) {
+        this.setData(prev => {
+            const updated = mergeRetentionSettings(prev, item)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, path: "settings.retention" })
+            return updated
+        })
+    }
+
+    putTask(id: string, item: Task) {
         this.setData(prev => {
             const updated = mergeTask(prev, id, item)
-            storeData(updated)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, id, path: "contents.tasks" })
             return updated
         })
     }
 
-    putTopic(storageSettings: StorageSettings, id: string, item: Topic) {
-        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "topic" })
+    putTopic(id: string, item: Topic) {
         this.setData(prev => {
             const updated = mergeTopic(prev, id, item)
-            storeData(updated)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, id, path: "contents.topics" })
             return updated
         })
     }
 
-    putNote(storageSettings: StorageSettings, id: string, item: Note) {
-        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "note" })
+    putNote(id: string, item: Note) {
         this.setData(prev => {
             const updated = mergeNote(prev, id, item)
-            storeData(updated)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, id, path: "contents.notes" })
             return updated
         })
     }
 
-    putWork(storageSettings: StorageSettings, id: string, item: Work) {
-        logDeltaToLocalStorage(storageSettings, { ...item, id, evt: v4(), type: "work" })
+    putWork(id: string, item: Work) {
         this.setData(prev => {
             const updated = mergeWork(prev, id, item)
-            storeData(updated)
+            this.saveToDisk(updated)
+            this.cloudSyncItem(prev.settings.storage, { ...item, id, path: "contents.works" })
             return updated
         })
     }
 
-    delTasks(idList: string[]) {
+    delTasks(makeIdList: () => string[]) {
         this.setData(prev => {
+            const idList = makeIdList()
             const prevTasks = prev.contents.tasks ? prev.contents.tasks : {}
             const items: Record<string, Task> = {}
             idList.forEach(id => {
-                items[id] = {
+                const item = {
                     ...prevTasks[id],
                     updated: new Date().toISOString(),
                     deleted: new Date().toISOString(),
                 }
+                items[id] = item
+                this.cloudSyncItem(prev.settings.storage, { ...item, id, path: "contents.tasks" })
             })
             const updated = mergeTasks(prev, items)
-            storeData(updated)
+            this.saveToDisk(updated)
             return updated
         })
     }
 
-    pull() {
-        const res = fetchData()
-        if (res) {
-            const data: AppState = empty(JSON.parse(res))
-            this.setData(prev => mergeData(prev, data))
-        } else {
-            this.setData(empty())
+    private cloudSyncItem<T extends Typed & Updatable>(cfg: StorageSettings, item: T) {
+        const obj = { ...item, evt: v4() }
+        this.cloud
+            .pushItem(cfg, obj)
+            .catch(e => {
+                this.notify("Sync (put) failed (will retry automatically): " + e.desc)
+                this.enq(obj)
+            })
+    }
+
+    private async flushQAsync(cfg: StorageSettings) {
+        const logs = localStorage.getItem(LOGS_PATH)
+        if (logs) {
+            let count = 0
+            const cand: Writable[] = JSON.parse(logs)
+            cand.sort(sortByUpdated())
+            for (let i = 0; i < cand.length; i++) {
+                try {
+                    this.cloud.pushItem(cfg, cand[i])
+                    count += 1
+                } catch {
+                    break
+                }
+            }
+            for (let i = 0; i < count; i++) {
+                cand.shift()
+            }
+            if (count > 0) {
+                localStorage.setItem(LOGS_PATH, JSON.stringify(cand))
+            }
         }
     }
 
-    push(data: AppState) {
-        this.setData(prev => {
-            const updated = mergeData(prev, data)
-            storeData(updated)
-            return updated
-        })
+    private saveToDisk(data: AppState) {
+        localStorage.setItem(DATA_PATH, JSON.stringify(data))
     }
 
+    private enq(obj: Writable) {
+        const logs = localStorage.getItem(LOGS_PATH)
+        const cand = [] as Writable[]
+        if (logs) {
+            const prev: Writable[] = JSON.parse(logs)
+            prev.sort(sortByUpdated())
+            prev.forEach(o => cand.push(o))
+        }
+        cand.push(obj)
+        localStorage.setItem(LOGS_PATH, JSON.stringify(cand))
+    }
 }

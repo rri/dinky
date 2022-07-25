@@ -34,7 +34,12 @@ export function App() {
     const [data, setData] = useState<AppState>(empty())
     const [note, setNotify] = useState<string>("")
 
-    const store = useMemo(() => new Store(setData), [setData])
+    const notify = (note?: string) => {
+        setNotify(note || "")
+        setTimeout(setNotify, 3000)
+    }
+
+    const store = useMemo(() => new Store(setData, notify), [setData])
 
     const refs: Record<string, React.RefObject<HTMLInputElement>> = {
         search: React.createRef(),
@@ -50,11 +55,6 @@ export function App() {
         icon: icons.clear,
         desc: "Clear search results",
         action: () => setTerm(new Term(""))
-    }
-
-    const notify = (note?: string) => {
-        setNotify(note || "")
-        setTimeout(setNotify, 3000)
     }
 
     const newTask = (template?: string): string => {
@@ -169,7 +169,7 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putTask(data.settings.storage, id, enrich(item))
+            store.putTask(id, enrich(item))
         }
         return !!itemData
     }
@@ -187,7 +187,7 @@ export function App() {
                 return res
             })
         } else {
-            store.putTopic(data.settings.storage, id, { ...enrich(item), data: itemData ? `#${itemData}` : "" })
+            store.putTopic(id, { ...enrich(item), data: itemData ? `#${itemData}` : "" })
         }
         return !!itemData
     }
@@ -202,7 +202,7 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putNote(data.settings.storage, id, enrich(item))
+            store.putNote(id, enrich(item))
         }
         return !!itemData
     }
@@ -217,14 +217,13 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putWork(data.settings.storage, id, enrich(item))
+            store.putWork(id, enrich(item))
         }
         return !!itemData
     }
 
     const delTasks = (makeIdList: () => string[]) => {
-        const idList = makeIdList()
-        store.delTasks(idList)
+        store.delTasks(makeIdList)
     }
 
     const exportData = () => {
@@ -261,7 +260,7 @@ export function App() {
                         if (evt.target && evt.target.result) {
                             try {
                                 const toImport = empty(JSON.parse(evt.target.result.toString()))
-                                store.push(toImport)
+                                store.loadFromData(toImport)
                             } catch (e) {
                                 notify("File contents could not be read!")
                             }
@@ -277,14 +276,10 @@ export function App() {
         input.click()
     }
 
-    const sync = () => {
-        notify("Syncing to the cloud...")
-        store
-            .sync(data, notify)
-            .catch(e => notify("Sync failed: " + e.desc))
-    }
+    const sync = () => store.cloudSyncData(data)
 
-    useEffect(() => store.pull(), [store])
+    useEffect(() => store.loadFromDisk(), [store])
+    useEffect(() => store.flushQ(data.settings.storage), [store, data.settings.storage])
 
     const keyMap = {
         SEARCH: "/",
