@@ -1,8 +1,7 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { AppState, empty, mergeData, purgeDeleted } from "./AppState"
-import { Writable } from "./Item"
 import { StorageSettings } from "./StorageSettings"
-import { DATA_PATH, LOGS_PATH } from "./Store"
+import { DATA_PATH } from "./Store"
 
 export class Cloud {
 
@@ -13,28 +12,32 @@ export class Cloud {
     }
 
     async pullData(data: AppState, onSuccess: (data: AppState) => void) {
-        this.withS3Client(data.settings.storage, client => {
+        this.withS3Client(data.settings.storage, async client => {
             this.notify("Sync starting...")
             const get = new GetObjectCommand({
                 Bucket: data.settings.storage.s3Bucket,
                 Key: DATA_PATH,
                 IfNoneMatch: data.settings.storage.eTag,
             })
-            client
-                .send(get)
-                .then(async res => {
-                    const { Body, ETag } = res
-                    const body = await new Response(Body as ReadableStream).text()
-                    const updated = purgeDeleted(mergeData(data, empty(JSON.parse(body))))
-                    updated.settings.storage.eTag = ETag
-                    onSuccess(updated)
-                })
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
-                    this.checkHttpStatusCode(e, httpStatusCode)
-                    const updated = purgeDeleted(data)
-                    onSuccess(updated)
-                })
+            try {
+                await client
+                    .send(get)
+                    .then(async res => {
+                        const { Body, ETag } = res
+                        const body = await new Response(Body as ReadableStream).text()
+                        const updated = purgeDeleted(mergeData(data, empty(JSON.parse(body))))
+                        updated.settings.storage.eTag = ETag
+                        onSuccess(updated)
+                    })
+                    .catch(e => {
+                        const { $metadata: { httpStatusCode } } = e
+                        this.checkHttpStatusCode(e, httpStatusCode)
+                        const updated = purgeDeleted(data)
+                        onSuccess(updated)
+                    })
+            } catch (e: any) {
+                this.notify("Sync (get) failed: " + e.desc)
+            }
         }, () => this.notify("Sync not set up!"))
     }
 
@@ -52,7 +55,7 @@ export class Cloud {
                 }
             }
         )
-        this.withS3Client(data.settings.storage, client => {
+        this.withS3Client(data.settings.storage, async client => {
             const toExport: AppState = {
                 ...data,
                 settings: {
@@ -66,40 +69,26 @@ export class Cloud {
                 Body: JSON.stringify(toExport),
                 ContentType: "application/json",
             })
-            client
-                .send(put)
-                .then(async res => {
-                    const { ETag } = res
-                    const updated = setMeta(data, new Date().toISOString(), ETag)
-                    onSuccess(updated)
-                })
-                .then(() => this.notify("Sync completed!"))
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
-                    this.checkHttpStatusCode(e, httpStatusCode)
-                    const updated = setMeta(data, new Date().toISOString())
-                    onSuccess(updated)
-                    this.notify("Sync completed!")
-                })
+            try {
+                await client
+                    .send(put)
+                    .then(async res => {
+                        const { ETag } = res
+                        const updated = setMeta(data, new Date().toISOString(), ETag)
+                        onSuccess(updated)
+                    })
+                    .then(() => this.notify("Sync completed!"))
+                    .catch(e => {
+                        const { $metadata: { httpStatusCode } } = e
+                        this.checkHttpStatusCode(e, httpStatusCode)
+                        const updated = setMeta(data, new Date().toISOString())
+                        onSuccess(updated)
+                        this.notify("Sync completed!")
+                    })
+            } catch (e: any) {
+                this.notify("Sync (put) failed: " + e.desc)
+            }
         }, () => this.notify("Sync not set up!"))
-    }
-
-    async pushItem<T extends Writable>(cfg: StorageSettings, item: T) {
-        this.withS3Client(cfg, client => {
-            const { evt, ...obj } = item
-            const put = new PutObjectCommand({
-                Bucket: cfg.s3Bucket,
-                Key: LOGS_PATH + "/" + evt,
-                Body: JSON.stringify(obj),
-                ContentType: "application/json",
-            })
-            client
-                .send(put)
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
-                    this.checkHttpStatusCode(e, httpStatusCode)
-                })
-        })
     }
 
     private withS3Client(cfg: StorageSettings, action: (s3Client: S3Client) => void, otherwise?: () => void) {

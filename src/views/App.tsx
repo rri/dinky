@@ -279,7 +279,6 @@ export function App() {
     const sync = () => store.cloudSyncData(data)
 
     useEffect(() => store.loadFromDisk(), [store])
-    useEffect(() => store.flushQ(data.settings.storage), [store, data.settings.storage])
 
     const keyMap = {
         SEARCH: "/",
