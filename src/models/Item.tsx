@@ -32,11 +32,12 @@ export interface Schedulable {
 export interface Archivable {
     archive?: boolean,
 }
+
 export interface Typed {
-    type: "task" | "topic" | "note" | "work"
+    path: "settings.storage" | "settings.retention" | "settings.today" | "contents.tasks" | "contents.topics" | "contents.notes" | "contents.works"
 }
 
-export type Writable = Event & Id & Typed & Updatable
+export type Writable = Event & Typed & Updatable
 
 export type Sorter = (x: any, y: any) => 1 | -1 | 0
 
