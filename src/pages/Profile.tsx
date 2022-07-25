@@ -101,7 +101,7 @@ export function Profile(props: Props) {
                     />
                 </SettingList>
             </Card>
-            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true} defaultCollapsed={true}>
+            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true}>
                 <SettingList>
                     <Setting
                         label="Evening buffer (hours)"
@@ -127,7 +127,7 @@ export function Profile(props: Props) {
                     />
                 </SettingList>
             </Card>
-            <Card title="Manage Your Data" id="manage-your-data" collapsible={true} defaultCollapsed={true}>
+            <Card title="Manage Your Data" id="manage-your-data" collapsible={true}>
                 <SettingList>
                     <Setting
                         label="Retention period (days)"
