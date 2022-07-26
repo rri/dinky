@@ -1,5 +1,6 @@
 import moment from "moment"
 import { NavLink } from "react-router-dom"
+import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { Settings } from "../models/Settings"
 import { StorageSettings } from "../models/StorageSettings"
@@ -8,13 +9,14 @@ import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
 import { InfoBox } from "../views/InfoBox"
 import { LastSynced, LastSyncedDateTime } from "../views/LastSynced"
-import { ActionLink, Setting, SettingList } from "../views/Settings"
+import { ActionLink, OptionSetting, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
 
 interface Props {
     settings: Settings,
     putTodaySettings: (value: TodaySettings) => void,
     putRetentionSettings: (value: RetentionSettings) => void,
+    putDisplaySettings: (value: DisplaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     registerExportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
@@ -99,6 +101,36 @@ export function Profile(props: Props) {
                         onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                         onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
                     />
+                </SettingList>
+            </Card>
+            <Card title="Display Preferences" id="theme-preferences" collapsible={true}>
+                <SettingList>
+                    <OptionSetting label="Theme" values={[
+                        {
+                            label: "Auto",
+                            action: () => props.putDisplaySettings({
+                                ...props.settings.display,
+                                theme: DisplayTheme.Auto,
+                            }),
+                            checked: props.settings.display.theme === DisplayTheme.Auto,
+                        },
+                        {
+                            label: "Light",
+                            action: () => props.putDisplaySettings({
+                                ...props.settings.display,
+                                theme: DisplayTheme.Light,
+                            }),
+                            checked: props.settings.display.theme === DisplayTheme.Light,
+                        },
+                        {
+                            label: "Dark",
+                            action: () => props.putDisplaySettings({
+                                ...props.settings.display,
+                                theme: DisplayTheme.Dark,
+                            }),
+                            checked: props.settings.display.theme === DisplayTheme.Dark,
+                        },
+                    ]}></OptionSetting>
                 </SettingList>
             </Card>
             <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true}>

@@ -17,6 +17,19 @@
     white-space: nowrap;
 }
 
+.main .optionGroup {
+    display: flex;
+    align-items: center;
+    column-gap: calc(var(--spacing) * 2);
+    justify-content: stretch;
+    width: 100%;
+}
+
+.main .option {
+    cursor: pointer;
+    display: block;
+}
+
 .main input {
     width: inherit;
     flex-grow: 1;

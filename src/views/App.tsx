@@ -10,6 +10,7 @@ import { Note } from "../models/Note"
 import { Work } from "../models/Work"
 import { Topic } from "../models/Topic"
 import { Store } from "../models/Store"
+import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
@@ -155,6 +156,13 @@ export function App() {
         })
     }
 
+    const putDisplaySettings = (value: DisplaySettings) => {
+        store.putDisplaySettings({
+            ...value,
+            updated: moment().toISOString(),
+        })
+    }
+
     const putStorageSettings = (value: StorageSettings) => {
         store.putStorageSettings(value)
     }
@@ -280,6 +288,33 @@ export function App() {
 
     useEffect(() => store.loadFromDisk(), [store])
 
+    useEffect(() => {
+        const setDisplayTheme = () => {
+            let mode = DisplayTheme.Light
+            if (data.settings.display.theme === DisplayTheme.Auto) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    mode = DisplayTheme.Dark
+                } else {
+                    mode = DisplayTheme.Light
+                }
+            } else {
+                if (data.settings.display.theme === DisplayTheme.Light) {
+                    mode = DisplayTheme.Light
+                }
+                if (data.settings.display.theme === DisplayTheme.Dark) {
+                    mode = DisplayTheme.Dark
+                }
+            }
+            if (mode === DisplayTheme.Dark) {
+                window.document.documentElement.setAttribute("data-theme", "Dark")
+            } else {
+                window.document.documentElement.setAttribute("data-theme", "Light")
+            }
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setDisplayTheme())
+        setDisplayTheme()
+    }, [data.settings.display.theme])
+
     const keyMap = {
         SEARCH: "/",
         ESCAPE: "escape",
@@ -373,6 +408,7 @@ export function App() {
                 newWork={newWork}
                 putTodaySettings={putTodaySettings}
                 putRetentionSettings={putRetentionSettings}
+                putDisplaySettings={putDisplaySettings}
                 putStorageSettings={putStorageSettings}
                 putTask={putTask}
                 putTopic={putTopic}
