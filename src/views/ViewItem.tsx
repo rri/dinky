@@ -26,6 +26,7 @@ interface Props {
     icon?: string,
     rows?: number,
     oneline?: boolean,
+    metadata?: boolean,
     actions: Action[],
     highlight?: Term,
     autoNew?: boolean,
@@ -112,7 +113,7 @@ export function ViewItem(props: Props) {
         setEdit(false)
     }
 
-    const [main, bits] = formatData(props.item.data)
+    const [main, bits] = props.metadata ? formatData(props.item.data) : [props.item.data]
 
     const item = edit || !props.item.created
         ? <textarea

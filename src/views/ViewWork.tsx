@@ -79,6 +79,7 @@ export function ViewWork(props: Props) {
             readonly={props.readonly ? props.readonly : archive}
             icon={props.icon}
             oneline={true}
+            metadata={true}
             actions={actions}
             strikethru={false}
             placeholder={"Describe your item as <title> | <primary-author>; <secondary-author>; ..."}
