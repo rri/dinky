@@ -44,6 +44,7 @@ export class Store {
     }
 
     cloudSyncData(data: AppState) {
+        this.notify("Sync starting...")
         this.cloud
             .pullData(data, (data: AppState) => {
                 this.saveToDisk(data)
