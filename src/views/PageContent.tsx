@@ -23,6 +23,7 @@ import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
 import { TodaySettings } from "../models/TodaySettings"
+import { DisplaySettings } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import userguide from "../docs/UserGuide.md"
@@ -41,6 +42,7 @@ interface Props {
 
     putTodaySettings: (value: TodaySettings) => void,
     putRetentionSettings: (value: RetentionSettings) => void,
+    putDisplaySettings: (value: DisplaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
     putTask: (id: string, item: Task) => boolean,
     putTopic: (id: string, item: Topic) => boolean,
@@ -188,6 +190,7 @@ export function PageContent(props: Props) {
                     settings={props.settings}
                     putTodaySettings={props.putTodaySettings}
                     putRetentionSettings={props.putRetentionSettings}
+                    putDisplaySettings={props.putDisplaySettings}
                     putStorageSettings={props.putStorageSettings}
                     registerExportHandler={props.registerExportHandler}
                     registerImportHandler={props.registerImportHandler}

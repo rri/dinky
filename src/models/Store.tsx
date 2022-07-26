@@ -1,6 +1,7 @@
-import { AppState, empty, mergeData, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTodaySettings, mergeTopic, mergeWork } from "./AppState"
+import { AppState, empty, mergeData, mergeDisplaySettings, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTodaySettings, mergeTopic, mergeWork } from "./AppState"
 import { Cloud } from "./Cloud"
 import { Note } from "./Note"
+import { DisplaySettings } from "./DisplaySettings"
 import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
 import { Task } from "./Task"
@@ -77,6 +78,14 @@ export class Store {
     putRetentionSettings(item: RetentionSettings) {
         this.setData(prev => {
             const updated = mergeRetentionSettings(prev, item)
+            this.saveToDisk(updated)
+            return updated
+        })
+    }
+
+    putDisplaySettings(item: DisplaySettings) {
+        this.setData(prev => {
+            const updated = mergeDisplaySettings(prev, item)
             this.saveToDisk(updated)
             return updated
         })

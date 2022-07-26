@@ -4,6 +4,12 @@ import { Icon } from "./Icon"
 import { Shortcut } from "./Shortcuts"
 import styles from "../styles/Settings.module.css"
 
+interface Option {
+    label: string,
+    checked?: boolean,
+    action: () => void,
+}
+
 interface GroupProps {
     label?: string,
 }
@@ -12,12 +18,17 @@ interface SettingProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string,
 }
 
+interface OptionProps extends InputHTMLAttributes<HTMLInputElement> {
+    label: string,
+    values: Option[],
+}
+
 interface ActionLinkProps extends InputHTMLAttributes<HTMLAnchorElement> {
     icon: string,
     shortcuts: string[],
 }
 
-interface ActionButtonProps extends InputHTMLAttributes<HTMLInputElement> {}
+interface ActionButtonProps extends InputHTMLAttributes<HTMLInputElement> { }
 
 export function SettingList(props: PropsWithChildren<GroupProps>) {
     return (
@@ -33,7 +44,29 @@ export function Setting(props: SettingProps) {
     return (
         <Wrapper layout="row" className={styles.main}>
             <div className={styles.label}>{label}</div>
-            <input {...rest} />
+            <input {...rest} title={label} />
+        </Wrapper>
+    )
+}
+
+export function OptionSetting(props: OptionProps) {
+    const { label, ...rest } = props
+    return (
+        <Wrapper layout="row" className={styles.main}>
+            <div className={styles.label}>{label}</div>
+            <div className={styles.optionGroup}>
+                {props.values.map(opt => (
+                    <label key={opt.label} className={styles.option}>
+                        <input
+                            name={label}
+                            type="radio"
+                            onChange={opt.action}
+                            checked={opt.checked}
+                            {...rest}
+                        /> {opt.label}
+                    </label>
+                ))}
+            </div>
         </Wrapper>
     )
 }

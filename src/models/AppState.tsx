@@ -1,5 +1,6 @@
 import { Contents } from "./Contents"
 import { Note } from "./Note"
+import { DisplaySettings, DisplayTheme } from "./DisplaySettings"
 import { RetentionSettings } from "./RetentionSettings"
 import { Settings } from "./Settings"
 import { StorageSettings } from "./StorageSettings"
@@ -78,6 +79,9 @@ export const empty = (state?: AppState): AppState => {
             retention: {
                 periodDays: 30,
             },
+            display: {
+                theme: DisplayTheme.Auto,
+            },
         },
         contents: {
             tasks: {},
@@ -109,6 +113,19 @@ export const mergeRetentionSettings = (state: AppState, value: RetentionSettings
             ...state.settings,
             retention: {
                 ...state.settings.retention,
+                ...value,
+            },
+        }
+    })
+}
+
+export const mergeDisplaySettings = (state: AppState, value: DisplaySettings): AppState => {
+    return ({
+        ...state,
+        settings: {
+            ...state.settings,
+            display: {
+                ...state.settings.display,
                 ...value,
             },
         }
@@ -213,16 +230,15 @@ export const mergeData = (curr: AppState, data: AppState): AppState => {
 
     return {
         settings: {
-            ...curr.settings,
             storage: {
                 ...curr.settings.storage,
                 ...data.settings.storage,
             },
             today: mergeByUpdated(curr.settings.today, data.settings.today),
             retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
+            display: mergeByUpdated(curr.settings.display, data.settings.display),
         },
         contents: {
-            ...curr.contents,
             tasks: mergeRecordsByUpdated(curr.contents.tasks, data.contents.tasks),
             topics: makeUnique(mergeRecordsByUpdated(curr.contents.topics, data.contents.topics)),
             notes: mergeRecordsByUpdated(curr.contents.notes, data.contents.notes),

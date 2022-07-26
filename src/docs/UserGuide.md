@@ -114,7 +114,7 @@ action-item
 
 # Color Themes
 
-This application allows for two color themes, *light* and *dark*, automatically switching between these themes based on the user's operating system settings. This behavior is not customizable by the user at this time.
+This application allows for two color themes, *light* and *dark*, automatically switching between these themes based on the user's operating system settings. If you want, you can customize this behavior to permanently set the theme to *light* or *dark* in your [theme preferences](/profile/#theme-preferences).
 
 # Getting in Touch
 
