@@ -143,7 +143,13 @@ export class Store {
     }
 
     private saveToDisk(data: AppState) {
-        localStorage.setItem(DATA_PATH, JSON.stringify(data))
+        let next = data
+        const res = localStorage.getItem(DATA_PATH)
+        if (res) {
+            const prev: AppState = empty(JSON.parse(res))
+            next = mergeData(prev, data)
+        }
+        localStorage.setItem(DATA_PATH, JSON.stringify(next))
     }
 
 }
