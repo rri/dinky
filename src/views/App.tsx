@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
-import { AppState, empty } from "../models/AppState"
-import { Creatable, DataObj, Deletable, Updatable } from "../models/Item"
+import { AppState, empty, toExport } from "../models/AppState"
+import { Creatable, DataObj, Deletable, Syncable, Updatable } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
 import { Work } from "../models/Work"
@@ -114,13 +114,19 @@ export function App() {
         return id
     }
 
-    const enrich = <T extends DataObj & Creatable & Deletable & Updatable,>(item: T): T => {
-        return {
+    const enrich = <T extends DataObj & Creatable & Deletable & Updatable & Syncable,>(item: T): T => {
+        const updated = {
             ...item,
             created: item.created ? item.created : moment().toISOString(),
             updated: moment().toISOString(),
             deleted: item.data ? item.deleted : moment().toISOString(),
         }
+
+        if (!item.created) {
+            item.unsynced = true
+        }
+
+        return updated
     }
 
     const createTopics = (text: string) => {
@@ -235,16 +241,8 @@ export function App() {
     }
 
     const exportData = () => {
-        const toExport: AppState = {
-            ...data,
-            settings: {
-                ...data.settings,
-                storage: {},
-            }
-        } as const
-
         const bytes = new Blob(
-            [new TextEncoder().encode(JSON.stringify(toExport))],
+            [new TextEncoder().encode(JSON.stringify(toExport(data)))],
             { type: 'application/octet-stream' })
         const href = window.URL.createObjectURL(bytes)
         const anchor = document.createElement("a")

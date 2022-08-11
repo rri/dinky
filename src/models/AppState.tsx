@@ -8,7 +8,7 @@ import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 import { Work } from "./Work"
-import { Deletable } from "./Item"
+import { Deletable, Syncable, Updatable } from "./Item"
 import moment from "moment"
 
 export interface AppState {
@@ -17,22 +17,69 @@ export interface AppState {
     contents: Contents,
 }
 
-const mergeByUpdated = <T extends { updated?: string }>(oldVal: T, newVal: T) => {
-    if (!newVal) {
-        return oldVal
+const stripSyncStatus = <T extends Syncable>(rec?: Record<string, T>) => {
+    if (rec) {
+        const res: Record<string, T> = {}
+        Object
+            .entries(rec)
+            .forEach((val: [string, T]) => {
+                res[val[0]] = {
+                    ...val[1],
+                    unsynced: undefined,
+                }
+            })
+        return res
+    }
+    return rec
+}
+
+const mergeByUpdated = <T extends Updatable>(currVal: T, nextVal: T) => {
+    if (!nextVal) {
+        return currVal
     }
 
-    if (!oldVal) {
-        return newVal
+    if (!currVal) {
+        return nextVal
     }
 
-    if (!oldVal.updated
-        || (newVal.updated
-            && oldVal.updated < newVal.updated)) {
-        return newVal
+    if (!currVal.updated
+        || (nextVal.updated
+            && currVal.updated < nextVal.updated)) {
+        return nextVal
     }
 
-    return oldVal
+    return currVal
+}
+
+const mergeRecords = <T extends Syncable>(currRec?: Record<string, T>, nextRec?: Record<string, T>, forceDel?: boolean, forceSync?: boolean) => {
+    const res: Record<string, T> = {}
+    Object
+        .entries(currRec ? currRec : {})
+        .forEach((val: [id: string, obj: any]) => {
+            res[val[0]] = val[1]
+        })
+    Object
+        .entries(nextRec ? nextRec : {})
+        .forEach((val: [id: string, obj: any]) => {
+            const currVal = res[val[0]]
+            const nextVal = val[1]
+
+            if (currVal && nextVal) {
+                res[val[0]] = mergeByUpdated(currVal, nextVal)
+                const unsynced = forceSync || (currVal.unsynced && nextVal.unsynced)
+                if (unsynced) {
+                    res[val[0]].unsynced = unsynced
+                }
+            } else if (forceDel && !nextVal && !currVal.unsynced) {
+                // Delete the value by simply not setting it
+            } else {
+                res[val[0]] = currVal ? currVal : nextVal
+                if (forceSync) {
+                    res[val[0]].unsynced = true
+                }
+            }
+        })
+    return res
 }
 
 const makeUnique = (topics: Record<string, Topic>) => {
@@ -211,41 +258,23 @@ export const mergeWork = (state: AppState, id: string, item: Work): AppState => 
     })
 }
 
-export const mergeData = (curr: AppState, data: AppState): AppState => {
-
-    const mergeRecordsByUpdated = (arr1?: Record<string, any>, arr2?: Record<string, any>) => {
-        const res: Record<string, any> = {}
-        Object
-            .entries(arr1 ? arr1 : {})
-            .forEach((val: [id: string, obj: any]) => {
-                res[val[0]] = val[1]
-            })
-        Object
-            .entries(arr2 ? arr2 : {})
-            .forEach((val: [id: string, obj: any]) => {
-                res[val[0]] = mergeByUpdated(res[val[0]], val[1])
-            })
-        return res
-    }
-
-    return {
-        settings: {
-            storage: {
-                ...curr.settings.storage,
-                ...data.settings.storage,
-            },
-            today: mergeByUpdated(curr.settings.today, data.settings.today),
-            retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
-            display: mergeByUpdated(curr.settings.display, data.settings.display),
+export const mergeData = (curr: AppState, data: AppState, forceDel?: boolean, forceSync?: boolean): AppState => ({
+    settings: {
+        storage: {
+            ...curr.settings.storage,
+            ...data.settings.storage,
         },
-        contents: {
-            tasks: mergeRecordsByUpdated(curr.contents.tasks, data.contents.tasks),
-            topics: makeUnique(mergeRecordsByUpdated(curr.contents.topics, data.contents.topics)),
-            notes: mergeRecordsByUpdated(curr.contents.notes, data.contents.notes),
-            works: mergeRecordsByUpdated(curr.contents.works, data.contents.works),
-        }
+        today: mergeByUpdated(curr.settings.today, data.settings.today),
+        retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
+        display: mergeByUpdated(curr.settings.display, data.settings.display),
+    },
+    contents: {
+        tasks: mergeRecords(curr.contents.tasks, data.contents.tasks, forceDel, forceSync),
+        topics: makeUnique(mergeRecords(curr.contents.topics, data.contents.topics, forceDel, forceSync)),
+        notes: mergeRecords(curr.contents.notes, data.contents.notes, forceDel, forceSync),
+        works: mergeRecords(curr.contents.works, data.contents.works, forceDel, forceSync),
     }
-}
+})
 
 export const purgeDeleted = (data: AppState): AppState => {
     const purge = <T extends Deletable>(arr1?: Record<string, T>) => {
@@ -278,3 +307,17 @@ export const purgeDeleted = (data: AppState): AppState => {
 
     return res
 }
+
+export const toExport = (data: AppState) => ({
+    ...data,
+    contents: {
+        tasks: stripSyncStatus(data.contents.tasks),
+        topics: stripSyncStatus(data.contents.topics),
+        notes: stripSyncStatus(data.contents.notes),
+        works: stripSyncStatus(data.contents.works),
+    },
+    settings: {
+        ...data.settings,
+        storage: {},
+    }
+})

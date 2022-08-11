@@ -25,7 +25,7 @@ export class Store {
 
     loadFromData(data: AppState) {
         this.setData(prev => {
-            const updated = mergeData(prev, data)
+            const updated = mergeData(prev, data, false, true)
             this.saveToDisk(updated)
             return updated
         })

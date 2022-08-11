@@ -13,6 +13,10 @@ export interface Creatable {
     created?: string,
 }
 
+export interface Syncable {
+    unsynced?: boolean,
+}
+
 export interface Deletable {
     deleted?: string,
 }
