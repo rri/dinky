@@ -1,5 +1,5 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { AppState, empty, mergeData, purgeDeleted } from "./AppState"
+import { AppState, empty, mergeData, purgeDeleted, toExport } from "./AppState"
 import { StorageSettings } from "./StorageSettings"
 import { DATA_PATH } from "./Store"
 
@@ -23,7 +23,7 @@ export class Cloud {
                 .then(async res => {
                     const { Body, ETag } = res
                     const body = await new Response(Body as ReadableStream).text()
-                    const updated = purgeDeleted(mergeData(data, empty(JSON.parse(body))))
+                    const updated = purgeDeleted(mergeData(data, empty(JSON.parse(body)), true))
                     updated.settings.storage.eTag = ETag
                     onSuccess(updated)
                 })
@@ -40,11 +40,11 @@ export class Cloud {
     }
 
     async pushData(data: AppState, onSuccess: (data: AppState) => void) {
-        const setMeta = (data: AppState, lastSynced: string, eTag?: string) => (
+        const setMeta = (exported: AppState, lastSynced: string, eTag?: string) => (
             {
-                ...data,
+                ...exported,
                 settings: {
-                    ...data.settings,
+                    ...exported.settings,
                     storage: {
                         ...data.settings.storage,
                         eTag: eTag ? eTag : data.settings.storage.eTag,
@@ -54,31 +54,25 @@ export class Cloud {
             }
         )
         const putData = async (client: S3Client) => {
-            const toExport: AppState = {
-                ...data,
-                settings: {
-                    ...data.settings,
-                    storage: {},
-                }
-            } as const
+            const readyToExport = toExport(data)
             const put = new PutObjectCommand({
                 Bucket: data.settings.storage.s3Bucket,
                 Key: DATA_PATH,
-                Body: JSON.stringify(toExport),
+                Body: JSON.stringify(readyToExport),
                 ContentType: "application/json",
             })
             await client
                 .send(put)
                 .then(async res => {
                     const { ETag } = res
-                    const updated = setMeta(data, new Date().toISOString(), ETag)
+                    const updated = setMeta(readyToExport, new Date().toISOString(), ETag)
                     onSuccess(updated)
                 })
                 .then(() => this.notify("Sync completed!"))
                 .catch(e => {
                     const { $metadata: { httpStatusCode } } = e
                     this.checkHttpStatusCode(e, httpStatusCode)
-                    const updated = setMeta(data, new Date().toISOString())
+                    const updated = setMeta(readyToExport, new Date().toISOString())
                     onSuccess(updated)
                     this.notify("Sync completed!")
                 })
