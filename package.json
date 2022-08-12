@@ -16,7 +16,9 @@
         "react-markdown": "^8.0.3",
         "react-router-dom": "^6.2.2",
         "react-scripts": "5.0.1",
+        "remark": "^14.0.2",
         "remark-gfm": "^3.0.1",
+        "remark-textr": "^5.0.1",
         "typescript": "^4.6.3",
         "uuid": "^8.3.2",
         "web-vitals": "^2.1.4"

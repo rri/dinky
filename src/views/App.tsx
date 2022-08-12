@@ -25,6 +25,8 @@ import { Wrapper } from "./Wrapper"
 import { useNavigate } from "react-router-dom"
 import { icons } from "./Icon"
 import { v4 } from "uuid"
+import { remark } from "remark"
+import remarkTextr from "remark-textr"
 import styles from "../styles/App.module.css"
 
 export function App() {
@@ -129,23 +131,28 @@ export function App() {
         return updated
     }
 
-    const createTopics = (text: string) => {
-        const exp = /#([a-zA-Z][a-zA-Z0-9-]*\w)/g
-        while (true) {
-            const match = exp.exec(text)
-            if (match != null) {
-                const newTopic = match[0]
-                const topics = data.contents.topics ? data.contents.topics : {}
-                if (Object
-                    .values(topics)
-                    .filter(topic => topic.data === newTopic)
-                    .length === 0) {
-                    putTopic(v4(), { data: newTopic })
+    const createTopics = async (text: string) => {
+        const createTopicsNow = (text: string) => {
+            const exp = /#([a-zA-Z][a-zA-Z0-9-]*\w)/g
+            while (true) {
+                const match = exp.exec(text)
+                if (match != null) {
+                    const newTopic = match[0]
+                    const topics = data.contents.topics ? data.contents.topics : {}
+                    if (Object
+                        .values(topics)
+                        .filter(topic => topic.data === newTopic)
+                        .length === 0) {
+                        putTopic(v4(), { data: newTopic })
+                    }
+                } else {
+                    break
                 }
-            } else {
-                break
             }
         }
+        await remark()
+            .use(remarkTextr, { plugins: [createTopicsNow] })
+            .process(text)
     }
 
     const putTodaySettings = (value: TodaySettings) => {
