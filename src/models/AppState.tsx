@@ -54,14 +54,9 @@ const mergeByUpdated = <T extends Updatable>(currVal: T, nextVal: T) => {
 const mergeRecords = <T extends Syncable>(currRec?: Record<string, T>, nextRec?: Record<string, T>, forceDel?: boolean, forceSync?: boolean) => {
     const res: Record<string, T> = {}
     Object
-        .entries(currRec ? currRec : {})
-        .forEach((val: [id: string, obj: any]) => {
-            res[val[0]] = val[1]
-        })
-    Object
         .entries(nextRec ? nextRec : {})
         .forEach((val: [id: string, obj: any]) => {
-            const currVal = res[val[0]]
+            const currVal = currRec ? currRec[val[0]] : undefined
             const nextVal = val[1]
 
             if (currVal && nextVal) {
@@ -70,8 +65,8 @@ const mergeRecords = <T extends Syncable>(currRec?: Record<string, T>, nextRec?:
                 if (unsynced) {
                     res[val[0]].unsynced = unsynced
                 }
-            } else if (forceDel && !nextVal && !currVal.unsynced) {
-                // Delete the value by simply not setting it
+            } else if (forceDel && !nextVal && (!currVal || !currVal.unsynced)) {
+                // Delete the value by simply not setting it.
             } else {
                 res[val[0]] = currVal ? currVal : nextVal
                 if (forceSync) {
