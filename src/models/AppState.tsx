@@ -184,6 +184,8 @@ export const mergeStorageSettings = (state: AppState, value: StorageSettings): A
                 awsAccessKey: state.settings.storage.awsAccessKey,
                 awsSecretKey: state.settings.storage.awsSecretKey,
                 awsRegion: state.settings.storage.awsRegion,
+                syncOnLoad: state.settings.storage.syncOnLoad,
+                periodMinutes: state.settings.storage.periodMinutes,
                 ...value,
             },
         }

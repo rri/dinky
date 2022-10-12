@@ -8,6 +8,7 @@ import { Task } from "./Task"
 import { TodaySettings } from "./TodaySettings"
 import { Topic } from "./Topic"
 import { Work } from "./Work"
+import moment from "moment"
 
 export const DATA_PATH = "data"
 
@@ -16,11 +17,47 @@ export class Store {
     private setData: (value: React.SetStateAction<AppState>) => void
     private notify: (note?: string) => void
     private cloud: Cloud
+    private lastSyncStart?: string
 
     constructor(setData: (value: React.SetStateAction<AppState>) => void, notify: (note?: string) => void) {
         this.setData = setData
         this.notify = notify
         this.cloud = new Cloud(this.notify)
+
+        // Sync on page load
+        const syncOnLoad = () => {
+            this.setData(prev => {
+                if (prev.settings.storage.syncOnLoad) {
+                    const cfg = prev.settings.storage
+                    if (!cfg.s3Bucket
+                        || !cfg.awsAccessKey
+                        || !cfg.awsSecretKey
+                        || !cfg.awsRegion) {
+                        // not set up for cloud sync, return silently
+                    } else {
+                        this.cloudSyncData(prev)
+                    }
+                }
+                return prev
+            })
+        }
+
+        setTimeout(syncOnLoad, 1000)
+
+        // Auto sync
+        const autoSyncAction = () => {
+            this.setData(prev => {
+                const periodMinutes = prev.settings.storage.periodMinutes || 0
+                if (periodMinutes > 0) {
+                    this.cloudSyncData(prev, periodMinutes)
+                }
+                setTimeout(autoSyncAction, 60000)
+                return prev
+            })
+        }
+
+        autoSyncAction()
+
     }
 
     loadFromData(data: AppState) {
@@ -43,7 +80,16 @@ export class Store {
         })
     }
 
-    cloudSyncData(data: AppState) {
+    cloudSyncData(data: AppState, minDelayMinutes?: number) {
+
+        if (this.lastSyncStart &&
+            minDelayMinutes &&
+            moment().subtract(minDelayMinutes, "minutes").isBefore(moment(this.lastSyncStart))) {
+            // too soon, return immediately without doing anything
+            return
+        }
+
+        this.lastSyncStart = moment().format("YYYY-MM-DD HH:mm")
         this.notify("Sync starting...")
         this.cloud
             .pullData(data, (data: AppState) => {
