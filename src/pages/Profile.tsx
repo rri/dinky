@@ -37,12 +37,19 @@ export function Profile(props: Props) {
         props.importData()
     })
 
-    const updateCloudSync = (s3Bucket?: string, awsAccessKey?: string, awsSecretKey?: string, awsRegion?: string) => {
+    const updateCloudSync = (s3Bucket?: string,
+        awsAccessKey?: string,
+        awsSecretKey?: string,
+        awsRegion?: string,
+        syncOnLoad?: boolean,
+        periodMinutes?: number) => {
         props.putStorageSettings({
             s3Bucket,
             awsAccessKey,
             awsSecretKey,
             awsRegion,
+            syncOnLoad,
+            periodMinutes,
         })
     }
 
@@ -50,6 +57,8 @@ export function Profile(props: Props) {
     const awsAccessKey = props.settings.storage.awsAccessKey || ""
     const awsSecretKey = props.settings.storage.awsSecretKey || ""
     const awsRegion = props.settings.storage.awsRegion || ""
+    const syncOnLoad = props.settings.storage.syncOnLoad || false
+    const periodMinutes = props.settings.storage.periodMinutes || 0
 
     const lastSynced = props.settings.storage.lastSynced
         ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:mm")
@@ -66,40 +75,74 @@ export function Profile(props: Props) {
                         onClick={props.sync}>
                         Sync your data now
                     </ActionLink>
+                    <OptionSetting label="Sync on page load?" values={[
+                        {
+                            label: "Yes",
+                            action: () => updateCloudSync(s3Bucket,
+                                awsAccessKey,
+                                awsSecretKey,
+                                awsRegion,
+                                true,
+                                periodMinutes),
+                            checked: syncOnLoad,
+                        },
+                        {
+                            label: "No",
+                            action: () => updateCloudSync(s3Bucket,
+                                awsAccessKey,
+                                awsSecretKey,
+                                awsRegion,
+                                false,
+                                periodMinutes),
+                            checked: !syncOnLoad,
+                        },
+                    ]}></OptionSetting>
+                    <Setting
+                        label="Auto sync (minutes)"
+                        onChange={evt => updateCloudSync(s3Bucket,
+                            awsAccessKey,
+                            awsSecretKey,
+                            awsRegion,
+                            syncOnLoad,
+                            parseInt(evt.currentTarget.value))}
+                        type="number"
+                        min={0}
+                        value={periodMinutes || 0}
+                    />
                     <InfoBox>Provide your AWS settings below (<NavLink to="/help" aria-label="More Info">more info</NavLink>).</InfoBox>
                     <Setting
                         label="S3 Bucket"
                         type="text"
                         value={s3Bucket}
-                        onChange={evt => updateCloudSync(evt.currentTarget.value, awsAccessKey, awsSecretKey, awsRegion)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onChange={evt => updateCloudSync(evt.currentTarget.value, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
                     />
                     <Setting
                         label="Access Key"
                         type="text"
                         value={awsAccessKey}
-                        onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)
+                        onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)
                         }
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
                     />
                     <Setting
                         label="Secret Key"
                         type="password"
                         value={awsSecretKey}
-                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion, syncOnLoad, periodMinutes)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
                     />
                     <Setting
                         label="Region"
                         type="text"
                         placeholder="us-west-2"
                         value={awsRegion}
-                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion)}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value, syncOnLoad, periodMinutes)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes)}
                     />
                 </SettingList>
             </Card>

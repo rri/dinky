@@ -96,6 +96,14 @@ To set up your sync configuration:
 
 Finally, enter the information collected above into your sync settings on the [profile](/profile/#cloud-sync) page.
 
+# Sync on Page Load
+
+You may configure the app to synchronize automatically whenever the page loads (or reloads), on the [profile](/profile/#cloud-sync) page. Please note that synchronization may incur charges on your AWS account.
+
+# Auto Sync
+
+You may configure the app to synchronize automatically on a periodic basis. You can set this on the [profile](/profile/#cloud-sync) page, with the periodic value defined in minutes. Declaring the value to be zero (0) turns off periodic synchronization. Please note that synchronization may incur charges on your AWS account.
+
 # Retention Period
 
 You may specify a retention period (default: 30 days) on the [profile](/profile/#manage-your-data) page. Deleted items are retained in storage (but not directly visible to the user) for the period configured here, after which they are automatically purged on a best-effort basis. Currently, the ability to restore deleted-but-not-yet-purged items is not available.
