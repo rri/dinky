@@ -122,6 +122,8 @@ export class Cloud {
                     err.desc = "invalid authentication credentials"
                     throw err
                 }
+                err.desc = "unexpected error (http status code = " + httpStatusCode + ")"
+                throw err
             }
         } else {
             err.desc = "unexpected error"
