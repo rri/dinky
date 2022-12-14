@@ -1,6 +1,6 @@
 import React from "react"
 import { NavLink, useNavigate } from "react-router-dom"
-import { filterByToday, sortByReminder, sortByToday } from "../models/Item"
+import { filterByToday, sortByToday } from "../models/Item"
 import { fetchTasks, Task } from "../models/Task"
 import { fetchWorks, Work } from "../models/Work"
 import { Card } from "../views/Card"
@@ -46,13 +46,13 @@ export function Today(props: Props) {
     const openTasks = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: [sortByToday(), sortByReminder()],
+        sortBy: [sortByToday()],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
     const openWorks = fetchWorks({
         works: props.works,
         archive: false,
-        sortBy: [sortByToday(), sortByReminder()],
+        sortBy: [sortByToday()],
         filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
     })
 

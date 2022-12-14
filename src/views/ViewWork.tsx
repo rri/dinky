@@ -5,6 +5,7 @@ import { belongsToToday, Id } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
+import moment from "moment"
 
 interface Props {
     item: Id & Work,
@@ -34,13 +35,17 @@ export function ViewWork(props: Props) {
     const actions: Action[] = []
 
     const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
+    const reminder =
+        props.item.today                                // date is set
+        && moment(props.item.today).isAfter(moment())   // date is in the future
+        && !today                                       // date is not "today" (considering buffer hours)
 
     if (!archive) {
         actions.push(
             {
-                icon: icons.today,
+                icon: reminder ? icons.alarm : icons.today,
                 desc: today ? "Remove this item from today's agenda" : "Add this item to today's agenda",
-                gray: !today,
+                gray: !reminder && !today,
                 action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
             },
         )

@@ -1,6 +1,5 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import moment from 'moment'
 import React, { useState } from "react"
 import { Action } from '../models/Action'
 import { Note } from '../models/Note'
@@ -146,8 +145,7 @@ export function ViewItem(props: Props) {
                 styles.data,
                 props.readonly ? styles.readonly : "",
                 props.oneline ? styles.oneline : "",
-                props.details ? styles.link : "",
-                props.item.today && moment(props.item.today).isAfter(moment()) ? styles.reminder : ""
+                props.details ? styles.link : ""
             ].join(" ")}
             onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
             <ReactMarkdown

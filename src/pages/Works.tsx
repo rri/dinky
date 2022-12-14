@@ -1,5 +1,5 @@
 import React from "react"
-import { sortByCreated, sortByUpdated, sortByReminder } from "../models/Item"
+import { sortByCreated, sortByUpdated } from "../models/Item"
 import { fetchWorks, Work } from "../models/Work"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
@@ -28,7 +28,7 @@ export function Works(props: Props) {
     const openWorks = fetchWorks({
         works: props.works,
         archive: false,
-        sortBy: [sortByCreated(true), sortByReminder()],
+        sortBy: [sortByCreated(true)],
     })
     const doneWorks = fetchWorks({
         works: props.works,

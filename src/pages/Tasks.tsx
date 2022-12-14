@@ -1,5 +1,5 @@
 import React from "react"
-import { sortByCreated, sortByUpdated, sortByReminder } from "../models/Item"
+import { sortByCreated, sortByUpdated } from "../models/Item"
 import { fetchTasks, Task } from "../models/Task"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
@@ -29,7 +29,7 @@ export function Tasks(props: Props) {
     const openTasks = fetchTasks({
         tasks: props.tasks,
         archive: false,
-        sortBy: [sortByCreated(true), sortByReminder()],
+        sortBy: [sortByCreated(true)],
     })
     const doneTasks = fetchTasks({
         tasks: props.tasks,

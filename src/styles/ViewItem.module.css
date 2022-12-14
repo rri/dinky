@@ -60,14 +60,6 @@ div.data.oneline {
     cursor: pointer;
 }
 
-.data.reminder {
-    font-style: italic;
-}
-
-.data.reminder:before {
-    content: "💤 ";
-}
-
 .data * {
     font-size: 1em;
     margin: 0;
