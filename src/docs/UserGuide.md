@@ -8,7 +8,7 @@
 
 * **Synthesis.** Prioritize tasks and notes, and associate them with [topics](/topics). Topics are hyphenated phrases prefixed with a "`#`" (example: `#my-topic`), which are added inline to tasks and notes. This process which we call *synthesis*, is a form of deep thinking and planning that bridges the gap between information consumption and action determination. Synthesis takes a few forms: (a) given notes captured during the day, what new tasks should you create? (b) given a large or ambiguous task, what smaller tasks should you break it down into? (c) do the current set of tasks continue to help you make progress towards your larger objectives?
 
-Everyday, you can pick tasks in your backlog to be completed, by adding them to your [agenda](/) on the start page. Tasks added to your agenda disappear (from your agenda, not the backlog) at the end of the day. You can always visit the backlog and re-add them, if you want to pick them up again.
+Everyday, you can pick tasks in your backlog to be completed, by adding them to your [agenda](/) on the start page. Tasks added to your agenda disappear (from your agenda, not the backlog) at the end of the day. You can always visit the backlog and re-add them, if you want to pick them up again. Items in your [library](/library) work a bit differently: they *stay* on your agenda until you manually remove them.
 
 # Library
 
