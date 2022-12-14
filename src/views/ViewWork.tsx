@@ -34,7 +34,7 @@ export function ViewWork(props: Props) {
 
     const actions: Action[] = []
 
-    const today = belongsToToday(props.item, props.today.eveningBufferHours, props.today.morningBufferHours)
+    const today = belongsToToday(props.item, props.today.eveningBufferHours)
     const reminder =
         props.item.today                                // date is set
         && moment(props.item.today).isAfter(moment())   // date is in the future

@@ -53,7 +53,7 @@ export function Today(props: Props) {
         works: props.works,
         archive: false,
         sortBy: [sortByToday()],
-        filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
+        filterMore: filterByToday(props.today.eveningBufferHours),
     })
 
     const newTaskAction = {

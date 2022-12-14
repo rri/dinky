@@ -99,17 +99,19 @@ export function filterByArchive(archive: boolean) {
     return filterByStatus(item => item.archive, archive)
 }
 
-export function filterByToday<T extends Schedulable>(eveningBufferHours: number, morningBufferHours: number) {
+export function filterByToday<T extends Schedulable>(eveningBufferHours: number, morningBufferHours?: number) {
+    const infiniteMorningBufferHours = morningBufferHours ? false : true
     return (item: T) => {
-        const referencePoint = Number.parseInt(moment().format("H")) >= morningBufferHours
+        const referencePoint = Number.parseInt(moment().format("H")) >= (morningBufferHours || 0)
             ? moment()
             : moment().subtract(1, "days")
         return item.today
             ? moment(item.today) <= moment()
-            && referencePoint
-                .startOf("day")
-                .subtract(eveningBufferHours, "hours")
-                .isBefore(moment(item.today))
+            && (infiniteMorningBufferHours
+                || referencePoint
+                    .startOf("day")
+                    .subtract(eveningBufferHours, "hours")
+                    .isBefore(moment(item.today)))
             : false
     }
 }
@@ -151,6 +153,6 @@ export function sortByToday(reverse?: boolean) {
     return sortByChronology((item: Schedulable) => withDefaultDate(item.today, new Date()), reverse)
 }
 
-export function belongsToToday<T extends Schedulable>(item: T, eveningBufferHours: number, morningBufferHours: number) {
+export function belongsToToday<T extends Schedulable>(item: T, eveningBufferHours: number, morningBufferHours?: number) {
     return filterByToday(eveningBufferHours, morningBufferHours)(item)
 }
