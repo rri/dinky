@@ -154,29 +154,3 @@ export function sortByToday(reverse?: boolean) {
 export function belongsToToday<T extends Schedulable>(item: T, eveningBufferHours: number, morningBufferHours: number) {
     return filterByToday(eveningBufferHours, morningBufferHours)(item)
 }
-
-export function sortByReminder<T extends Schedulable>() {
-    return (x: T, y: T) => {
-        const a = x.today
-        const b = y.today
-        if (a && moment().isBefore(moment(a))) {
-            // X's today is in the future
-            if (b && moment().isBefore(moment(b))) {
-                // Y's today is in the future
-                return 0
-            } else {
-                // X in the future, Y in the past
-                return 1
-            }
-        } else {
-            // X's today is not in the future
-            if (b && moment().isBefore(moment(b))) {
-                // Y in the future, X in the past
-                return -1
-            } else {
-                // Both in the past
-                return 0
-            }
-        }
-    }
-}

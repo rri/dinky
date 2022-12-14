@@ -1,3 +1,4 @@
+import alarm from "@material-design-icons/svg/two-tone/alarm_on.svg"
 import arrowDown from "@material-design-icons/svg/two-tone/expand_more.svg"
 import arrowLeft from "@material-design-icons/svg/two-tone/chevron_left.svg"
 import back from "@material-design-icons/svg/two-tone/keyboard_backspace.svg"
@@ -36,6 +37,7 @@ export function Icon(props: Props) {
 }
 
 export const icons = {
+    alarm,
     arrowDown,
     arrowLeft,
     back,
