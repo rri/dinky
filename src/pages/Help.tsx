@@ -20,6 +20,7 @@ export function Help(props: Props) {
                     <Shortcut codes={["1"]}>Go to <NavLink to="/tasks" title="Go to tasks">tasks</NavLink></Shortcut>
                     <Shortcut codes={["2"]}>Go to <NavLink to="/topics" title="Go to topics">topics</NavLink></Shortcut>
                     <Shortcut codes={["3"]}>Go to <NavLink to="/notes" title="Go to notes">notes</NavLink></Shortcut>
+                    <Shortcut codes={["l"]}>Go to your <NavLink to="/works" title="Go to your library">library</NavLink></Shortcut>
                     <Shortcut codes={["?"]}>Get help (this page)</Shortcut>
                     <Shortcut codes={[","]}>View or edit your <NavLink to="/profile" title="Go to your profile">profile</NavLink></Shortcut>
                 </ShortcutList>
