@@ -55,6 +55,7 @@ interface Props {
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerExportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
+    notify: (note?: string) => void,
 }
 
 export function PageContent(props: Props) {
@@ -84,6 +85,7 @@ export function PageContent(props: Props) {
             newNote={props.newNote}
             putTask={props.putTask}
             putWork={props.putWork}
+            notify={props.notify}
         />
     )
 
@@ -100,6 +102,7 @@ export function PageContent(props: Props) {
                     putTask={props.putTask}
                     putWork={props.putWork}
                     registerNewHandler={props.registerNewHandler}
+                    notify={props.notify}
                 />}
             />
             <Route
@@ -111,6 +114,7 @@ export function PageContent(props: Props) {
                     putTask={props.putTask}
                     delTasks={props.delTasks}
                     registerNewHandler={props.registerNewHandler}
+                    notify={props.notify}
                 />}
             />
             <Route
@@ -120,6 +124,7 @@ export function PageContent(props: Props) {
                     tasks={tasks}
                     topAction={props.back}
                     putTask={props.putTask}
+                    notify={props.notify}
                 />}
             />
             <Route
@@ -163,6 +168,7 @@ export function PageContent(props: Props) {
                     putTopic={props.putTopic}
                     putTask={props.putTask}
                     putWork={props.putWork}
+                    notify={props.notify}
                 />}
             />
             <Route
@@ -173,6 +179,7 @@ export function PageContent(props: Props) {
                     newWork={props.newWork}
                     putWork={props.putWork}
                     registerNewHandler={props.registerNewHandler}
+                    notify={props.notify}
                 />}
             />
             <Route
@@ -182,6 +189,7 @@ export function PageContent(props: Props) {
                     works={works}
                     topAction={props.back}
                     putWork={props.putWork}
+                    notify={props.notify}
                 />}
             />
             <Route

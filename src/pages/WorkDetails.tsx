@@ -16,6 +16,7 @@ interface Props {
     },
     topAction: Action,
     putWork: (id: string, item: Work) => boolean,
+    notify: (note?: string) => void,
 }
 
 export function WorkDetails(props: Props) {
@@ -35,6 +36,7 @@ export function WorkDetails(props: Props) {
                             putWork={props.putWork}
                             hideDetails={true}
                             actionOnDelete={true}
+                            notify={props.notify}
                         />
                         : <MsgBox emoji="🚫">The item you're looking for cannot be found in your library!</MsgBox>
                 }
