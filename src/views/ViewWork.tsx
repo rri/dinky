@@ -22,6 +22,7 @@ interface Props {
     actionOnDelete?: boolean,
     newWork?: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
+    notify: (note?: string) => void,
 }
 
 export function ViewWork(props: Props) {
@@ -44,9 +45,11 @@ export function ViewWork(props: Props) {
         actions.push(
             {
                 icon: reminder ? icons.alarm : icons.today,
-                desc: today ? "Remove this item from today's agenda" : "Add this item to today's agenda",
+                desc: today ? "Remove this task from today's agenda" : (reminder ? "Remove from schedule." : "Add this task to today's agenda"),
                 gray: !reminder && !today,
                 action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
+                showTooltip: () => reminder && props.notify("Scheduled for " + moment(props.item.today).format("YYYY-MM-DD")),
+                hideTooltip: () => reminder && props.notify(),
             },
         )
     }

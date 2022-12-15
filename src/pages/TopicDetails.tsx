@@ -31,6 +31,7 @@ interface Props {
     putTopic: (id: string, item: Topic) => boolean,
     putTask: (id: string, item: Task) => boolean,
     putWork: (id: string, item: Work) => boolean,
+    notify: (note?: string) => void,
 }
 
 export function TopicDetails(props: Props) {
@@ -112,6 +113,7 @@ export function TopicDetails(props: Props) {
                                         icon={icons.tasks}
                                         clear={props.clear}
                                         putTask={props.putTask}
+                                        notify={props.notify}
                                     />)
                                 }
                                 {
@@ -124,6 +126,7 @@ export function TopicDetails(props: Props) {
                                         icon={icons.works}
                                         clear={props.clear}
                                         putWork={props.putWork}
+                                        notify={props.notify}
                                     />)
                                 }
                                 {
@@ -147,6 +150,7 @@ export function TopicDetails(props: Props) {
                                         icon={icons.tasks}
                                         clear={props.clear}
                                         putTask={props.putTask}
+                                        notify={props.notify}
                                     />)
                                 }
                                 {
@@ -159,6 +163,7 @@ export function TopicDetails(props: Props) {
                                         icon={icons.works}
                                         clear={props.clear}
                                         putWork={props.putWork}
+                                        notify={props.notify}
                                     />)
                                 }
                                 {

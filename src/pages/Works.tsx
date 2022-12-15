@@ -16,6 +16,7 @@ interface Props {
     newWork: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
+    notify: (note?: string) => void,
 }
 
 export function Works(props: Props) {
@@ -58,6 +59,7 @@ export function Works(props: Props) {
                                         autoNew={true}
                                         newWork={props.newWork}
                                         putWork={props.putWork}
+                                        notify={props.notify}
                                         readonly={true}
                                     />)
                                 }
@@ -76,6 +78,7 @@ export function Works(props: Props) {
                                         item={item}
                                         today={props.today}
                                         putWork={props.putWork}
+                                        notify={props.notify}
                                         readonly={true}
                                     />)
                                 }

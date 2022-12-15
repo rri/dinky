@@ -9,6 +9,8 @@ export function Button(props: Action) {
             alt={props.desc}
             title={props.desc}
             onClick={props.action}
+            onMouseOver={props.showTooltip}
+            onMouseLeave={props.hideTooltip}
         />
     )
 }
