@@ -44,7 +44,7 @@ export function ViewTask(props: Props) {
         actions.push(
             {
                 icon: reminder ? icons.alarm : icons.today,
-                desc: today ? "Remove this task from today's agenda" : "Add this task to today's agenda",
+                desc: today ? "Remove this task from today's agenda" : (reminder ? "Scheduled for " + moment(props.item.today).format("YYYY-MM-DD") + ". Click to unschedule." : "Add this task to today's agenda"),
                 gray: !reminder && !today,
                 action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
             },
