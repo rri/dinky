@@ -125,7 +125,7 @@ export function App() {
         }
 
         if (!item.created) {
-            item.unsynced = true
+            updated.unsynced = true
         }
 
         return updated

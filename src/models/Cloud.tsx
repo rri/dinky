@@ -11,30 +11,30 @@ export class Cloud {
         this.notify = notify
     }
 
-    async pullData(data: AppState, onSuccess: (data: AppState) => void) {
+    async pullData(localData: AppState, onSuccess: (mergedData: AppState) => void) {
         const getData = async (client: S3Client) => {
             const get = new GetObjectCommand({
-                Bucket: data.settings.storage.s3Bucket,
+                Bucket: localData.settings.storage.s3Bucket,
                 Key: DATA_PATH,
-                IfNoneMatch: data.settings.storage.eTag,
+                IfNoneMatch: localData.settings.storage.eTag,
             })
             await client
                 .send(get)
                 .then(async res => {
                     const { Body, ETag } = res
                     const body = await new Response(Body as ReadableStream).text()
-                    const updated = purgeDeleted(mergeData(data, empty(JSON.parse(body)), true))
+                    const updated = purgeDeleted(mergeData(localData, empty(JSON.parse(body)), true))
                     updated.settings.storage.eTag = ETag
                     onSuccess(updated)
                 })
                 .catch(e => {
                     const { $metadata: { httpStatusCode } } = e
                     this.checkHttpStatusCode(e, httpStatusCode)
-                    const updated = purgeDeleted(data)
+                    const updated = purgeDeleted(localData)
                     onSuccess(updated)
                 })
         }
-        this.withS3Client(data.settings.storage,
+        this.withS3Client(localData.settings.storage,
             client => getData(client).catch((e: any) => this.notify("Sync (get) failed: " + e.desc)),
             () => this.notify("Sync not set up!"))
     }
