@@ -43,7 +43,7 @@ export function Setting(props: SettingProps) {
     const { label, ...rest } = props
     return (
         <Wrapper layout="row" className={styles.main}>
-            <div className={styles.label}>{label}</div>
+            <div className={styles.label} title={label}>{label}</div>
             <input {...rest} title={label} />
         </Wrapper>
     )
@@ -53,12 +53,13 @@ export function OptionSetting(props: OptionProps) {
     const { label, ...rest } = props
     return (
         <Wrapper layout="row" className={styles.main}>
-            <div className={styles.label}>{label}</div>
+            <div className={styles.label} title={label}>{label}</div>
             <div className={styles.optionGroup}>
                 {props.values.map(opt => (
                     <label key={opt.label} className={styles.option}>
                         <input
                             name={label}
+                            title={label}
                             type="radio"
                             onChange={opt.action}
                             checked={opt.checked}
