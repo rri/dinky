@@ -1,5 +1,6 @@
 import React, { useMemo } from "react"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
@@ -32,6 +33,8 @@ import styles from "../styles/App.module.css"
 export function App() {
 
     const navigate = useNavigate()
+
+    const { hash } = useLocation()
 
     const [term, setTerm] = useState<Term>(new Term(""))
     const [data, setData] = useState<AppState>(empty())
@@ -319,6 +322,20 @@ export function App() {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setDisplayTheme())
         setDisplayTheme()
     }, [data.settings.display.theme])
+
+    useEffect(() => {
+        const search = encodeURI(term.source())
+        if (hash !== search) {
+            window.location.hash = search
+        }
+    }, [hash, term])
+
+    useEffect(() => {
+        const search = decodeURI(hash.replace(/^#/, ''))
+        if (search) {
+            setTerm(new Term(search))
+        }
+    }, [hash])
 
     const keyMap = {
         SEARCH: "/",
