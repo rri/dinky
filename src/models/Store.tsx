@@ -80,7 +80,7 @@ export class Store {
         })
     }
 
-    cloudSyncData(data: AppState, minDelayMinutes?: number) {
+    cloudSyncData(localData: AppState, minDelayMinutes?: number) {
 
         if (this.lastSyncStart &&
             minDelayMinutes &&
@@ -92,13 +92,13 @@ export class Store {
         this.lastSyncStart = moment().format("YYYY-MM-DD HH:mm")
         this.notify("Sync starting...")
         this.cloud
-            .pullData(data, (data: AppState) => {
-                this.saveToDisk(data)
-                this.setData(data)
+            .pullData(localData, (mergedData: AppState) => {
+                this.saveToDisk(mergedData)
+                this.setData(mergedData)
                 this.cloud
-                    .pushData(data, (data: AppState) => {
-                        this.saveToDisk(data)
-                        this.setData(data)
+                    .pushData(mergedData, (updated: AppState) => {
+                        this.saveToDisk(updated)
+                        this.setData(updated)
                     })
                     .catch(e => this.notify("Sync (put) failed: " + e.desc))
             })
