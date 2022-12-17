@@ -9,12 +9,17 @@
     font-family: var(--font-decorative);
     font-style: italic;
     padding: calc(var(--spacing) * 2) 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main .label {
     padding: var(--spacing);
     min-width: 30%;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main .optionGroup {

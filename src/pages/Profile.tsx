@@ -109,7 +109,7 @@ export function Profile(props: Props) {
                         min={0}
                         value={periodMinutes || 0}
                     />
-                    <InfoBox>Provide your AWS settings below (<NavLink to="/help" aria-label="More Info">more info</NavLink>).</InfoBox>
+                    <InfoBox>Provide your AWS settings (<NavLink to="/help" aria-label="Help">help</NavLink>).</InfoBox>
                     <Setting
                         label="S3 Bucket"
                         type="text"
