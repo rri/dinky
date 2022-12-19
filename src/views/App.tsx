@@ -42,7 +42,7 @@ export function App() {
 
     const notify = (note?: string) => {
         setNotify(note || "")
-        setTimeout(setNotify, 3000)
+        setTimeout(setNotify, 10000)
     }
 
     const store = useMemo(() => new Store(setData, notify), [setData])

@@ -3,6 +3,4 @@ export interface Action {
     desc: string,
     gray?: boolean,
     action: () => void,
-    showTooltip?: () => void,
-    hideTooltip?: () => void,
 }
