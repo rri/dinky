@@ -48,8 +48,6 @@ export function ViewWork(props: Props) {
                 desc: today ? "Remove this task from today's agenda" : (reminder ? "Remove from schedule." : "Add this task to today's agenda"),
                 gray: !reminder && !today,
                 action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
-                showTooltip: () => reminder && props.notify("Scheduled for " + moment(props.item.today).format("YYYY-MM-DD")),
-                hideTooltip: () => reminder && props.notify(),
             },
         )
     }
@@ -97,6 +95,8 @@ export function ViewWork(props: Props) {
             newWork={props.newWork}
             putWork={props.putWork}
             details={props.hideDetails ? undefined : details}
+            notify={props.notify}
+            notification={reminder ? () => "Scheduled for " + moment(props.item.today).format("YYYY-MM-DD") : undefined}
         />
     )
 }
