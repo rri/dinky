@@ -41,7 +41,7 @@ export interface Typed {
     path: "settings.storage" | "settings.retention" | "settings.today" | "settings.display" | "contents.tasks" | "contents.topics" | "contents.notes" | "contents.works"
 }
 
-export type Writable = Event & Typed & Updatable
+export type Writable = Event & Typed & Syncable & Updatable
 
 export type Sorter = (x: any, y: any) => 1 | -1 | 0
 
