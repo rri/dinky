@@ -2,11 +2,11 @@
 
 [dinky.dev](/) helps you organize your life. Its core concepts are simple, and built to take advantage of the natural ways in which a person acquires and manages information. Planned daily activities are boiled down to three simple abstractions: "note-taking", "task-execution", and "synthesis".
 
-* **Note-Taking.** Create [notes](/notes) to write down short blurbs of information (ideas, suggestions, meeting summaries, action items). Recall and learning are maximized when you *write down* your thoughts and takeaways. Notes make it easy to record *raw* information that's meant to be synthesized later.
+**Note-Taking.** Create [notes](/notes) to write down short blurbs of information (ideas, suggestions, meeting summaries, action items). Recall and learning are maximized when you *write down* your thoughts and takeaways. Notes make it easy to record *raw* information that's meant to be synthesized later.
 
-* **Task-Execution.** Create [tasks](/tasks) representing concrete actions you need to take. Each task ideally requires no more than 20 minutes to complete, and large tasks are meant to be broken down into smaller ones. Knowing what needs to be done *next* makes it easy to focus on the task at hand and getting it done.
+**Task-Execution.** Create [tasks](/tasks) representing concrete actions you need to take. Each task ideally requires no more than 20 minutes to complete, and large tasks are meant to be broken down into smaller ones. Knowing what needs to be done *next* makes it easy to focus on the task at hand and getting it done.
 
-* **Synthesis.** Prioritize tasks and notes, and associate them with [topics](/topics). Topics are hyphenated phrases prefixed with a "`#`" (example: `#my-topic`), which are added inline to tasks and notes. This process which we call *synthesis*, is a form of deep thinking and planning that bridges the gap between information consumption and action determination. Synthesis takes a few forms: (a) given notes captured during the day, what new tasks should you create? (b) given a large or ambiguous task, what smaller tasks should you break it down into? (c) do the current set of tasks continue to help you make progress towards your larger objectives?
+**Synthesis.** Prioritize tasks and notes, and associate them with [topics](/topics). Topics are hyphenated phrases prefixed with a "`#`" (example: `#my-topic`), which are added inline to tasks and notes. This process which we call *synthesis*, is a form of deep thinking and planning that bridges the gap between information consumption and action determination. Synthesis takes a few forms: (a) given notes captured during the day, what new tasks should you create? (b) given a large or ambiguous task, what smaller tasks should you break it down into? (c) do the current set of tasks continue to help you make progress towards your larger objectives?
 
 Everyday, you can pick tasks in your backlog to be completed, by adding them to your [agenda](/) on the start page. Tasks added to your agenda disappear (from your agenda, not the backlog) at the end of the day. You can always visit the backlog and re-add them, if you want to pick them up again. Items in your [library](/library) work a bit differently: they *stay* on your agenda until you manually remove them.
 
@@ -103,6 +103,10 @@ You may configure the app to synchronize automatically whenever the page loads (
 # Auto Sync
 
 You may configure the app to synchronize automatically on a periodic basis. You can set this on the [profile](/profile/#cloud-sync) page, with the periodic value defined in minutes. Declaring the value to be zero (0) turns off periodic synchronization. Please note that synchronization may incur charges on your AWS account.
+
+# Auto Push Items
+
+It is easy to forget to synchronize manually after adding or updating items. To make your life easier, you can turn on this setting on the [profile](/profile/#cloud-sync) page. When this setting is turned on, updates are individually posted to the cloud as *events*, and these events are automatically merged during manual or automatic synchronization on any device. Of course, updates will not be posted if the device is offline or the Internet is otherwise unavailable, but in such cases, you can still fall back to full synchronization at a later point.
 
 # Retention Period
 

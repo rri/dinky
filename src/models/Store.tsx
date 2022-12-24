@@ -125,7 +125,7 @@ export class Store {
     putTodaySettings(item: TodaySettings) {
         this.setData(prev => {
             const updated = mergeTodaySettings(prev, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "settings.today", ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "settings.today", ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -134,7 +134,7 @@ export class Store {
     putRetentionSettings(item: RetentionSettings) {
         this.setData(prev => {
             const updated = mergeRetentionSettings(prev, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "settings.retention", ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "settings.retention", ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -143,7 +143,7 @@ export class Store {
     putDisplaySettings(item: DisplaySettings) {
         this.setData(prev => {
             const updated = mergeDisplaySettings(prev, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "settings.display", ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "settings.display", ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -152,7 +152,7 @@ export class Store {
     putTask(id: string, item: Task) {
         this.setData(prev => {
             const updated = mergeTask(prev, id, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "contents.tasks", id, ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.tasks", id, ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -161,7 +161,7 @@ export class Store {
     putTopic(id: string, item: Topic) {
         this.setData(prev => {
             const updated = mergeTopic(prev, id, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "contents.topics", id, ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.topics", id, ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -170,7 +170,7 @@ export class Store {
     putNote(id: string, item: Note) {
         this.setData(prev => {
             const updated = mergeNote(prev, id, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "contents.notes", id, ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.notes", id, ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -179,7 +179,7 @@ export class Store {
     putWork(id: string, item: Work) {
         this.setData(prev => {
             const updated = mergeWork(prev, id, item)
-            this.cloud.pushItem(updated, { evt: v4(), path: "contents.works", id, ...item })
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.works", id, ...item })
             this.saveToDisk(updated)
             return updated
         })
@@ -196,7 +196,7 @@ export class Store {
                     updated: new Date().toISOString(),
                     deleted: new Date().toISOString(),
                 }
-                this.cloud.pushItem(prev, { evt: v4(), path: "contents.tasks", id, ...item })
+                prev.settings.storage.autoPushItems && this.cloud.pushItem(prev, { evt: v4(), path: "contents.tasks", id, ...item })
                 items[id] = item
             })
             const updated = mergeTasks(prev, items)
