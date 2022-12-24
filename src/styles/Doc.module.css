@@ -1,6 +1,6 @@
 .main {
     line-height: 1.8em;
-    padding: var(--spacing);
+    padding: var(--spacing) calc(4 * var(--spacing));
 }
 
 .main h1,

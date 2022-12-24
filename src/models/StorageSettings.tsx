@@ -5,6 +5,7 @@ export interface StorageSettings {
     awsRegion?: string,
     syncOnLoad?: boolean,
     periodMinutes?: number,
+    autoPushItems?: boolean,
     eTag?: string,
     lastSynced?: string,
 }
