@@ -22,7 +22,6 @@ interface Props {
     newWork: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
-    notify: (note?: string) => void,
 }
 
 export function Today(props: Props) {
@@ -84,7 +83,6 @@ export function Today(props: Props) {
                                         today={props.today}
                                         newTask={props.newTask}
                                         putTask={props.putTask}
-                                        notify={props.notify}
                                         readonly={true}
                                     />)
                                 }
@@ -104,7 +102,6 @@ export function Today(props: Props) {
                                         today={props.today}
                                         newWork={props.newWork}
                                         putWork={props.putWork}
-                                        notify={props.notify}
                                         readonly={true}
                                     />)
                                 }

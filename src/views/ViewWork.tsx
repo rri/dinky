@@ -22,7 +22,6 @@ interface Props {
     actionOnDelete?: boolean,
     newWork?: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
-    notify: (note?: string) => void,
 }
 
 export function ViewWork(props: Props) {
@@ -95,8 +94,6 @@ export function ViewWork(props: Props) {
             newWork={props.newWork}
             putWork={props.putWork}
             details={props.hideDetails ? undefined : details}
-            notify={props.notify}
-            notification={reminder ? () => "Scheduled for " + moment(props.item.today).format("YYYY-MM-DD") : undefined}
         />
     )
 }

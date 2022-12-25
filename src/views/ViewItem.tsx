@@ -31,8 +31,6 @@ interface Props {
     autoNew?: boolean,
     actionOnDelete?: () => void,
     details?: () => void,
-    notify?: (note?: string) => void,
-    notification?: () => string,
     newTask?: (template?: string) => string,
     newTopic?: (template?: string) => string,
     newNote?: (template?: string) => string,
@@ -165,8 +163,6 @@ export function ViewItem(props: Props) {
         <React.Fragment>
             <Wrapper
                 layout="col"
-                onMouseOver={() => props.notification && props.notify && props.notify(props.notification())}
-                onMouseLeave={() => props.notification && props.notify && props.notify()}
                 className={[styles.main, props.strikethru ? styles.strikethru : ""].join(" ")}>
                 <Wrapper layout="row">
                     {props.icon && <Icon icon={props.icon} />}

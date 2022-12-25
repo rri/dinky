@@ -443,7 +443,6 @@ export function App() {
                 registerNewHandler={registerNewHandler}
                 registerExportHandler={registerExportHandler}
                 registerImportHandler={registerImportHandler}
-                notify={notify}
             />
             <Footer />
         </Wrapper>
