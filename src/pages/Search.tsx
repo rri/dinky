@@ -26,7 +26,6 @@ type Props = Contents & {
     newNote: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
     putWork: (id: string, item: Work) => boolean,
-    notify: (note?: string) => void,
 }
 
 export function Search(props: Props) {
@@ -109,7 +108,6 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
-                                    notify={props.notify}
                                 />)
                             }
                             {
@@ -122,7 +120,6 @@ export function Search(props: Props) {
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}
-                                    notify={props.notify}
                                 />)
                             }
                             {
@@ -156,7 +153,6 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
-                                    notify={props.notify}
                                 />)
                             }
                             {
@@ -169,7 +165,6 @@ export function Search(props: Props) {
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}
-                                    notify={props.notify}
                                 />)
                             }
                             {

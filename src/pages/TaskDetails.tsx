@@ -16,7 +16,6 @@ interface Props {
     },
     topAction: Action,
     putTask: (id: string, item: Task) => boolean,
-    notify: (note?: string) => void,
 }
 
 export function TaskDetails(props: Props) {
@@ -36,7 +35,6 @@ export function TaskDetails(props: Props) {
                             putTask={props.putTask}
                             hideDetails={true}
                             actionOnDelete={true}
-                            notify={props.notify}
                         />
                         : <MsgBox emoji="🚫">The task you're looking for cannot be found!</MsgBox>
                 }

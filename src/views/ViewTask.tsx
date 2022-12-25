@@ -22,7 +22,6 @@ interface Props {
     actionOnDelete?: boolean,
     newTask?: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
-    notify: (note?: string) => void,
 }
 
 export function ViewTask(props: Props) {
@@ -93,8 +92,6 @@ export function ViewTask(props: Props) {
             newTask={props.newTask}
             putTask={props.putTask}
             details={props.hideDetails ? undefined : details}
-            notify={props.notify}
-            notification={reminder ? () => "Scheduled for " + moment(props.item.today).format("YYYY-MM-DD") : undefined}
         />
     )
 }
