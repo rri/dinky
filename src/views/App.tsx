@@ -332,10 +332,10 @@ export function App() {
 
     useEffect(() => {
         const search = decodeURI(hash.replace(/^#/, ''))
-        if (search) {
+        if (search && term.source() !== search) {
             setTerm(new Term(search))
         }
-    }, [hash])
+    }, [hash, term])
 
     const keyMap = {
         SEARCH: "/",
