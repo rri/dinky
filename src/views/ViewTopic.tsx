@@ -17,6 +17,7 @@ interface Props {
     newNote: (template?: string) => string,
     newTopic?: (template?: string) => string,
     putTopic?: (id: string, item: Topic) => boolean,
+    returnURL?: string,
 }
 
 export function ViewTopic(props: Props) {
@@ -66,6 +67,7 @@ export function ViewTopic(props: Props) {
             newTopic={props.newTopic}
             putTopic={props.putTopic}
             details={props.hideDetails ? undefined : details}
+            returnURL={props.returnURL}
         />
     )
 }

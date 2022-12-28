@@ -22,6 +22,7 @@ interface Props {
     actionOnDelete?: boolean,
     newWork?: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
+    returnURL?: string,
 }
 
 export function ViewWork(props: Props) {
@@ -94,6 +95,7 @@ export function ViewWork(props: Props) {
             newWork={props.newWork}
             putWork={props.putWork}
             details={props.hideDetails ? undefined : details}
+            returnURL={props.returnURL}
         />
     )
 }
