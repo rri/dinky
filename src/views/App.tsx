@@ -324,18 +324,11 @@ export function App() {
     }, [data.settings.display.theme])
 
     useEffect(() => {
-        const search = encodeURI(term.source())
-        if (hash !== search) {
-            window.location.hash = search
-        }
-    }, [hash, term])
-
-    useEffect(() => {
         const search = decodeURI(hash.replace(/^#/, ''))
-        if (search && term.source() !== search) {
+        if (search) {
             setTerm(new Term(search))
         }
-    }, [hash, term])
+    }, [hash])
 
     const keyMap = {
         SEARCH: "/",

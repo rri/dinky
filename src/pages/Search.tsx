@@ -81,6 +81,10 @@ export function Search(props: Props) {
 
     const results = x1.length + y1.length + w1.length + z1.length + x2.length + y2.length + w2.length + z2.length
 
+    const getReturnURL = () => {
+        return window.location.toString().replace(/([^#]*).*/, "$1#" + props.term.source())
+    }
+
     return (
         <Wrapper layout="col">
             <Card title="Search Results" action={props.clear} count={results ? results : undefined}>
@@ -96,6 +100,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     clear={props.clear}
                                     newNote={props.newNote}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -108,6 +113,7 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -120,6 +126,7 @@ export function Search(props: Props) {
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -131,6 +138,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     icon={icons.notes}
                                     clear={props.clear}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -141,6 +149,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     clear={props.clear}
                                     newNote={props.newNote}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -153,6 +162,7 @@ export function Search(props: Props) {
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -165,6 +175,7 @@ export function Search(props: Props) {
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                             {
@@ -176,6 +187,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     icon={icons.notes}
                                     clear={props.clear}
+                                    returnURL={getReturnURL()}
                                 />)
                             }
                         </React.Fragment>

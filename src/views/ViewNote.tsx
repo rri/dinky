@@ -18,6 +18,7 @@ interface Props {
     actionOnDelete?: boolean,
     newNote?: (template?: string) => string,
     putNote?: (id: string, item: Note) => boolean,
+    returnURL?: string,
 }
 
 export function ViewNote(props: Props) {
@@ -60,6 +61,7 @@ export function ViewNote(props: Props) {
             newNote={props.newNote}
             putNote={props.putNote}
             details={props.hideDetails ? undefined : details}
+            returnURL={props.returnURL}
         />
     )
 }

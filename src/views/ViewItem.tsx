@@ -15,6 +15,7 @@ import { v4 } from 'uuid'
 import { Enriched } from './Enriched'
 import { Link } from './Link'
 import styles from "../styles/ViewItem.module.css"
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
     slug: string,
@@ -39,11 +40,14 @@ interface Props {
     putTopic?: (id: string, item: Topic) => boolean,
     putNote?: (id: string, item: Note) => boolean,
     putWork?: (id: string, item: Work) => boolean,
+    returnURL?: string,
 }
 
 export function ViewItem(props: Props) {
 
     let dirty = !props.item.created // Guard that ensures the update only fires once
+
+    const navigate = useNavigate()
 
     const [edit, setEdit] = useState(false)
 
@@ -114,6 +118,11 @@ export function ViewItem(props: Props) {
 
     const [main, bits] = props.metadata ? formatData(props.item.data) : [props.item.data]
 
+    const setReturnURLAndThen = (func: () => void) => {
+        props.returnURL && navigate(props.returnURL);
+        return func()
+    }
+
     const item = edit || !props.item.created
         ? <textarea
             autoFocus
@@ -147,7 +156,13 @@ export function ViewItem(props: Props) {
                 props.oneline ? styles.oneline : "",
                 props.details ? styles.link : ""
             ].join(" ")}
-            onClick={() => { (props.readonly && props.details) ? props.details() : setEdit(true) }}>
+            onClick={() => {
+                (props.readonly && props.details)
+                    ? (props.returnURL
+                        ? setReturnURLAndThen(() => props.details && props.details())
+                        : props.details())
+                    : setEdit(true)
+            }}>
             <ReactMarkdown
                 children={props.oneline ? main : props.item.data}
                 remarkPlugins={[remarkGfm]}

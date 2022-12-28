@@ -22,6 +22,7 @@ interface Props {
     actionOnDelete?: boolean,
     newTask?: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
+    returnURL?: string,
 }
 
 export function ViewTask(props: Props) {
@@ -92,6 +93,7 @@ export function ViewTask(props: Props) {
             newTask={props.newTask}
             putTask={props.putTask}
             details={props.hideDetails ? undefined : details}
+            returnURL={props.returnURL}
         />
     )
 }
