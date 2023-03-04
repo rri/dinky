@@ -45,7 +45,7 @@ export function ViewWork(props: Props) {
         actions.push(
             {
                 icon: reminder ? icons.alarm : icons.today,
-                desc: today ? "Remove this task from today's agenda" : (reminder ? "Remove from schedule." : "Add this task to today's agenda"),
+                desc: today ? "Remove this item from today's reading" : (reminder ? "Remove from schedule." : "Add this item to today's reading"),
                 gray: !reminder && !today,
                 action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
             },
