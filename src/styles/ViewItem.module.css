@@ -117,8 +117,6 @@ div.data.oneline {
 .data h5:not(:first-child),
 .data h6:not(:first-child),
 .data p:not(:first-child),
-.data ul:not(:first-child),
-.data ol:not(:first-child),
 .data hr:not(:first-child),
 .data blockquote:not(:first-child),
 .data pre:not(:first-child),
