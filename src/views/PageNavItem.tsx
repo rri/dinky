@@ -7,7 +7,6 @@ interface Props {
     name: string,
     slug: string,
     icon: string,
-    hideName?: boolean,
     clear: Action,
 }
 
@@ -23,9 +22,8 @@ export function PageNavItem(props: Props) {
                 title={props.name}
                 onClick={props.clear.action}
             >
-                <img className={styles.icon} src={props.icon} alt={props.hideName ? props.name : ""} />
-                {props.hideName
-                    || <div className={styles.name}>{props.name}</div>}
+                <img className={styles.icon} src={props.icon} alt={props.name} />
+                <div className={styles.name}>{props.name}</div>
             </NavLink>
         </Wrapper>
     )
