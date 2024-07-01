@@ -18,10 +18,6 @@ import { ViewWork } from "../views/ViewWork"
 
 type Props = Contents & {
     term: Term,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     clear: Action,
     newNote: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
@@ -109,7 +105,6 @@ export function Search(props: Props) {
                                     item={item}
                                     readonly={true}
                                     highlight={props.term}
-                                    today={props.today}
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
@@ -122,7 +117,6 @@ export function Search(props: Props) {
                                     item={item}
                                     readonly={true}
                                     highlight={props.term}
-                                    today={props.today}
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}
@@ -158,7 +152,6 @@ export function Search(props: Props) {
                                     item={item}
                                     readonly={true}
                                     highlight={props.term}
-                                    today={props.today}
                                     icon={icons.tasks}
                                     clear={props.clear}
                                     putTask={props.putTask}
@@ -171,7 +164,6 @@ export function Search(props: Props) {
                                     item={item}
                                     readonly={true}
                                     highlight={props.term}
-                                    today={props.today}
                                     icon={icons.works}
                                     clear={props.clear}
                                     putWork={props.putWork}

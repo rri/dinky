@@ -22,7 +22,6 @@ import { WorkDetails } from "../pages/WorkDetails"
 import { Search } from "../pages/Search"
 import { Wrapper } from "./Wrapper"
 import { NotFound } from "../pages/NotFound"
-import { TodaySettings } from "../models/TodaySettings"
 import { DisplaySettings } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
@@ -40,7 +39,6 @@ interface Props {
     newNote: (template?: string) => string,
     newWork: (template?: string) => string,
 
-    putTodaySettings: (value: TodaySettings) => void,
     putRetentionSettings: (value: RetentionSettings) => void,
     putDisplaySettings: (value: DisplaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
@@ -74,7 +72,6 @@ export function PageContent(props: Props) {
 
     const search = (
         <Search
-            today={props.settings.today}
             tasks={tasks}
             notes={notes}
             topics={topics}
@@ -92,7 +89,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/*"
                 element={<Today
-                    today={props.settings.today}
                     tasks={tasks}
                     works={works}
                     newTask={props.newTask}
@@ -105,7 +101,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/tasks/*"
                 element={<Tasks
-                    today={props.settings.today}
                     tasks={tasks}
                     newTask={props.newTask}
                     putTask={props.putTask}
@@ -116,7 +111,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/tasks/:id"
                 element={<TaskDetails
-                    today={props.settings.today}
                     tasks={tasks}
                     topAction={props.back}
                     putTask={props.putTask}
@@ -152,7 +146,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/topics/:id"
                 element={<TopicDetails
-                    today={props.settings.today}
                     tasks={tasks}
                     notes={notes}
                     works={works}
@@ -168,7 +161,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/works/*"
                 element={<Works
-                    today={props.settings.today}
                     works={works}
                     newWork={props.newWork}
                     putWork={props.putWork}
@@ -178,7 +170,6 @@ export function PageContent(props: Props) {
             <Route
                 path="/works/:id"
                 element={<WorkDetails
-                    today={props.settings.today}
                     works={works}
                     topAction={props.back}
                     putWork={props.putWork}
@@ -188,7 +179,6 @@ export function PageContent(props: Props) {
                 path="/profile/*"
                 element={<Profile
                     settings={props.settings}
-                    putTodaySettings={props.putTodaySettings}
                     putRetentionSettings={props.putRetentionSettings}
                     putDisplaySettings={props.putDisplaySettings}
                     putStorageSettings={props.putStorageSettings}

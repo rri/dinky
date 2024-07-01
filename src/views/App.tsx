@@ -15,7 +15,6 @@ import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
-import { TodaySettings } from "../models/TodaySettings"
 import { NotifyBox } from "./NotifyBox"
 import { Footer } from "./Footer"
 import { Header } from "./Header"
@@ -156,13 +155,6 @@ export function App() {
         await remark()
             .use(remarkTextr, { plugins: [createTopicsNow] })
             .process(text)
-    }
-
-    const putTodaySettings = (value: TodaySettings) => {
-        store.putTodaySettings({
-            ...value,
-            updated: moment().toISOString(),
-        })
     }
 
     const putRetentionSettings = (value: RetentionSettings) => {
@@ -421,7 +413,6 @@ export function App() {
                 newTopic={newTopic}
                 newNote={newNote}
                 newWork={newWork}
-                putTodaySettings={putTodaySettings}
                 putRetentionSettings={putRetentionSettings}
                 putDisplaySettings={putDisplaySettings}
                 putStorageSettings={putStorageSettings}

@@ -10,10 +10,6 @@ import moment from "moment"
 interface Props {
     item: Id & Work,
     hideDetails?: boolean,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     icon?: string,
     autoNew?: boolean,
     readonly?: boolean,
@@ -35,7 +31,7 @@ export function ViewWork(props: Props) {
 
     const actions: Action[] = []
 
-    const today = belongsToToday(props.item, props.today.eveningBufferHours)
+    const today = belongsToToday(props.item)
     const reminder =
         props.item.today                                // date is set
         && moment(props.item.today).isAfter(moment())   // date is in the future

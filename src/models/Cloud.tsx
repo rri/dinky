@@ -4,7 +4,6 @@ import { StorageSettings } from "./StorageSettings"
 import { Id, Writable } from "./Item"
 import { DATA_PATH } from "./Store"
 import { EVENTS_PATH } from "./Store"
-import { TodaySettings } from "./TodaySettings"
 import { RetentionSettings } from "./RetentionSettings"
 import { DisplaySettings } from "./DisplaySettings"
 import { Task } from "./Task"
@@ -137,9 +136,6 @@ export class Cloud {
                         const body = await new Response(Body as ReadableStream).text()
                         const { path, ...obj } = JSON.parse(body)
                         switch (path) {
-                            case "settings.today": {
-                                return mergeData(data, { ...data, settings: { ...data.settings, today: obj as TodaySettings } })
-                            }
                             case "settings.retention": {
                                 return mergeData(data, { ...data, settings: { ...data.settings, retention: obj as RetentionSettings } })
                             }

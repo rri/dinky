@@ -1,11 +1,10 @@
-import { AppState, empty, mergeData, mergeDisplaySettings, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTodaySettings, mergeTopic, mergeWork } from "./AppState"
+import { AppState, empty, mergeData, mergeDisplaySettings, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTopic, mergeWork } from "./AppState"
 import { Cloud } from "./Cloud"
 import { Note } from "./Note"
 import { DisplaySettings } from "./DisplaySettings"
 import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
 import { Task } from "./Task"
-import { TodaySettings } from "./TodaySettings"
 import { Topic } from "./Topic"
 import { Work } from "./Work"
 import { v4 } from "uuid"
@@ -117,15 +116,6 @@ export class Store {
         this.setData(prev => {
             const updated = mergeStorageSettings(prev, item)
             // Bypass potential cloud sync, as storage settings are local
-            this.saveToDisk(updated)
-            return updated
-        })
-    }
-
-    putTodaySettings(item: TodaySettings) {
-        this.setData(prev => {
-            const updated = mergeTodaySettings(prev, item)
-            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "settings.today", ...item })
             this.saveToDisk(updated)
             return updated
         })

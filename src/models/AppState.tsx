@@ -6,7 +6,6 @@ import { Settings } from "./Settings"
 import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
-import { TodaySettings } from "./TodaySettings"
 import { Work } from "./Work"
 import { Deletable, Syncable, Updatable } from "./Item"
 import moment from "moment"
@@ -114,10 +113,6 @@ export const empty = (state?: AppState): AppState => {
     const def = {
         settings: {
             storage: {},
-            today: {
-                eveningBufferHours: 7,
-                morningBufferHours: 2,
-            },
             retention: {
                 periodDays: 30,
             },
@@ -133,19 +128,6 @@ export const empty = (state?: AppState): AppState => {
         },
     }
     return { ...def, ...state }
-}
-
-export const mergeTodaySettings = (state: AppState, value: TodaySettings): AppState => {
-    return ({
-        ...state,
-        settings: {
-            ...state.settings,
-            today: {
-                ...state.settings.today,
-                ...value,
-            },
-        }
-    })
 }
 
 export const mergeRetentionSettings = (state: AppState, value: RetentionSettings): AppState => {
@@ -261,7 +243,6 @@ export const mergeData = (curr: AppState, data: AppState, forceDel?: boolean, fo
             ...curr.settings.storage,
             ...data.settings.storage,
         },
-        today: mergeByUpdated(curr.settings.today, data.settings.today),
         retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
         display: mergeByUpdated(curr.settings.display, data.settings.display),
     },

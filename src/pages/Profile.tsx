@@ -4,7 +4,6 @@ import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { Settings } from "../models/Settings"
 import { StorageSettings } from "../models/StorageSettings"
-import { TodaySettings } from "../models/TodaySettings"
 import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
 import { InfoBox } from "../views/InfoBox"
@@ -14,7 +13,6 @@ import { Wrapper } from "../views/Wrapper"
 
 interface Props {
     settings: Settings,
-    putTodaySettings: (value: TodaySettings) => void,
     putRetentionSettings: (value: RetentionSettings) => void,
     putDisplaySettings: (value: DisplaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
@@ -204,32 +202,6 @@ export function Profile(props: Props) {
                             checked: props.settings.display.theme === DisplayTheme.Dark,
                         },
                     ]}></OptionSetting>
-                </SettingList>
-            </Card>
-            <Card title="Agenda Preferences" id="agenda-preferences" collapsible={true}>
-                <SettingList>
-                    <Setting
-                        label="Evening buffer (hours)"
-                        onChange={evt => props.putTodaySettings({
-                            ...props.settings.today,
-                            eveningBufferHours: parseInt(evt.currentTarget.value),
-                        })}
-                        type="number"
-                        min={0}
-                        max={24}
-                        value={props.settings.today.eveningBufferHours || 0}
-                    />
-                    <Setting
-                        label="Morning buffer (hours)"
-                        onChange={evt => props.putTodaySettings({
-                            ...props.settings.today,
-                            morningBufferHours: parseInt(evt.currentTarget.value),
-                        })}
-                        type="number"
-                        min={0}
-                        max={24}
-                        value={props.settings.today.morningBufferHours || 0}
-                    />
                 </SettingList>
             </Card>
             <Card title="Manage Your Data" id="manage-your-data" collapsible={true}>

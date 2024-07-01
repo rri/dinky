@@ -9,10 +9,7 @@ import { icons } from "../views/Icon"
 
 interface Props {
     works: Record<string, Work>,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
+    
     newWork: (template?: string) => string,
     putWork: (id: string, item: Work) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
@@ -54,7 +51,6 @@ export function Works(props: Props) {
                                     openWorks.map(item => <ViewWork
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         autoNew={true}
                                         newWork={props.newWork}
                                         putWork={props.putWork}
@@ -74,7 +70,6 @@ export function Works(props: Props) {
                                     doneWorks.map(item => <ViewWork
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         putWork={props.putWork}
                                         readonly={true}
                                     />)

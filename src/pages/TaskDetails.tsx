@@ -10,10 +10,6 @@ import { Setting, SettingList } from "../views/Settings"
 
 interface Props {
     tasks: Record<string, Task>,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     topAction: Action,
     putTask: (id: string, item: Task) => boolean,
 }
@@ -31,7 +27,6 @@ export function TaskDetails(props: Props) {
                     item && found
                         ? <ViewTask
                             item={item}
-                            today={props.today}
                             putTask={props.putTask}
                             hideDetails={true}
                             actionOnDelete={true}
