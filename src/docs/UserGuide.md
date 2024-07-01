@@ -34,10 +34,6 @@ If you go to the details of a task or an item in your library, you can set a rem
 
 You can quickly search for text by pressing the "`/`" (forward slash) shortcut at any time. Search text may include regular expressions, in case you're savvy with those. Additional [keyboard shortcuts](#keyboard-shortcuts) are available for easy navigation.
 
-# Customization
-
-The way you manage your agenda can be customized in a couple of ways. Firstly, you can set your *morning buffer*, which keeps tasks on your agenda for a bit longer — as many hours as you specify — beyond midnight. Secondly, you can set your *evening buffer*, which helps when you want to set the following day's agenda on the previous evening itself (for instance, as you make plans for the following day). Both these settings are available on the [profile](/profile/#agenda-preferences) page.
-
 # Storage & Security
 
 Your data is stored locally within the browser's [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), and is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time.

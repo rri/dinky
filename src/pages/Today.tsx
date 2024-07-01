@@ -13,10 +13,6 @@ import { Wrapper } from "../views/Wrapper"
 interface Props {
     tasks: Record<string, Task>,
     works: Record<string, Work>,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
     newWork: (template?: string) => string,
@@ -47,13 +43,13 @@ export function Today(props: Props) {
         tasks: props.tasks,
         archive: false,
         sortBy: [sortByToday()],
-        filterMore: filterByToday(props.today.eveningBufferHours, props.today.morningBufferHours),
+        filterMore: filterByToday(),
     })
     const openWorks = fetchWorks({
         works: props.works,
         archive: false,
         sortBy: [sortByToday()],
-        filterMore: filterByToday(props.today.eveningBufferHours),
+        filterMore: filterByToday(),
     })
 
     const newTaskAction = {
@@ -80,7 +76,6 @@ export function Today(props: Props) {
                                     openTasks.map(item => <ViewTask
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         newTask={props.newTask}
                                         putTask={props.putTask}
                                         readonly={true}
@@ -99,7 +94,6 @@ export function Today(props: Props) {
                                     openWorks.map(item => <ViewWork
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         newWork={props.newWork}
                                         putWork={props.putWork}
                                         readonly={true}

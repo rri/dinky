@@ -23,10 +23,6 @@ interface Props {
     works: Record<string, Work>,
     topAction: Action,
     clear: Action,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     newNote: (template?: string) => string,
     putTopic: (id: string, item: Topic) => boolean,
     putTask: (id: string, item: Task) => boolean,
@@ -108,7 +104,6 @@ export function TopicDetails(props: Props) {
                                         item={item}
                                         readonly={true}
                                         highlight={term}
-                                        today={props.today}
                                         icon={icons.tasks}
                                         clear={props.clear}
                                         putTask={props.putTask}
@@ -120,7 +115,6 @@ export function TopicDetails(props: Props) {
                                         item={item}
                                         readonly={true}
                                         highlight={term}
-                                        today={props.today}
                                         icon={icons.works}
                                         clear={props.clear}
                                         putWork={props.putWork}
@@ -143,7 +137,6 @@ export function TopicDetails(props: Props) {
                                         item={item}
                                         readonly={true}
                                         highlight={term}
-                                        today={props.today}
                                         icon={icons.tasks}
                                         clear={props.clear}
                                         putTask={props.putTask}
@@ -155,7 +148,6 @@ export function TopicDetails(props: Props) {
                                         item={item}
                                         readonly={true}
                                         highlight={term}
-                                        today={props.today}
                                         icon={icons.works}
                                         clear={props.clear}
                                         putWork={props.putWork}

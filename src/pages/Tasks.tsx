@@ -9,10 +9,6 @@ import { icons } from "../views/Icon"
 
 interface Props {
     tasks: Record<string, Task>,
-    today: {
-        eveningBufferHours: number,
-        morningBufferHours: number,
-    },
     newTask: (template?: string) => string,
     putTask: (id: string, item: Task) => boolean,
     delTasks: (makeIdList: () => string[]) => void,
@@ -61,7 +57,6 @@ export function Tasks(props: Props) {
                                     openTasks.map(item => <ViewTask
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         autoNew={true}
                                         newTask={props.newTask}
                                         putTask={props.putTask}
@@ -81,7 +76,6 @@ export function Tasks(props: Props) {
                                     doneTasks.map(item => <ViewTask
                                         key={item.id}
                                         item={item}
-                                        today={props.today}
                                         putTask={props.putTask}
                                         readonly={true}
                                     />)
