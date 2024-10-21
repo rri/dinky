@@ -10,8 +10,8 @@ import { icons } from "../views/Icon"
 interface Props {
     tasks: Record<string, Task>,
     newTask: (template?: string) => string,
-    putTask: (id: string, item: Task) => boolean,
-    delTasks: (makeIdList: () => string[]) => void,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
+    killTasks: (makeIdList: () => string[]) => void,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -42,13 +42,13 @@ export function Tasks(props: Props) {
     const delAction = {
         icon: icons.trash,
         desc: "Delete all completed tasks listed below",
-        action: () => props.delTasks(() => doneTasks.map(item => item.id))
+        action: () => props.killTasks(() => doneTasks.map(item => item.id))
     }
 
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Backlog" action={newAction} count={openTasks.length ? openTasks.length : undefined}>
+                <Card title="Backlog" actions={[newAction]} count={openTasks.length ? openTasks.length : undefined}>
                     {
                         openTasks.length
                             ?
@@ -67,7 +67,7 @@ export function Tasks(props: Props) {
                             : <MsgBox emoji="🔨">No tasks in your backlog!</MsgBox>
                     }
                 </Card>
-                <Card title="Done" action={delAction} count={doneTasks.length ? doneTasks.length : undefined}>
+                <Card title="Done" actions={[delAction]} count={doneTasks.length ? doneTasks.length : undefined}>
                     {
                         doneTasks.length
                             ?

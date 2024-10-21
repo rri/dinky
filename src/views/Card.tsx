@@ -8,7 +8,7 @@ import pluralize from "pluralize"
 
 interface Props {
     title?: string,
-    action?: Action,
+    actions?: Action[],
     count?: number,
     id?: string,
     defaultCollapsed?: boolean,
@@ -25,7 +25,7 @@ export function Card(props: PropsWithChildren<Props>) {
         action: () => collapsed ? setCollapsed(false) : setCollapsed(true),
     }
 
-    const useToggleAction = !props.action && props.collapsible
+    const useToggleAction = !props.actions && props.collapsible
 
     return (
         <Wrapper layout="col" className={styles.main}>
@@ -34,8 +34,8 @@ export function Card(props: PropsWithChildren<Props>) {
                     <div className={styles.title}>{props.title}</div>
                     {props.count
                         && <div className={styles.info}>({pluralize("items", props.count, true)})</div>}
-                    {props.action
-                        && <div className={styles.button}><Button {...props.action} /></div>}
+                    {props.actions
+                        && props.actions.map((action, index) => <div key={index} className={styles.button}><Button {...action} /></div>)}
                     {useToggleAction
                         && <div className={styles.button}><Button {...toggleCollapseAction} /></div>}
                 </div>}

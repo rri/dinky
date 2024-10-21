@@ -11,6 +11,7 @@ import more from "@material-design-icons/svg/two-tone/more_horiz.svg"
 import notes from "@material-design-icons/svg/two-tone/edit_note.svg"
 import plus from "@material-design-icons/svg/two-tone/add_box.svg"
 import profile from "@material-design-icons/svg/two-tone/manage_accounts.svg"
+import restore from "@material-design-icons/svg/two-tone/restore.svg"
 import topics from "@material-design-icons/svg/two-tone/tag.svg"
 import tasks from "@material-design-icons/svg/two-tone/directions_run.svg"
 import tick from "@material-design-icons/svg/two-tone/done.svg"
@@ -50,6 +51,7 @@ export const icons = {
     notes,
     plus,
     profile,
+    restore,
     topics,
     tasks,
     tick,

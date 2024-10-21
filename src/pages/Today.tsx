@@ -14,9 +14,9 @@ interface Props {
     tasks: Record<string, Task>,
     works: Record<string, Work>,
     newTask: (template?: string) => string,
-    putTask: (id: string, item: Task) => boolean,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
     newWork: (template?: string) => string,
-    putWork: (id: string, item: Work) => boolean,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -67,7 +67,7 @@ export function Today(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda" action={newTaskAction} count={openTasks.length ? openTasks.length : undefined}>
+                <Card title="Agenda" actions={[newTaskAction]} count={openTasks.length ? openTasks.length : undefined}>
                     {
                         openTasks.length
                             ?
@@ -85,7 +85,7 @@ export function Today(props: Props) {
                             : <MsgBox>Add tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink>!</MsgBox>
                     }
                 </Card>
-                <Card title="Today's Reading" action={newWorkAction} count={openWorks.length ? openWorks.length : undefined}>
+                <Card title="Today's Reading" actions={[newWorkAction]} count={openWorks.length ? openWorks.length : undefined}>
                     {
                         openWorks.length
                             ?

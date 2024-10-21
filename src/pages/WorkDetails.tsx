@@ -7,11 +7,13 @@ import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
 import { ViewWork } from "../views/ViewWork"
 import { Setting, SettingList } from "../views/Settings"
+import { InfoBox } from "../views/InfoBox"
 
 interface Props {
     works: Record<string, Work>,
-    topAction: Action,
-    putWork: (id: string, item: Work) => boolean,
+    killAction: (action: () => void, undo?: boolean) => Action,
+    backAction: Action,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
 }
 
 export function WorkDetails(props: Props) {
@@ -20,9 +22,16 @@ export function WorkDetails(props: Props) {
     const found: boolean = id ? !!props.works[id] : false
     const item = id ? { ...props.works[id], id } : undefined
 
+    const killAction = props.killAction(() => id && item && found && props.putWork(id, item, !item?.deleted), !!item?.deleted)
+
     return (
         <Wrapper layout="col">
-            <Card title="Item Details" action={props.topAction}>
+            <Card title="Item Details" actions={[killAction, props.backAction]}>
+                {
+                    item && found && item.deleted
+                        ? <InfoBox> Careful! This item is currently in your trash.</InfoBox>
+                        : undefined
+                }
                 {
                     item && found
                         ? <ViewWork

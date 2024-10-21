@@ -11,7 +11,7 @@ interface Props {
     topics: Record<string, Topic>,
     newNote: (template?: string) => string,
     newTopic: (template?: string) => string,
-    putTopic: (id: string, item: Topic) => boolean,
+    putTopic: (id: string, item: Topic, tombstone?: boolean) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -43,7 +43,7 @@ export function Topics(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Topics" action={action} count={results.length ? results.length : undefined}>
+            <Card title="Topics" actions={[action]} count={results.length ? results.length : undefined}>
                 {
                     results.length
                         ?

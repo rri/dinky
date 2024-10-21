@@ -38,8 +38,10 @@ export interface Archivable {
 }
 
 export interface Typed {
-    path: "settings.storage" | "settings.retention" | "settings.today" | "settings.display" | "contents.tasks" | "contents.topics" | "contents.notes" | "contents.works"
+    path: ItemPath,
 }
+
+export type ItemPath = "settings.storage" | "settings.retention" | "settings.today" | "settings.display" | "contents.tasks" | "contents.topics" | "contents.notes" | "contents.works"
 
 export type Writable = Event & Typed & Syncable & Updatable
 

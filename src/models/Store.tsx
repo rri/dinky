@@ -1,14 +1,11 @@
-import { AppState, empty, mergeData, mergeDisplaySettings, mergeNote, mergeRetentionSettings, mergeStorageSettings, mergeTask, mergeTasks, mergeTopic, mergeWork } from "./AppState"
+import { AppState, empty, mergeData, mergeDisplaySettings, mergeRetentionSettings, mergeStorageSettings } from "./AppState"
 import { Cloud } from "./Cloud"
-import { Note } from "./Note"
 import { DisplaySettings } from "./DisplaySettings"
 import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
-import { Task } from "./Task"
-import { Topic } from "./Topic"
-import { Work } from "./Work"
 import { v4 } from "uuid"
 import moment from "moment"
+import { DataObj, Deletable, ItemPath, Updatable } from "./Item"
 
 export const DATA_PATH = "data"
 export const EVENTS_PATH = "events"
@@ -139,57 +136,30 @@ export class Store {
         })
     }
 
-    putTask(id: string, item: Task) {
+    putItem<T>(id: string, item: T, mergeItem: (state: AppState, id: string, item: T) => AppState, path: ItemPath) {
         this.setData(prev => {
-            const updated = mergeTask(prev, id, item)
-            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.tasks", id, ...item })
+            const updated = mergeItem(prev, id, item)
+            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path, id, ...item })
             this.saveToDisk(updated)
             return updated
         })
     }
 
-    putTopic(id: string, item: Topic) {
-        this.setData(prev => {
-            const updated = mergeTopic(prev, id, item)
-            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.topics", id, ...item })
-            this.saveToDisk(updated)
-            return updated
-        })
-    }
-
-    putNote(id: string, item: Note) {
-        this.setData(prev => {
-            const updated = mergeNote(prev, id, item)
-            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.notes", id, ...item })
-            this.saveToDisk(updated)
-            return updated
-        })
-    }
-
-    putWork(id: string, item: Work) {
-        this.setData(prev => {
-            const updated = mergeWork(prev, id, item)
-            updated.settings.storage.autoPushItems && this.cloud.pushItem(updated, { evt: v4(), path: "contents.works", id, ...item })
-            this.saveToDisk(updated)
-            return updated
-        })
-    }
-
-    delTasks(makeIdList: () => string[]) {
+    killItems<T extends DataObj & Updatable & Deletable>(makeIdList: () => string[], contents: (prev: AppState) => Record<string, T>, mergeItems: (state: AppState, items: Record<string, T>) => AppState, path: ItemPath) {
         this.setData(prev => {
             const idList = makeIdList()
-            const prevTasks = prev.contents.tasks ? prev.contents.tasks : {}
-            const items: Record<string, Task> = {}
+            const prevItems = contents(prev)
+            const items: Record<string, T> = {}
             idList.forEach(id => {
                 const item = {
-                    ...prevTasks[id],
+                    ...prevItems[id],
                     updated: new Date().toISOString(),
                     deleted: new Date().toISOString(),
                 }
-                prev.settings.storage.autoPushItems && this.cloud.pushItem(prev, { evt: v4(), path: "contents.tasks", id, ...item })
+                prev.settings.storage.autoPushItems && this.cloud.pushItem(prev, { evt: v4(), path, id, ...item })
                 items[id] = item
             })
-            const updated = mergeTasks(prev, items)
+            const updated = mergeItems(prev, items)
             this.saveToDisk(updated)
             return updated
         })

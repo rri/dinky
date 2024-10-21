@@ -20,8 +20,8 @@ type Props = Contents & {
     term: Term,
     clear: Action,
     newNote: (template?: string) => string,
-    putTask: (id: string, item: Task) => boolean,
-    putWork: (id: string, item: Work) => boolean,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
 }
 
 export function Search(props: Props) {
@@ -83,7 +83,7 @@ export function Search(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Search Results" action={props.clear} count={results ? results : undefined}>
+            <Card title="Search Results" actions={[props.clear]} count={results ? results : undefined}>
                 {
                     results
                         ?
