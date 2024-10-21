@@ -9,9 +9,9 @@ import { icons } from "../views/Icon"
 
 interface Props {
     works: Record<string, Work>,
-    
+
     newWork: (template?: string) => string,
-    putWork: (id: string, item: Work) => boolean,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -42,7 +42,7 @@ export function Works(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Library" action={newAction} count={openWorks.length ? openWorks.length : undefined}>
+                <Card title="Library" actions={[newAction]} count={openWorks.length ? openWorks.length : undefined}>
                     {
                         openWorks.length
                             ?

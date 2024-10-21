@@ -15,18 +15,20 @@ import { ViewNote } from "../views/ViewNote"
 import { ViewTask } from "../views/ViewTask"
 import { ViewWork } from "../views/ViewWork"
 import { icons } from "../views/Icon"
+import { InfoBox } from "../views/InfoBox"
 
 interface Props {
     tasks: Record<string, Task>,
     notes: Record<string, Note>,
     topics: Record<string, Topic>,
     works: Record<string, Work>,
-    topAction: Action,
+    killAction: (action: () => void, undo?: boolean) => Action,
+    backAction: Action,
     clear: Action,
     newNote: (template?: string) => string,
-    putTopic: (id: string, item: Topic) => boolean,
-    putTask: (id: string, item: Task) => boolean,
-    putWork: (id: string, item: Work) => boolean,
+    putTopic: (id: string, item: Topic, tombstone?: boolean) => boolean,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
 }
 
 export function TopicDetails(props: Props) {
@@ -35,6 +37,8 @@ export function TopicDetails(props: Props) {
     const found: boolean = id ? !!props.topics[id] : false
     const item = id ? { ...props.topics[id], id } : undefined
     const term = item ? new Term(item.data) : new Term("")
+
+    const killAction = props.killAction(() => id && item && found && props.putTopic(id, item, !item?.deleted), !!item?.deleted)
 
     const y1 = fetchTasks({
         tasks: props.tasks,
@@ -77,7 +81,12 @@ export function TopicDetails(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Topic Details" action={props.topAction}>
+            <Card title="Topic Details" actions={[killAction, props.backAction]}>
+                {
+                    item && found && item.deleted
+                        ? <InfoBox> Careful! This item is currently in your trash.</InfoBox>
+                        : undefined
+                }
                 {
                     item && found
                         ? <ViewTopic

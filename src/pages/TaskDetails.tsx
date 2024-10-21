@@ -7,11 +7,13 @@ import { MsgBox } from "../views/MsgBox"
 import { Wrapper } from "../views/Wrapper"
 import { ViewTask } from "../views/ViewTask"
 import { Setting, SettingList } from "../views/Settings"
+import { InfoBox } from "../views/InfoBox"
 
 interface Props {
     tasks: Record<string, Task>,
-    topAction: Action,
-    putTask: (id: string, item: Task) => boolean,
+    killAction: (action: () => void, undo?: boolean) => Action,
+    backAction: Action,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
 }
 
 export function TaskDetails(props: Props) {
@@ -20,9 +22,16 @@ export function TaskDetails(props: Props) {
     const found: boolean = id ? !!props.tasks[id] : false
     const item = id ? { ...props.tasks[id], id } : undefined
 
+    const killAction = props.killAction(() => id && item && found && props.putTask(id, item, !item?.deleted), !!item?.deleted)
+
     return (
         <Wrapper layout="col">
-            <Card title="Task Details" action={props.topAction}>
+            <Card title="Task Details" actions={[killAction, props.backAction]}>
+                {
+                    item && found && item.deleted
+                        ? <InfoBox> Careful! This item is currently in your trash.</InfoBox>
+                        : undefined
+                }
                 {
                     item && found
                         ? <ViewTask

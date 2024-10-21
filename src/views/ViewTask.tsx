@@ -17,7 +17,7 @@ interface Props {
     highlight?: Term,
     actionOnDelete?: boolean,
     newTask?: (template?: string) => string,
-    putTask: (id: string, item: Task) => boolean,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
     returnURL?: string,
 }
 

@@ -27,6 +27,7 @@ import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import userguide from "../docs/UserGuide.md"
 import styles from "../styles/PageContent.module.css"
+import { icons } from "./Icon"
 
 interface Props {
     settings: Settings,
@@ -38,15 +39,14 @@ interface Props {
     newTopic: (template?: string) => string,
     newNote: (template?: string) => string,
     newWork: (template?: string) => string,
-
     putRetentionSettings: (value: RetentionSettings) => void,
     putDisplaySettings: (value: DisplaySettings) => void,
     putStorageSettings: (value: StorageSettings) => void,
-    putTask: (id: string, item: Task) => boolean,
-    putTopic: (id: string, item: Topic) => boolean,
-    putNote: (id: string, item: Note) => boolean,
-    putWork: (id: string, item: Work) => boolean,
-    delTasks: (makeIdList: () => string[]) => void,
+    putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
+    putTopic: (id: string, item: Topic, tombstone?: boolean) => boolean,
+    putNote: (id: string, item: Note, tombstone?: boolean) => boolean,
+    putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
+    killTasks: (makeIdList: () => string[]) => void,
     exportData: () => void,
     importData: () => void,
     sync: () => void,
@@ -84,6 +84,14 @@ export function PageContent(props: Props) {
         />
     )
 
+    const killAction = (action: () => void, undo?: boolean): Action => {
+        return {
+            icon: undo ? icons.restore : icons.trash,
+            desc: undo ? "Restore this item" : "Delete this item",
+            action,
+        }
+    }
+
     const routes = (
         <Routes>
             <Route
@@ -104,7 +112,7 @@ export function PageContent(props: Props) {
                     tasks={tasks}
                     newTask={props.newTask}
                     putTask={props.putTask}
-                    delTasks={props.delTasks}
+                    killTasks={props.killTasks}
                     registerNewHandler={props.registerNewHandler}
                 />}
             />
@@ -112,7 +120,8 @@ export function PageContent(props: Props) {
                 path="/tasks/:id"
                 element={<TaskDetails
                     tasks={tasks}
-                    topAction={props.back}
+                    killAction={killAction}
+                    backAction={props.back}
                     putTask={props.putTask}
                 />}
             />
@@ -129,7 +138,8 @@ export function PageContent(props: Props) {
                 path="/notes/:id"
                 element={<NoteDetails
                     notes={notes}
-                    topAction={props.back}
+                    killAction={killAction}
+                    backAction={props.back}
                     putNote={props.putNote}
                 />}
             />
@@ -150,7 +160,8 @@ export function PageContent(props: Props) {
                     notes={notes}
                     works={works}
                     topics={topics}
-                    topAction={props.back}
+                    killAction={killAction}
+                    backAction={props.back}
                     clear={props.clear}
                     newNote={props.newNote}
                     putTopic={props.putTopic}
@@ -171,7 +182,8 @@ export function PageContent(props: Props) {
                 path="/works/:id"
                 element={<WorkDetails
                     works={works}
-                    topAction={props.back}
+                    killAction={killAction}
+                    backAction={props.back}
                     putWork={props.putWork}
                 />}
             />

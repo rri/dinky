@@ -4,6 +4,6 @@
     font-family: var(--font-decorative);
     font-style: italic;
     justify-content: center;
-    margin: calc(var(--spacing) * 2) 0 0 0;
+    margin: calc(var(--spacing)) 0;
     padding: calc(var(--spacing) * 2);
 }

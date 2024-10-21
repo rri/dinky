@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom"
 import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
-import { AppState, empty, toExport } from "../models/AppState"
+import { AppState, empty, mergeNote, mergeTask, mergeTasks, mergeTopic, mergeWork, toExport } from "../models/AppState"
 import { Creatable, DataObj, Deletable, Syncable, Updatable } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
@@ -118,12 +118,12 @@ export function App() {
         return id
     }
 
-    const enrich = <T extends DataObj & Creatable & Deletable & Updatable & Syncable,>(item: T): T => {
+    const updateAuditFields = <T extends DataObj & Creatable & Deletable & Updatable & Syncable,>(item: T, tombstone?: boolean): T => {
         const updated = {
             ...item,
             created: item.created ? item.created : moment().toISOString(),
             updated: moment().toISOString(),
-            deleted: item.data ? item.deleted : moment().toISOString(),
+            deleted: tombstone || !item.data ? moment().toISOString() : undefined,
         }
 
         if (!item.created) {
@@ -175,7 +175,7 @@ export function App() {
         store.putStorageSettings(value)
     }
 
-    const putTask = (id: string, item: Task): boolean => {
+    const putTask = (id: string, item: Task, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
             setData(prev => {
@@ -185,12 +185,12 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putTask(id, enrich(item))
+            store.putItem(id, updateAuditFields(item, tombstone), mergeTask, "contents.tasks")
         }
         return !!itemData
     }
 
-    const putTopic = (id: string, item: Topic): boolean => {
+    const putTopic = (id: string, item: Topic, tombstone?: boolean): boolean => {
         const regx = /^([a-zA-Z][a-zA-Z0-9-]*)/g
         const cand = item.data?.trim()
             .replaceAll(/^[# ]+/g, "")
@@ -203,12 +203,12 @@ export function App() {
                 return res
             })
         } else {
-            store.putTopic(id, { ...enrich(item), data: itemData ? `#${itemData}` : "" })
+            store.putItem(id, { ...updateAuditFields(item, tombstone), data: itemData ? `#${itemData}` : "" }, mergeTopic, "contents.topics")
         }
         return !!itemData
     }
 
-    const putNote = (id: string, item: Note): boolean => {
+    const putNote = (id: string, item: Note, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
             setData(prev => {
@@ -218,12 +218,12 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putNote(id, enrich(item))
+            store.putItem(id, updateAuditFields(item, tombstone), mergeNote, "contents.notes")
         }
         return !!itemData
     }
 
-    const putWork = (id: string, item: Work): boolean => {
+    const putWork = (id: string, item: Work, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
             setData(prev => {
@@ -233,13 +233,13 @@ export function App() {
             })
         } else {
             itemData && createTopics(itemData)
-            store.putWork(id, enrich(item))
+            store.putItem(id, updateAuditFields(item, tombstone), mergeWork, "contents.works")
         }
         return !!itemData
     }
 
-    const delTasks = (makeIdList: () => string[]) => {
-        store.delTasks(makeIdList)
+    const killTasks = (makeIdList: () => string[]) => {
+        store.killItems(makeIdList, (prev: AppState) => prev.contents.tasks ? prev.contents.tasks : {}, mergeTasks, "contents.tasks")
     }
 
     const exportData = () => {
@@ -420,7 +420,7 @@ export function App() {
                 putTopic={putTopic}
                 putNote={putNote}
                 putWork={putWork}
-                delTasks={delTasks}
+                killTasks={killTasks}
                 exportData={exportData}
                 importData={importData}
                 sync={sync}

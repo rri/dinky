@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 interface Props {
     notes: Record<string, Note>,
     newNote: (template?: string) => string,
-    putNote?: (id: string, item: Note) => boolean,
+    putNote?: (id: string, item: Note, tombstone?: boolean) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -50,7 +50,7 @@ export function Notes(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Notes" action={action} count={results.length ? results.length : undefined}>
+            <Card title="Notes" actions={[action]} count={results.length ? results.length : undefined}>
                 {
                     results.length
                         ?
