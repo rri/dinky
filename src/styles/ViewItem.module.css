@@ -154,3 +154,9 @@ div.data.oneline {
 .data.oneline li+li:before {
     content: "□ ";
 }
+
+.data.oneline {
+    h1 ~ * {
+        display: none;
+    }
+}
