@@ -51,6 +51,11 @@ div.data.oneline {
     white-space: nowrap;
 }
 
+.data.oneline {
+    display: inline-flex;
+    align-items: stretch;
+}
+
 .data.readonly {
     cursor: default;
     user-select: none;
@@ -65,63 +70,57 @@ div.data.oneline {
     margin: 0;
 }
 
-.data h1 {
+.data:not(.oneline) h1 {
     font-weight: bold;
-    margin-bottom: calc(var(--spacing));
 }
 
-.data h2 {
+.data:not(.oneline) h2 {
     font-weight: normal;
     text-transform: uppercase;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h3 {
+.data:not(.oneline) h3 {
     font-weight: normal;
     font-style: italic;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h3 {
+.data:not(.oneline) h3 {
     font-weight: normal;
     text-decoration: underline;
     font-style: italic;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h4 {
+.data:not(.oneline) h4 {
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h5 {
+.data:not(.oneline) h5 {
     font-weight: normal;
     text-decoration: underline;
     text-transform: uppercase;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h6 {
+.data:not(.oneline) h6 {
     font-weight: normal;
     text-decoration: underline;
     font-style: italic;
     text-transform: uppercase;
-    margin-bottom: calc(var(--spacing) / 2);
 }
 
-.data h1:not(:first-child),
-.data h2:not(:first-child),
-.data h3:not(:first-child),
-.data h4:not(:first-child),
-.data h5:not(:first-child),
-.data h6:not(:first-child),
-.data p:not(:first-child),
-.data hr:not(:first-child),
-.data blockquote:not(:first-child),
-.data pre:not(:first-child),
-.data code:not(:first-child) {
+.data:not(.oneline) h1:not(:first-child),
+.data:not(.oneline) h2:not(:first-child),
+.data:not(.oneline) h3:not(:first-child),
+.data:not(.oneline) h4:not(:first-child),
+.data:not(.oneline) h5:not(:first-child),
+.data:not(.oneline) h6:not(:first-child),
+.data:not(.oneline) p:not(:first-child),
+.data:not(.oneline) hr:not(:first-child),
+.data:not(.oneline) blockquote:not(:first-child),
+.data:not(.oneline) pre:not(:first-child),
+.data:not(.oneline) code:not(:first-child) {
     margin-top: calc(var(--spacing) * 2);
+    margin-bottom: calc(var(--spacing) * 2);
 }
 
 .data.oneline h1,
@@ -138,6 +137,7 @@ div.data.oneline {
 .data.oneline pre,
 .data.oneline code {
     display: inline;
+    font-weight: normal;
     padding: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -159,4 +159,8 @@ div.data.oneline {
     h1 ~ * {
         display: none;
     }
+}
+
+.name {
+    flex: 1;
 }

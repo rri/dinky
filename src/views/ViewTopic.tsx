@@ -8,6 +8,7 @@ import { ViewItem } from "./ViewItem"
 
 interface Props {
     item: Id & Topic,
+    name?: string,
     hideDetails?: boolean,
     autoNew?: boolean,
     clear?: Action,
@@ -56,6 +57,7 @@ export function ViewTopic(props: Props) {
             key={props.item.id}
             slug={slug}
             item={props.item}
+            name={props.name}
             oneline={true}
             readonly={props.readonly}
             actions={actions}

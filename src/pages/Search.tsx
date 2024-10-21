@@ -92,6 +92,7 @@ export function Search(props: Props) {
                                 x1.map(item => <ViewTopic
                                     key={item.id}
                                     item={item}
+                                    name={item.name}
                                     readonly={true}
                                     highlight={props.term}
                                     clear={props.clear}
@@ -139,6 +140,7 @@ export function Search(props: Props) {
                                 x2.map(item => <ViewTopic
                                     key={item.id}
                                     item={item}
+                                    name={item.name}
                                     readonly={true}
                                     highlight={props.term}
                                     clear={props.clear}

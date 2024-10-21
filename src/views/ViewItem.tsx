@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 interface Props {
     slug: string,
     item: Id & DataObj & Creatable & Deletable & Updatable & Schedulable,
+    name?: string,
     placeholder: string,
     strikethru?: boolean,
     readonly?: boolean,
@@ -123,6 +124,16 @@ export function ViewItem(props: Props) {
         return func()
     }
 
+    const mdData = <ReactMarkdown
+        children={props.oneline ? main : props.item.data}
+        remarkPlugins={[remarkGfm]}
+        disallowedElements={props.oneline ? ["hr"] : []}
+        components={{
+            a: Link,
+            p: Enriched,
+        }}
+    />
+
     const item = edit || !props.item.created
         ? <textarea
             autoFocus
@@ -163,15 +174,9 @@ export function ViewItem(props: Props) {
                         : props.details())
                     : setEdit(true)
             }}>
-            <ReactMarkdown
-                children={props.oneline ? main : props.item.data}
-                remarkPlugins={[remarkGfm]}
-                disallowedElements={props.oneline ? ["hr"] : []}
-                components={{
-                    a: Link,
-                    p: Enriched,
-                }}
-            />
+            {props.name
+                ? <React.Fragment><span className={styles.name}>{props.name}</span>{mdData}</React.Fragment>
+                : <React.Fragment>{mdData}</React.Fragment>}
         </div>
 
     return (

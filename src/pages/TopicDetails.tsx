@@ -16,6 +16,7 @@ import { ViewTask } from "../views/ViewTask"
 import { ViewWork } from "../views/ViewWork"
 import { icons } from "../views/Icon"
 import { InfoBox } from "../views/InfoBox"
+import { Setting, SettingList } from "../views/Settings"
 
 interface Props {
     tasks: Record<string, Task>,
@@ -99,6 +100,18 @@ export function TopicDetails(props: Props) {
                         : <MsgBox emoji="🚫">The topic you're looking for cannot be found!</MsgBox>
                 }
             </Card>
+            {item && found && id && <Card title="Metadata">
+                <SettingList>
+                    <Setting
+                        label="Display Name"
+                        type="text"
+                        value={item.name || ""}
+                        onChange={evt => props.putTopic(id, { ...item, name: evt.currentTarget.value })}
+                        onBlur={evt => props.putTopic(id, { ...item, name: evt.currentTarget.value })}
+                        onKeyDownCapture={evt => evt.code === "Enter" && props.putTopic(id, { ...item, name: evt.currentTarget.value })}
+                    ></Setting>
+                </SettingList>
+            </Card>}
             {
                 item && found
                 &&

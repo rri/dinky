@@ -1,7 +1,7 @@
-import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, Deletable, Updatable, DataObj, Syncable } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, Deletable, Updatable, DataObj, Syncable, Named } from "./Item"
 import { Term } from "./Term"
 
-export type Topic = DataObj & Creatable & Deletable & Updatable & Syncable
+export type Topic = DataObj & Creatable & Deletable & Updatable & Syncable & Named
 
 interface Props {
     topics: Record<string, Topic>,
