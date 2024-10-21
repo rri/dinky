@@ -203,7 +203,7 @@ export function App() {
                 return res
             })
         } else {
-            store.putItem(id, { ...updateAuditFields(item, tombstone), data: itemData ? `#${itemData}` : "" }, mergeTopic, "contents.topics")
+            store.putItem(id, { name: item.name, ...updateAuditFields(item, tombstone), data: itemData ? `#${itemData}` : "" }, mergeTopic, "contents.topics")
         }
         return !!itemData
     }

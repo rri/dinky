@@ -52,6 +52,7 @@ export function Topics(props: Props) {
                                 results.map(item => <ViewTopic
                                     key={item.id}
                                     item={item}
+                                    name={item.name}
                                     readonly={true}
                                     autoNew={true}
                                     newNote={props.newNote}

@@ -37,6 +37,10 @@ export interface Archivable {
     archive?: boolean,
 }
 
+export interface Named {
+    name?: string,
+}
+
 export interface Typed {
     path: ItemPath,
 }
