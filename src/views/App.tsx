@@ -355,11 +355,11 @@ export function App() {
         },
         LINK_1: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            navigate("/tasks")
+            navigate("/topics")
         },
         LINK_2: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            navigate("/topics")
+            navigate("/tasks")
         },
         LINK_3: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
