@@ -13,8 +13,8 @@ export function PageNav(props: Props) {
     return (
         <Wrapper layout="row" className={styles.main}>
             <PageNavItem name="Today" slug="" icon={icons.today} clear={props.clear} />
-            <PageNavItem name="Tasks" slug="tasks" icon={icons.tasks} clear={props.clear} />
             <PageNavItem name="Topics" slug="topics" icon={icons.topics} clear={props.clear} />
+            <PageNavItem name="Tasks" slug="tasks" icon={icons.tasks} clear={props.clear} />
             <PageNavItem name="Notes" slug="notes" icon={icons.notes} clear={props.clear} />
             <Spacer />
             <PageNavItem name="Library" slug="works" icon={icons.works} clear={props.clear} />

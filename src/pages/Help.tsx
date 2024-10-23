@@ -17,8 +17,8 @@ export function Help(props: Props) {
             <Card title="Keyboard Shortcuts" id="keyboard-shortcuts">
                 <ShortcutList group="Navigation">
                     <Shortcut codes={["`"]}>Go to <NavLink to="/" title="Go to today's agenda">today's agenda</NavLink></Shortcut>
-                    <Shortcut codes={["1"]}>Go to <NavLink to="/tasks" title="Go to tasks">tasks</NavLink></Shortcut>
-                    <Shortcut codes={["2"]}>Go to <NavLink to="/topics" title="Go to topics">topics</NavLink></Shortcut>
+                    <Shortcut codes={["1"]}>Go to <NavLink to="/topics" title="Go to topics">topics</NavLink></Shortcut>
+                    <Shortcut codes={["2"]}>Go to <NavLink to="/tasks" title="Go to tasks">tasks</NavLink></Shortcut>
                     <Shortcut codes={["3"]}>Go to <NavLink to="/notes" title="Go to notes">notes</NavLink></Shortcut>
                     <Shortcut codes={["l"]}>Go to your <NavLink to="/works" title="Go to your library">library</NavLink></Shortcut>
                     <Shortcut codes={["?"]}>Get help (this page)</Shortcut>
@@ -28,8 +28,8 @@ export function Help(props: Props) {
                     <Shortcut codes={["/"]}>Start type-to-search</Shortcut>
                 </ShortcutList>
                 <ShortcutList group="Content">
-                    <Shortcut codes={["n"]}>New task (on <NavLink to="/tasks" title="Go to tasks">tasks</NavLink> and <NavLink to="/" title="Go to today's agenda">agenda</NavLink> pages)</Shortcut>
                     <Shortcut codes={["n"]}>New topic (on <NavLink to="/topics" title="Go to topics">topics</NavLink> page)</Shortcut>
+                    <Shortcut codes={["n"]}>New task (on <NavLink to="/tasks" title="Go to tasks">tasks</NavLink> and <NavLink to="/" title="Go to today's agenda">agenda</NavLink> pages)</Shortcut>
                     <Shortcut codes={["n"]}>New note (on <NavLink to="/notes" title="Go to notes">notes</NavLink> page)</Shortcut>
                     <Shortcut codes={["n"]}>New library item (on <NavLink to="/works" title="Go to library">library</NavLink> page)</Shortcut>
                 </ShortcutList>
