@@ -21,5 +21,22 @@
     ],
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "display": "standalone",
+    "screenshots": [
+        {
+            "src": "/screenshot-wide.png",
+            "sizes": "1842x1562",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "dinky.dev"
+        },
+        {
+            "src": "/screenshot-narrow.png",
+            "sizes": "1224x1562",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "dinky.dev"
+        }
+    ],
+    "description": "Install dinky.dev so you can run it as if it were a local application."
 }
