@@ -1,6 +1,7 @@
 {
     "name": "dinky.dev",
     "short_name": "dinky.dev",
+    "start_url": "https://dinky.dev",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
