@@ -12,6 +12,7 @@ export function SearchBox(props: Props) {
         <Wrapper layout="row" className={styles.main} wrapClassName={styles.wrap}>
             <input
                 className={styles.search}
+                name="search"
                 type="search"
                 value={props.value}
                 onChange={evt => props.action(evt.currentTarget.value)}
