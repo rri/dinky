@@ -17,7 +17,7 @@ interface Props {
     readonly?: boolean,
     actionOnDelete?: boolean,
     newNote?: (template?: string) => string,
-    putNote?: (id: string, item: Note) => boolean,
+    putNote: (id: string, item: Note) => boolean,
     returnURL?: string,
 }
 
@@ -27,7 +27,19 @@ export function ViewNote(props: Props) {
 
     const slug = "notes"
 
+    const { id, archive, ...item } = props.item
+
     const actions: Action[] = []
+
+    !props.oneline
+        || actions.push(
+            {
+                icon: !props.item.archive ? icons.archive : icons.unarchive,
+                desc: !props.item.archive ? "Archive this note" : "Make this note active again",
+                gray: !props.item.archive,
+                action: () => props.putNote(id, { ...item, archive: !archive }),
+            },
+        )
 
     const details = () => {
         props.clear?.action.apply([])
@@ -36,6 +48,7 @@ export function ViewNote(props: Props) {
 
     props.hideDetails
         || props.readonly
+        || props.item.archive
         || actions.push(
             {
                 icon: icons.more,

@@ -1,4 +1,5 @@
 import alarm from "@material-design-icons/svg/two-tone/alarm_on.svg"
+import archive from "@material-design-icons/svg/two-tone/archive.svg"
 import arrowDown from "@material-design-icons/svg/two-tone/expand_more.svg"
 import arrowLeft from "@material-design-icons/svg/two-tone/chevron_left.svg"
 import back from "@material-design-icons/svg/two-tone/keyboard_backspace.svg"
@@ -17,6 +18,7 @@ import tasks from "@material-design-icons/svg/two-tone/directions_run.svg"
 import tick from "@material-design-icons/svg/two-tone/done.svg"
 import today from "@material-design-icons/svg/two-tone/wb_sunny.svg"
 import trash from "@material-design-icons/svg/two-tone/delete.svg"
+import unarchive from "@material-design-icons/svg/two-tone/unarchive.svg"
 import upload from "@material-design-icons/svg/two-tone/file_upload.svg"
 import works from "@material-design-icons/svg/two-tone/menu_book.svg"
 import styles from "../styles/Icon.module.css"
@@ -39,6 +41,7 @@ export function Icon(props: Props) {
 
 export const icons = {
     alarm,
+    archive,
     arrowDown,
     arrowLeft,
     back,
@@ -57,6 +60,7 @@ export const icons = {
     tick,
     today,
     trash,
+    unarchive,
     upload,
     works,
 } as const

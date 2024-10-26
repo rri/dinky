@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 interface Props {
     notes: Record<string, Note>,
     newNote: (template?: string) => string,
-    putNote?: (id: string, item: Note, tombstone?: boolean) => boolean,
+    putNote: (id: string, item: Note, tombstone?: boolean) => boolean,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
 }
 
@@ -40,8 +40,6 @@ export function Notes(props: Props) {
         sortBy: [sortByUpdated(true)],
     })
 
-    const results = openNotes.concat(doneNotes)
-
     const action = {
         icon: icons.plus,
         desc: "Add a new note",
@@ -50,13 +48,13 @@ export function Notes(props: Props) {
 
     return (
         <Wrapper layout="col">
-            <Card title="Notes" actions={[action]} count={results.length ? results.length : undefined}>
+            <Card title="Notes" actions={[action]} count={openNotes.length ? openNotes.length : undefined}>
                 {
-                    results.length
+                    openNotes.length
                         ?
                         <React.Fragment>
                             {
-                                results.map(item => <ViewNote
+                                openNotes.map(item => <ViewNote
                                     key={item.id}
                                     item={item}
                                     oneline={true}
@@ -67,7 +65,26 @@ export function Notes(props: Props) {
                                 />)
                             }
                         </React.Fragment>
-                        : <MsgBox emoji="📓">You haven't created any notes!</MsgBox>
+                        : <MsgBox emoji="📓">You don't have any active notes!</MsgBox>
+                }
+            </Card>
+            <Card title="Archives" collapsible={true} defaultCollapsed={true} count={doneNotes.length ? doneNotes.length : undefined}>
+                {
+                    doneNotes.length
+                        ?
+                        <React.Fragment>
+                            {
+                                doneNotes.map(item => <ViewNote
+                                    key={item.id}
+                                    item={item}
+                                    oneline={true}
+                                    putNote={props.putNote}
+                                    readonly={true}
+                                />)
+                            }
+                        </React.Fragment>
+                        : <MsgBox emoji="🗃️">You don't have any archived notes!</MsgBox>
+
                 }
             </Card>
         </Wrapper>

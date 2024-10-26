@@ -27,6 +27,7 @@ interface Props {
     backAction: Action,
     clear: Action,
     newNote: (template?: string) => string,
+    putNote: (id: string, item: Note, tombstone?: boolean) => boolean,
     putTopic: (id: string, item: Topic, tombstone?: boolean) => boolean,
     putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
     putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
@@ -151,6 +152,7 @@ export function TopicDetails(props: Props) {
                                         highlight={term}
                                         icon={icons.notes}
                                         clear={props.clear}
+                                        putNote={props.putNote}
                                     />)
                                 }
                                 {
@@ -184,6 +186,7 @@ export function TopicDetails(props: Props) {
                                         highlight={term}
                                         icon={icons.notes}
                                         clear={props.clear}
+                                        putNote={props.putNote}
                                     />)
                                 }
                             </React.Fragment>

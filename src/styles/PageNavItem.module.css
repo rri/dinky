@@ -26,7 +26,6 @@
 
 .main .name {
     display: none;
-    font-size: 0.8em;
     padding: 0 calc(var(--spacing) / 1.5);
 }
 

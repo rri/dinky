@@ -124,7 +124,7 @@ export function ViewItem(props: Props) {
         return func()
     }
 
-    const mdData = <ReactMarkdown
+    const markdownData = <ReactMarkdown
         children={props.oneline ? main : props.item.data}
         remarkPlugins={[remarkGfm]}
         disallowedElements={props.oneline ? ["hr"] : []}
@@ -175,8 +175,8 @@ export function ViewItem(props: Props) {
                     : setEdit(true)
             }}>
             {props.name
-                ? <React.Fragment><span className={styles.name}>{props.name}</span>{mdData}</React.Fragment>
-                : <React.Fragment>{mdData}</React.Fragment>}
+                ? <React.Fragment><span className={styles.name}>{props.name}</span>{markdownData}</React.Fragment>
+                : <React.Fragment>{markdownData}</React.Fragment>}
         </div>
 
     return (
@@ -187,7 +187,7 @@ export function ViewItem(props: Props) {
                 <Wrapper layout="row">
                     {props.icon && <Icon icon={props.icon} />}
                     {item}
-                    {props.actions.map(action => <Button key={action.icon} {...action} />)}
+                    {props.actions.map(action => <div key={action.icon} className={styles.button}><Button {...action} /></div>)}
                 </Wrapper>
                 {
                     !(edit || !props.item.created) &&
