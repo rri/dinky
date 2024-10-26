@@ -5,7 +5,7 @@ import { sortByUpdated } from "../models/Item"
 import { Term } from "../models/Term"
 import { fetchTopics } from "../models/Topic"
 import { fetchTasks, Task } from "../models/Task"
-import { fetchNotes } from "../models/Note"
+import { fetchNotes, Note } from "../models/Note"
 import { fetchWorks, Work } from "../models/Work"
 import { Card } from "../views/Card"
 import { MsgBox } from "../views/MsgBox"
@@ -20,6 +20,7 @@ type Props = Contents & {
     term: Term,
     clear: Action,
     newNote: (template?: string) => string,
+    putNote: (id: string, item: Note, tombstone?: boolean) => boolean,
     putTask: (id: string, item: Task, tombstone?: boolean) => boolean,
     putWork: (id: string, item: Work, tombstone?: boolean) => boolean,
 }
@@ -133,6 +134,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     icon={icons.notes}
                                     clear={props.clear}
+                                    putNote={props.putNote}
                                     returnURL={getReturnURL()}
                                 />)
                             }
@@ -181,6 +183,7 @@ export function Search(props: Props) {
                                     highlight={props.term}
                                     icon={icons.notes}
                                     clear={props.clear}
+                                    putNote={props.putNote}
                                     returnURL={getReturnURL()}
                                 />)
                             }

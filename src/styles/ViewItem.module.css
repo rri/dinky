@@ -25,9 +25,8 @@
     padding: calc(var(--spacing) / 2);
 }
 
-.main img {
-    height: 24px;
-    width: 24px;
+.button {
+    display: flex;
 }
 
 .strikethru .data {

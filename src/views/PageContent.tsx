@@ -79,6 +79,7 @@ export function PageContent(props: Props) {
             term={props.term}
             clear={props.clear}
             newNote={props.newNote}
+            putNote={props.putNote}
             putTask={props.putTask}
             putWork={props.putWork}
         />
@@ -164,6 +165,7 @@ export function PageContent(props: Props) {
                     backAction={props.back}
                     clear={props.clear}
                     newNote={props.newNote}
+                    putNote={props.putNote}
                     putTopic={props.putTopic}
                     putTask={props.putTask}
                     putWork={props.putWork}
