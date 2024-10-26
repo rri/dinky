@@ -1,7 +1,7 @@
 {
     "name": "dinky.dev",
     "short_name": "dinky.dev",
-    "start_url": "https://dinky.dev",
+    "start_url": ".",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,9 +15,8 @@
         },
         {
             "src": "/maskable-512x512.png",
-            "type": "image/png",
             "sizes": "512x512",
-            "purpose": "any maskable"
+            "type": "image/png"
         }
     ],
     "theme_color": "#ffffff",
