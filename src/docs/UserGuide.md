@@ -1,30 +1,18 @@
 # Introduction
 
-[dinky.dev](/) helps you organize your life.
+[dinky.dev](/) helps you organize your life. Its core concepts are simple, and built to take advantage of the natural ways in which a person acquires and manages information. Planned daily activities are boiled down to three simple abstractions: "note-taking", "task-execution", and "synthesis".
 
-Its core concepts are simple, and built to take advantage of the natural ways in which you acquire and manage information. Daily activities boil down to a few simple abstractions: topics, tasks, and notes. **dinky.dev** also features a library where you can track your books and papers.
+**Note-Taking.** Create [notes](/notes) to write down short blurbs of information (ideas, suggestions, meeting summaries, action items). Recall and learning are maximized when you *write down* your thoughts and takeaways. Notes make it easy to record *raw* information that's meant to be synthesized later.
 
-# Topics
+**Task-Execution.** Create [tasks](/tasks) representing concrete actions you need to take. Each task ideally requires no more than 20 minutes to complete, and large tasks are meant to be broken down into smaller ones. Knowing what needs to be done *next* makes it easy to focus on the task at hand and getting it done.
 
-First, identify your goal, project or problem area of interest and associate it with a [topic](/topics). A topic is a short hyphenated phrases prefixed with a "`#`" (example: `#my-topic`) that can be added inline to tasks and notes.
+**Synthesis.** Prioritize tasks and notes, and associate them with [topics](/topics). Topics are hyphenated phrases prefixed with a "`#`" (example: `#my-topic`), which are added inline to tasks and notes. This process which we call *synthesis*, is a form of deep thinking and planning that bridges the gap between information consumption and action determination. Synthesis takes a few forms: (a) given notes captured during the day, what new tasks should you create? (b) given a large or ambiguous task, what smaller tasks should you break it down into? (c) do the current set of tasks continue to help you make progress towards your larger objectives?
 
-Some ideas to ponder on:
-
-- Given notes captured during the day, what new tasks do you want to create?
-- Given a large or ambiguous task, how can you break it down into smaller ones?
-- Do the current tasks help you make progress towards your most important goals?
-
-# Tasks
-
-A [task](/tasks) represents a concrete, time-bound action you need to take. Each task ideally requires no more than 20 minutes to complete, and larger tasks are meant to be broken down into smaller ones. Knowing what needs to be done next makes it easy to focus on the task at hand and get it done.
-
-# Notes
-
-A [note](/notes) helps you write down short blurbs of information (ideas, suggestions, meeting summaries, action items). You can maximize recall and learning by adding your thoughts and takeaways. Notes make it easy to record raw information meant to be synthesized later.
+Everyday, you can pick tasks in your backlog to be completed, by adding them to your [agenda](/) on the start page. Tasks added to your agenda disappear (from your agenda, not the backlog) at the end of the day. You can always visit the backlog and re-add them, if you want to pick them up again. Items in your [library](/library) work a bit differently: they *stay* on your agenda until you manually remove them.
 
 # Library
 
-You can use your personalized [library](/works)) to manage references to books, papers, articles, journals, blog posts, and other reading material. When you add items to your library you can use the following special format to capture the title and authors separately. Authors are optional, and you can add as many as you like.
+You can use your personalized [library](/library) to manage information about your books, papers, articles, journals, blog posts, and other reading material. When you add items to your library you can use the following special format to capture the title and authors separately. Of course, authors are optional, and you can add as many as you like.
 
 ```
 <title> | <primary-author>; <secondary-author>; ...
@@ -38,13 +26,9 @@ An Equal Music | Vikram Seth
 Calculus | Ron Larson; Bruce H Edwards
 ```
 
-# Agenda
-
-Any number of tasks in your backlog or items in your library may be added to your daily agenda. When you add something to your agenda, the task or item stays there until it is removed or marked as done. Your agenda is always the first thing you see on the homepage.
-
 # Reminders
 
-If you go to the details of a task or an item in your library, you can set a reminder for it on any future date (today inclusive). When you set a reminder for a task or item, it will automatically appear on your [agenda](/) view on that date. **Note that you will not get any email or popup notifications.**
+If you go to the details of a task or an item in your library, you can set a reminder for it on any future date (today inclusive). When you set a reminder for a task or item, it will automatically appear on your [agenda](/) view on that date. *Note that you won't get any email or popup notifications.*
 
 # Search
 
@@ -52,7 +36,7 @@ You can quickly search for text by pressing the "`/`" (forward slash) shortcut a
 
 # Storage & Security
 
-Your data is stored locally within the browser's [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), and is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time. Using the `S` (i.e., capitalized) shortcut forces a slower synchronization process where your data files on the server are consolidated into a single one.
+Your data is stored locally within the browser's [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), and is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time.
 
 *Replace $bucket, $region, $policy, $usergroup and $user with arbitrary fresh values.*
 
@@ -122,13 +106,13 @@ It is easy to forget to synchronize manually after adding or updating items. To 
 
 # Retention Period
 
-You may specify a retention period (default: 30 days) on the [profile](/profile/#manage-your-data) page. Deleted items are retained in storage (but not directly visible to the user) for the period configured here, after which they are automatically purged on a best-effort basis. Currently, unfortunately, you cannot restore deleted-but-not-yet-purged items without hacking into your data files.
+You may specify a retention period (default: 30 days) on the [profile](/profile/#manage-your-data) page. Deleted items are retained in storage (but not directly visible to the user) for the period configured here, after which they are automatically purged on a best-effort basis. Currently, the ability to restore deleted-but-not-yet-purged items is not available.
 
 # Exporting & Importing Data
 
 You may export all of your data from the [profile](/profile/#manage-your-data) page. You'll be prompted for the download of a [JSON](https://www.json.org) file with your data. Sensitive settings (such as credentials) are **not** exported. You may import previously exported data from the same page. Any data you import is merged into the existing data based on individual item timestamps, overwriting older entries (where they exist) with newer ones.
 
-For topics, tasks and library items, there's another way to bulk-import items. You may create a new item, and copy-and-paste a newline-separated *list* of items into the input text area. This automatically creates individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new topic, you end up with three individual topics: `#home-improvement`, `#reading`, and `#action-item`. Note that this method of bulk import does **not** apply to notes, as a single note may itself consist of multiple lines.
+For tasks, topics and library items, there's another way to bulk-import items. You may create a new task, topic or library item, and copy-and-paste a newline-separated *list* of items into the input text area. This automatically creates individual items, one per line. As an example, if you copy-and-paste the following list into the input text area for creating a new topic, you end up with three individual topics: `#home-improvement`, `#reading`, and `#action-item`. Note that this method of bulk import does **not** apply to notes, as a single note may itself consist of multiple lines.
 
 ```
 home-improvement
@@ -138,8 +122,8 @@ action-item
 
 # Color Themes
 
-The web application allows for two color themes, *light* and *dark*, automatically switching between these themes based on the user's operating system settings. You can also customize this behavior to permanently set the theme to either *light* or *dark* in your [theme preferences](/profile/#theme-preferences).
+This application allows for two color themes, *light* and *dark*, automatically switching between these themes based on the user's operating system settings. If you want, you can customize this behavior to permanently set the theme to *light* or *dark* in your [theme preferences](/profile/#theme-preferences).
 
 # Getting in Touch
 
-Source code for [dinky.dev](/) is distributed as open-source software under the Apache 2.0 license. You can find more details (including the source code itself) on its [GitHub page](https://github.com/rri/dinky). Please feel free to report bugs or request features using the [issue tracker](https://github.com/rri/dinky/issues). If you're interested in contributing or would like to chat, my email address is **riyer** at **optimix.dev**.
+This application's source code is distributed as open-source software under the Apache 2.0 license. You can find more details (including the source code) on its [GitHub page](https://github.com/rri/dinky). Please feel free to report bugs or request features using the [issue tracker](https://github.com/rri/dinky/issues). If you're interested in contributing or would like to chat, my email address is **riyer** at **optimix.dev**.

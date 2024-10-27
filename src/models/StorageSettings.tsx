@@ -1,5 +1,3 @@
-import { Registry } from "./Registry";
-
 export interface StorageSettings {
     s3Bucket?: string,
     awsAccessKey?: string,
@@ -10,5 +8,4 @@ export interface StorageSettings {
     autoPushItems?: boolean,
     eTag?: string,
     lastSynced?: string,
-    registry?: Registry,
 }
