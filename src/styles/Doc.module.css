@@ -1,6 +1,6 @@
 .main {
     line-height: 1.8em;
-    padding: var(--spacing) calc(2 * var(--spacing));
+    padding: var(--spacing) calc(4 * var(--spacing));
 }
 
 .main h1,
@@ -22,7 +22,7 @@
 .main p,
 .main li {
     hyphens: auto;
-    text-align: left;
+    text-align: justify;
 }
 
 .main pre {

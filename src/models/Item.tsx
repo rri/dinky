@@ -1,12 +1,12 @@
 import moment from "moment"
 import { Term } from "./Term"
 
-export interface Identifiable {
+export interface Id {
     id: string,
 }
 
 export interface Event {
-    key: string,
+    evt: string,
 }
 
 export interface Creatable {

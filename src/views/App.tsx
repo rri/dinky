@@ -239,7 +239,7 @@ export function App() {
     }
 
     const killTasks = (makeIdList: () => string[]) => {
-        store.tombstoneItems(makeIdList, (prev: AppState) => prev.contents.tasks ? prev.contents.tasks : {}, mergeTasks, "contents.tasks")
+        store.killItems(makeIdList, (prev: AppState) => prev.contents.tasks ? prev.contents.tasks : {}, mergeTasks, "contents.tasks")
     }
 
     const exportData = () => {
@@ -284,7 +284,7 @@ export function App() {
         input.click()
     }
 
-    const sync = (fullSync?: boolean) => store.cloudSyncData(data, fullSync)
+    const sync = () => store.cloudSyncData(data)
 
     useEffect(() => store.loadFromDisk(), [store])
 
@@ -336,7 +336,6 @@ export function App() {
         EXPORT: "d",
         IMPORT: "u",
         SYNC: "s",
-        FULL_SYNC: "S",
     }
 
     const handlers = {
@@ -390,10 +389,6 @@ export function App() {
         SYNC: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
             sync()
-        },
-        FULL_SYNC: (evt?: KeyboardEvent) => {
-            evt?.preventDefault()
-            sync(true)
         },
     }
 
