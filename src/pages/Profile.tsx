@@ -10,6 +10,7 @@ import { InfoBox } from "../views/InfoBox"
 import { LastSynced, LastSyncedDateTime } from "../views/LastSynced"
 import { ActionLink, OptionSetting, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
+import { Registry } from "../models/Registry"
 
 interface Props {
     settings: Settings,
@@ -41,7 +42,8 @@ export function Profile(props: Props) {
         awsRegion: string,
         syncOnLoad: boolean,
         periodMinutes: number,
-        autoPushItems: boolean) => {
+        autoPushItems: boolean,
+        registry: Registry) => {
         props.putStorageSettings({
             s3Bucket,
             awsAccessKey,
@@ -50,6 +52,7 @@ export function Profile(props: Props) {
             syncOnLoad,
             periodMinutes,
             autoPushItems,
+            registry,
         })
     }
 
@@ -60,6 +63,7 @@ export function Profile(props: Props) {
     const syncOnLoad = props.settings.storage.syncOnLoad || false
     const periodMinutes = props.settings.storage.periodMinutes || 0
     const autoPushItems = props.settings.storage.autoPushItems || false
+    const registry = props.settings.storage.registry || { enabled: false, events: {} }
 
     const lastSynced = props.settings.storage.lastSynced
         ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:mm")
@@ -74,7 +78,13 @@ export function Profile(props: Props) {
                         icon={icons.cloud}
                         shortcuts={["s"]}
                         onClick={props.sync}>
-                        Sync your data now
+                        Fast sync
+                    </ActionLink>
+                    <ActionLink
+                        icon={icons.cloud}
+                        shortcuts={["S"]}
+                        onClick={props.sync}>
+                        Sync and compact data
                     </ActionLink>
                     <OptionSetting label="Sync on page load?" values={[
                         {
@@ -85,7 +95,8 @@ export function Profile(props: Props) {
                                 awsRegion,
                                 true,
                                 periodMinutes,
-                                autoPushItems),
+                                autoPushItems,
+                                registry),
                             checked: syncOnLoad,
                         },
                         {
@@ -96,11 +107,13 @@ export function Profile(props: Props) {
                                 awsRegion,
                                 false,
                                 periodMinutes,
-                                autoPushItems),
+                                autoPushItems,
+                                registry),
                             checked: !syncOnLoad,
                         },
                     ]}></OptionSetting>
                     <Setting
+                        name="periodMinutes"
                         label="Auto sync (minutes)"
                         onChange={evt => updateCloudSync(s3Bucket,
                             awsAccessKey,
@@ -108,7 +121,8 @@ export function Profile(props: Props) {
                             awsRegion,
                             syncOnLoad,
                             parseInt(evt.currentTarget.value),
-                            autoPushItems)}
+                            autoPushItems,
+                            registry)}
                         type="number"
                         min={0}
                         value={periodMinutes || 0}
@@ -122,7 +136,8 @@ export function Profile(props: Props) {
                                 awsRegion,
                                 syncOnLoad,
                                 periodMinutes,
-                                true),
+                                true,
+                                registry),
                             checked: autoPushItems,
                         },
                         {
@@ -133,44 +148,49 @@ export function Profile(props: Props) {
                                 awsRegion,
                                 syncOnLoad,
                                 periodMinutes,
-                                false),
+                                false,
+                                registry),
                             checked: !autoPushItems,
                         },
                     ]}></OptionSetting>
                     <InfoBox>Provide your AWS settings (<NavLink to="/help" aria-label="Help">help</NavLink>).</InfoBox>
                     <Setting
                         label="S3 Bucket"
+                        name="s3Bucket"
                         type="text"
                         value={s3Bucket}
-                        onChange={evt => updateCloudSync(evt.currentTarget.value, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
+                        onChange={evt => updateCloudSync(evt.currentTarget.value, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
                     />
                     <Setting
                         label="Access Key"
+                        name="awsAccessKey"
                         type="text"
                         value={awsAccessKey}
-                        onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)
+                        onChange={evt => updateCloudSync(s3Bucket, evt.currentTarget.value, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)
                         }
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
                     />
                     <Setting
                         label="Secret Key"
+                        name="awsSecretKey"
                         type="password"
                         value={awsSecretKey}
-                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, evt.currentTarget.value, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
                     />
                     <Setting
                         label="Region"
+                        name="awsRegion"
                         type="text"
                         placeholder="us-west-2"
                         value={awsRegion}
-                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value, syncOnLoad, periodMinutes, autoPushItems)}
-                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
-                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems)}
+                        onChange={evt => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, evt.currentTarget.value, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onBlur={() => updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
+                        onKeyDownCapture={evt => evt.code === "Enter" && updateCloudSync(s3Bucket, awsAccessKey, awsSecretKey, awsRegion, syncOnLoad, periodMinutes, autoPushItems, registry)}
                     />
                 </SettingList>
             </Card>
@@ -207,6 +227,7 @@ export function Profile(props: Props) {
             <Card title="Manage Your Data" id="manage-your-data" collapsible={true}>
                 <SettingList>
                     <Setting
+                        name="periodDays"
                         label="Retention period (days)"
                         onChange={evt => props.putRetentionSettings({
                             ...props.settings.retention,

@@ -143,12 +143,6 @@ div.data.oneline {
     white-space: nowrap;
 }
 
-.data:not(.oneline) p,
-.data:not(.oneline) li {
-    hyphens: auto;
-    text-align: justify;
-}
-
 .data.oneline p+p:before,
 .data.oneline li+li:before {
     content: "□ ";
