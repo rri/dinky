@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Work } from "../models/Work"
-import { belongsToToday, Id } from "../models/Item"
+import { belongsToToday, Identifiable } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 import moment from "moment"
 
 interface Props {
-    item: Id & Work,
+    item: Identifiable & Work,
     hideDetails?: boolean,
     icon?: string,
     autoNew?: boolean,
