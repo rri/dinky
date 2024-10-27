@@ -1,7 +1,7 @@
 import moment from "moment"
 import { Term } from "./Term"
 
-export interface Id {
+export interface Identifiable {
     id: string,
 }
 

@@ -6,7 +6,7 @@ import { Note } from '../models/Note'
 import { Topic } from '../models/Topic'
 import { Task } from '../models/Task'
 import { Work } from '../models/Work'
-import { Creatable, DataObj, Deletable, Id, Schedulable, Updatable } from "../models/Item"
+import { Creatable, DataObj, Deletable, Identifiable, Schedulable, Updatable } from "../models/Item"
 import { Term } from '../models/Term'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 
 interface Props {
     slug: string,
-    item: Id & DataObj & Creatable & Deletable & Updatable & Schedulable,
+    item: Identifiable & DataObj & Creatable & Deletable & Updatable & Schedulable,
     name?: string,
     placeholder: string,
     strikethru?: boolean,
@@ -137,6 +137,7 @@ export function ViewItem(props: Props) {
     const item = edit || !props.item.created
         ? <textarea
             autoFocus
+            name="editor"
             className={[styles.data, styles.edit, props.oneline && (!props.rows || props.rows === 1) ? styles.oneline : ""].join(" ")}
             rows={props.rows ? props.rows : 1}
             spellCheck={false}

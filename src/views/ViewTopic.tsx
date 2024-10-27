@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
-import { Id } from "../models/Item"
+import { Identifiable } from "../models/Item"
 import { Topic } from "../models/Topic"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 
 interface Props {
-    item: Id & Topic,
+    item: Identifiable & Topic,
     name?: string,
     hideDetails?: boolean,
     autoNew?: boolean,
