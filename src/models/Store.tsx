@@ -187,6 +187,7 @@ export class Store {
                             this.saveToDisk(mergedDataWithEventsAndRefs)
                             this.setData(mergedDataWithEventsAndRefs)
 
+                            const forceSync = mergedDataWithEventsAndRefs.settings.storage.registry?.forceSync
                             const unsynced: Writable[] = []
                             Object
                                 .values(mergedDataWithEventsAndRefs.settings.storage.registry?.events || {})
@@ -196,8 +197,8 @@ export class Store {
                                     }
                                 })
 
-                            const pushFull = !this.isRegistryEnabled(mergedDataWithEventsAndRefs) || ((unsynced.length > 0 || keys.length > 0) && !!fullSync)
-                            const pushPart = this.isRegistryEnabled(mergedDataWithEventsAndRefs) && (unsynced.length > 0 && !fullSync)
+                            const pushFull = !this.isRegistryEnabled(mergedDataWithEventsAndRefs) || (!!fullSync && (unsynced.length > 0 || keys.length > 0 || !!forceSync))
+                            const pushPart = this.isRegistryEnabled(mergedDataWithEventsAndRefs) && ((!fullSync && unsynced.length > 0))
 
                             if (!pushFull && !pushPart) {
                                 // no data that needs to be pushed
@@ -224,6 +225,9 @@ export class Store {
                                         this.deleteRefVals(pushedDataWithRegistryEnabled, unsynced.map(obj => obj.evt))
                                         // Clean up dangling references.
                                         this.cleanupRefs(pushedDataWithRegistryEnabled, keys)
+
+                                        // Reset the forceSync flag in case it had been set.
+                                        delete pushedDataWithRegistryEnabled.settings.storage.registry.forceSync
 
                                         this.saveToDisk(pushedDataWithRegistryEnabled)
                                         this.setData(pushedDataWithRegistryEnabled)

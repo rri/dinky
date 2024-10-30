@@ -252,7 +252,8 @@ export const mergeData = (curr: AppState, data: AppState, forceDel?: boolean, fo
                 events: {
                     ...curr.settings.storage.registry?.events,
                     ...data.settings.storage.registry?.events
-                }
+                },
+                forceSync,
             },
         },
         retention: mergeByUpdated(curr.settings.retention, data.settings.retention),
