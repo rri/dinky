@@ -38,6 +38,7 @@
 .main input {
     width: inherit;
     flex-grow: 1;
+    color-scheme: var(--color-scheme);
 }
 
 .main .bullet {
