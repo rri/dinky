@@ -37,6 +37,7 @@
     --image-gradient-reverse-light: linear-gradient(to bottom, #ffffff, #dddddd, #ffffff);
     --image-gradient-kbd: linear-gradient(to bottom, #f9f9f9 0%, #ffffff 50%, #c0c0c0 100%);
     --filter-icon: none;
+    --color-scheme: light;
 }
 
 [data-theme="Dark"] {
@@ -65,6 +66,7 @@
     --image-gradient-reverse-light: linear-gradient(to bottom, #222222, var(--color-bg-banner), #222222);
     --image-gradient-kbd: linear-gradient(to bottom, #828282 0%, #000000 50%, #121212 100%);
     --filter-icon: invert(80%);
+    --color-scheme: dark;
 }
 
 *,
