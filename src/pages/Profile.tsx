@@ -123,7 +123,8 @@ export function Profile(props: Props) {
                             parseInt(evt.currentTarget.value),
                             autoPushItems,
                             registry)}
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         min={0}
                         value={periodMinutes || 0}
                     />
@@ -233,7 +234,8 @@ export function Profile(props: Props) {
                             ...props.settings.retention,
                             periodDays: parseInt(evt.currentTarget.value),
                         })}
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         min={0}
                         value={props.settings.retention.periodDays || 0}
                     />
