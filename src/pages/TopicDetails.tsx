@@ -106,10 +106,19 @@ export function TopicDetails(props: Props) {
                     <Setting
                         label="Display Name"
                         type="text"
-                        value={item.name || ""}
-                        onChange={evt => props.putTopic(id, { ...item, name: evt.currentTarget.value })}
-                        onBlur={evt => props.putTopic(id, { ...item, name: evt.currentTarget.value })}
-                        onKeyDownCapture={evt => evt.code === "Enter" && props.putTopic(id, { ...item, name: evt.currentTarget.value })}
+                        spellCheck={false}
+                        defaultValue={item.name || ""}
+                        placeholder={"Enter a friendly name here..."}
+                        onBlur={evt => {
+                            evt.preventDefault()
+                            props.putTopic(id, { ...item, name: evt.currentTarget.value })
+                        }}
+                        onKeyDownCapture={evt => {
+                            if (evt.key === "Enter" || evt.key === "Escape") {
+                                evt.preventDefault()
+                                props.putTopic(id, { ...item, name: evt.currentTarget.value })
+                            }
+                        }}
                     ></Setting>
                 </SettingList>
             </Card>}
