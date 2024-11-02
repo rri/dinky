@@ -33,6 +33,7 @@ export class Store {
                         || !cfg.awsRegion) {
                         // not set up for cloud sync, return silently
                     } else {
+                        // async call
                         this.cloudSyncData(prev)
                     }
                 }
@@ -47,6 +48,7 @@ export class Store {
             this.setData(prev => {
                 const periodMinutes = prev.settings.storage.periodMinutes || 0
                 if (periodMinutes > 0) {
+                    // async call
                     this.cloudSyncData(prev, false, periodMinutes)
                 }
                 setTimeout(autoSyncAction, 60000)
@@ -134,7 +136,7 @@ export class Store {
         }
     }
 
-    cloudSyncData(data: AppState, fullSync?: boolean, minDelayMinutes?: number) {
+    async cloudSyncData(data: AppState, fullSync?: boolean, minDelayMinutes?: number) {
 
         if (this.lastSyncStart &&
             minDelayMinutes &&
@@ -256,16 +258,17 @@ export class Store {
     handleItemSync(events: Writable[], dataProvider: () => AppState): AppState {
         const updated = dataProvider()
 
-        // Register val-type keys to ensure that no updates are ever lost.
-        this.createVals(updated, events)
+        if (events.length > 0) {
+            // Register val-type keys to ensure that no updates are ever lost.
+            this.createVals(updated, events)
+
+            updated.settings.storage.autoPushItems &&
+                this.cloud.pushEvents(updated,
+                    events,
+                    (pushedData: AppState) => this.handleItemSyncComplete(pushedData, events))
+        }
 
         this.saveToDisk(updated)
-
-        updated.settings.storage.autoPushItems &&
-            this.cloud.pushEvents(updated,
-                events,
-                (pushedData: AppState) => this.handleItemSyncComplete(pushedData, events))
-
         return updated
     }
 
@@ -290,10 +293,8 @@ export class Store {
 
     putStorageSettings(item: StorageSettings) {
         this.setData(prev => {
-            const updated = mergeStorageSettings(prev, item)
-            // Bypass potential cloud sync, as storage settings are local
-            this.saveToDisk(updated)
-            return updated
+            const events: Writable[] = []
+            return this.handleItemSync(events, () => mergeStorageSettings(prev, item))
         })
     }
 
