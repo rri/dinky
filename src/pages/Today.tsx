@@ -54,7 +54,7 @@ export function Today(props: Props) {
 
     const newTaskAction = {
         icon: icons.listadd,
-        desc: "Add a new task to the backlog",
+        desc: "Add a new task to your task list",
         action: newTask,
     }
 
@@ -82,7 +82,7 @@ export function Today(props: Props) {
                                     />)
                                 }
                             </React.Fragment>
-                            : <MsgBox>Add tasks from your <NavLink to="/tasks" title="Go to tasks">backlog</NavLink>!</MsgBox>
+                            : <MsgBox>Add tasks from your <NavLink to="/tasks" title="Go to task list">task list</NavLink>!</MsgBox>
                     }
                 </Card>
                 <Card title="Today's Reading" actions={[newWorkAction]} count={openWorks.length ? openWorks.length : undefined}>
