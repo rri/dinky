@@ -30,12 +30,12 @@
 }
 
 .main.active .name {
-    display: block;
+    display: none;
     font-weight: bold;
 }
 
 .main:hover .name {
-    display: block;
+    display: none;
 }
 
 a.main,

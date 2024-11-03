@@ -67,7 +67,7 @@ export function Today(props: Props) {
     return (
         <Wrapper layout="col">
             <Wrapper layout="col">
-                <Card title="Agenda" actions={[newTaskAction]} count={openTasks.length ? openTasks.length : undefined}>
+                <Card title="Today's Tasks" actions={[newTaskAction]} count={openTasks.length ? openTasks.length : undefined}>
                     {
                         openTasks.length
                             ?
