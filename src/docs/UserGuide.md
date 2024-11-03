@@ -40,7 +40,7 @@ Calculus | Ron Larson; Bruce H Edwards
 
 # Agenda
 
-Any number of tasks in your backlog or items in your library may be added to your daily agenda. When you add something to your agenda, the task or item stays there until it is removed or marked as done. Your agenda is always the first thing you see on the homepage.
+Any number of tasks in your task list or items in your library may be added to your daily agenda. When you add something to your agenda, the task or item stays there until it is removed or marked as done. Your agenda is always the first thing you see on the homepage.
 
 # Reminders
 
