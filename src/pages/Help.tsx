@@ -34,7 +34,7 @@ export function Help(props: Props) {
                     <Shortcut codes={["n"]}>New library item (on <NavLink to="/works" title="Go to library">library</NavLink> page)</Shortcut>
                 </ShortcutList>
                 <ShortcutList group="Profile Data">
-                    <Shortcut codes={["s"]}>Fast sync (<NavLink to="/profile" title="Configure sync settings">configure</NavLink>)</Shortcut>
+                    <Shortcut codes={["s"]}>Sync (<NavLink to="/profile" title="Configure sync settings">configure</NavLink>)</Shortcut>
                     <Shortcut codes={["S"]}>Sync and compact data (<NavLink to="/profile" title="Configure sync settings">configure</NavLink>)</Shortcut>
                     <Shortcut codes={["d"]}>Download (on <NavLink to="/profile" title="Go to your profile">profile</NavLink> page)</Shortcut>
                     <Shortcut codes={["u"]}>Upload (on <NavLink to="/profile" title="Go to your profile">profile</NavLink> page)</Shortcut>

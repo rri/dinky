@@ -62,6 +62,13 @@ export function App() {
         action: () => setTerm(new Term(""))
     }
 
+    const sync: Action = {
+        icon: icons.sync,
+        desc: "Sync",
+        label: "Sync",
+        action: () => cloudSyncData(false)
+    }
+
     const newTask = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
@@ -284,7 +291,7 @@ export function App() {
         input.click()
     }
 
-    const sync = (fullSync?: boolean) => store.cloudSyncData(data, fullSync)
+    const cloudSyncData = (fullSync?: boolean) => store.cloudSyncData(data, fullSync)
 
     useEffect(() => store.loadFromDisk(), [store])
 
@@ -389,11 +396,11 @@ export function App() {
         },
         SYNC: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            sync()
+            cloudSyncData()
         },
         FULL_SYNC: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
-            sync(true)
+            cloudSyncData(true)
         },
     }
 
@@ -407,7 +414,7 @@ export function App() {
             <Header clear={clear} />
             <SearchBox value={term.source()} action={val => setTerm(new Term(val))} refs={refs} />
             <NotifyBox note={note} />
-            <PageNav clear={clear} />
+            <PageNav clear={clear} sync={sync} />
             <PageContent
                 settings={data.settings}
                 contents={data.contents}
@@ -428,7 +435,7 @@ export function App() {
                 killTasks={killTasks}
                 exportData={exportData}
                 importData={importData}
-                sync={sync}
+                sync={cloudSyncData}
                 registerNewHandler={registerNewHandler}
                 registerExportHandler={registerExportHandler}
                 registerImportHandler={registerImportHandler}

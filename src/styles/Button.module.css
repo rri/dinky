@@ -4,7 +4,7 @@
     padding: calc(var(--spacing) / 4);
 }
 
-.icon:hover {
+.label:hover {
     transform: scale(1.2);
 }
 
@@ -14,4 +14,11 @@
 
 .gray:hover {
     opacity: 1.0;
+}
+
+.label {
+    align-items: center;
+    display: flex;
+    padding: 0 calc(2 * var(--spacing));
+    cursor: pointer;
 }

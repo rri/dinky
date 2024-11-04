@@ -3,10 +3,12 @@ import { Action } from "../models/Action"
 import { PageNavItem } from "./PageNavItem"
 import { Spacer } from "./Spacer"
 import { Wrapper } from "./Wrapper"
+import { Button } from "./Button"
 import styles from "../styles/PageNav.module.css"
 
 interface Props {
     clear: Action,
+    sync: Action,
 }
 
 export function PageNav(props: Props) {
@@ -18,6 +20,7 @@ export function PageNav(props: Props) {
             <PageNavItem name="Notes" slug="notes" icon={icons.notes} clear={props.clear} />
             <PageNavItem name="Library" slug="works" icon={icons.works} clear={props.clear} />
             <Spacer />
+            <Button {...props.sync} />
             <PageNavItem name="Profile" slug="profile" icon={icons.profile} clear={props.clear} />
             <PageNavItem name="Help" slug="help" icon={icons.help} clear={props.clear} />
         </Wrapper>
