@@ -18,7 +18,8 @@
 
 .label {
     align-items: center;
-    display: flex;
-    padding: 0 calc(2 * var(--spacing));
     cursor: pointer;
+    display: flex;
+    margin: 0 calc(var(--spacing));
+    padding: 0 calc(var(--spacing));
 }
