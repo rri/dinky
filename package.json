@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@material-design-icons/svg": "^0.10.9",
+    "@material-design-icons/svg": "^0.14.13",
     "@types/node": "^16.11.27",
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",

@@ -75,13 +75,13 @@ export function Profile(props: Props) {
                 <SettingList>
                     <LastSynced>Last sync: <LastSyncedDateTime>{lastSynced}</LastSyncedDateTime></LastSynced>
                     <ActionLink
-                        icon={icons.cloud}
+                        icon={icons.sync}
                         shortcuts={["s"]}
                         onClick={props.sync}>
-                        Fast sync
+                        Sync
                     </ActionLink>
                     <ActionLink
-                        icon={icons.cloud}
+                        icon={icons.sync}
                         shortcuts={["S"]}
                         onClick={props.sync}>
                         Sync and compact data
