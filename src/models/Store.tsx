@@ -16,6 +16,7 @@ export class Store {
     private notify: (note?: string) => void
     private cloud: Cloud
     private lastSyncStart?: string
+    private syncTimeout?: NodeJS.Timeout
 
     constructor(setData: (value: React.SetStateAction<AppState>) => void, notify: (note?: string) => void) {
         this.setData = setData
@@ -262,10 +263,18 @@ export class Store {
             // Register val-type keys to ensure that no updates are ever lost.
             this.createVals(updated, events)
 
-            updated.settings.storage.autoPushItems &&
-                this.cloud.pushEvents(updated,
-                    events,
-                    (pushedData: AppState) => this.handleItemSyncComplete(pushedData, events))
+            // Clear existing timeout
+            if (this.syncTimeout) {
+                clearTimeout(this.syncTimeout)
+            }
+
+            // Set new timeout to sync after 3 seconds of no updates
+            this.syncTimeout = setTimeout(() => {
+                updated.settings.storage.autoPushItems &&
+                    this.cloud.pushEvents(updated,
+                        events,
+                        (pushedData: AppState) => this.handleItemSyncComplete(pushedData, events))
+            }, 3000)
         }
 
         this.saveToDisk(updated)
@@ -347,5 +356,4 @@ export class Store {
     private saveToDisk(data: AppState) {
         localStorage.setItem(DATA_PATH, JSON.stringify(data))
     }
-
 }
