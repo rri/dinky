@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Work } from "../models/Work"
@@ -21,7 +22,7 @@ interface Props {
     returnURL?: string,
 }
 
-export function ViewWork(props: Props) {
+export const ViewWork = memo(function ViewWork(props: Props) {
 
     const navigate = useNavigate()
 
@@ -94,4 +95,9 @@ export function ViewWork(props: Props) {
             returnURL={props.returnURL}
         />
     )
-}
+}, (prevProps, nextProps) => {
+    return prevProps.item.data === nextProps.item.data &&
+        prevProps.item.archive === nextProps.item.archive &&
+        prevProps.item.today === nextProps.item.today &&
+        prevProps.readonly === nextProps.readonly
+})

@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
@@ -21,7 +22,7 @@ interface Props {
     returnURL?: string,
 }
 
-export function ViewTask(props: Props) {
+export const ViewTask = memo(function ViewTask(props: Props) {
 
     const navigate = useNavigate()
 
@@ -92,4 +93,9 @@ export function ViewTask(props: Props) {
             returnURL={props.returnURL}
         />
     )
-}
+}, (prevProps, nextProps) => {
+    return prevProps.item.data === nextProps.item.data &&
+        prevProps.item.archive === nextProps.item.archive &&
+        prevProps.item.today === nextProps.item.today &&
+        prevProps.readonly === nextProps.readonly
+})
