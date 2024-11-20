@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Identifiable } from "../models/Item"
@@ -21,7 +22,7 @@ interface Props {
     returnURL?: string,
 }
 
-export function ViewTopic(props: Props) {
+export const ViewTopic = memo(function ViewTopic(props: Props) {
 
     const navigate = useNavigate()
 
@@ -72,4 +73,8 @@ export function ViewTopic(props: Props) {
             returnURL={props.returnURL}
         />
     )
-}
+}, (prevProps, nextProps) => {
+    return prevProps.item.data === nextProps.item.data &&
+        prevProps.item.name === nextProps.item.name &&
+        prevProps.readonly === nextProps.readonly
+})

@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Note } from "../models/Note"
@@ -21,7 +22,7 @@ interface Props {
     returnURL?: string,
 }
 
-export function ViewNote(props: Props) {
+export const ViewNote = memo(function ViewNote(props: Props) {
 
     const navigate = useNavigate()
 
@@ -77,4 +78,8 @@ export function ViewNote(props: Props) {
             returnURL={props.returnURL}
         />
     )
-}
+}, (prevProps, nextProps) => {
+    return prevProps.item.data === nextProps.item.data &&
+        prevProps.item.archive === nextProps.item.archive &&
+        prevProps.readonly === nextProps.readonly
+})
