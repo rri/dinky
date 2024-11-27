@@ -336,6 +336,7 @@ export function App() {
         LINK_1: "1",
         LINK_2: "2",
         LINK_3: "3",
+        LINK_4: "4",
         LINK_L: "l",
         COMMA: ",",
         QUESTION: "shift+?",
@@ -372,6 +373,10 @@ export function App() {
         LINK_3: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
             navigate("/notes")
+        },
+        LINK_4: (evt?: KeyboardEvent) => {
+            evt?.preventDefault()
+            navigate("/works")
         },
         LINK_L: (evt?: KeyboardEvent) => {
             evt?.preventDefault()
