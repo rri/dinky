@@ -1,0 +1,8 @@
+.label {
+    align-items: center;
+    cursor: default;
+    display: flex;
+    margin: 0 calc(var(--spacing)) 0 0;
+    padding: 0;
+    opacity: 0.3;
+}

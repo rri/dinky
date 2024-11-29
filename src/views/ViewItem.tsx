@@ -16,6 +16,8 @@ import { Enriched } from './Enriched'
 import { Link } from './Link'
 import styles from "../styles/ViewItem.module.css"
 import { useNavigate } from 'react-router-dom'
+import { TagLabel } from './TagLabel'
+import { Tag } from '../models/Tag'
 
 interface Props {
     slug: string,
@@ -28,6 +30,7 @@ interface Props {
     rows?: number,
     oneline?: boolean,
     metadata?: boolean,
+    tags?: Tag[],
     actions: Action[],
     highlight?: Term,
     autoNew?: boolean,
@@ -188,6 +191,7 @@ export function ViewItem(props: Props) {
                 <Wrapper layout="row">
                     {props.icon && <Icon icon={props.icon} />}
                     {item}
+                    {props.tags && props.tags.map(tag => <TagLabel key={tag.name} {...tag} />)}
                     {props.actions.map(action => <div key={action.icon} className={styles.button}><Button {...action} /></div>)}
                 </Wrapper>
                 {
