@@ -1,0 +1,36 @@
+.main {
+    border: none;
+    justify-content: stretch;
+    padding: var(--spacing);
+}
+
+.segment {
+    cursor: pointer;
+    flex-grow: 1;
+    text-align: center;
+    height: 1.3rem;
+
+    &.zero {
+        padding-right: var(--spacing);
+        text-align: right;
+    }
+
+    &.progress {
+        background-color: var(--color-progress);
+        border: var(--width-line) solid var(--color-bg-text);
+    }
+
+    &.none {
+        background-color: var(--color-line-3);
+        border: var(--width-line) solid var(--color-bg-text);
+
+        &:hover, &:has(~ .segment:hover) {
+            background-color: var(--color-progress);
+        }
+    }
+
+    &.done {
+        padding-left: var(--spacing);
+        text-align: left;
+    }
+}

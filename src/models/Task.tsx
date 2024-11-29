@@ -1,7 +1,7 @@
-import { Archivable, Creatable, DataObj, Deletable, filterByArchive, filterByDeleted, reduceByTerm, Schedulable, Sorter, Syncable, Updatable } from "./Item"
+import { Completable, Creatable, DataObj, Deletable, filterByArchive, filterByDeleted, reduceByTerm, Schedulable, Sorter, Syncable, Updatable } from "./Item"
 import { Term } from "./Term"
 
-export type Task = DataObj & Creatable & Deletable & Updatable & Syncable & Schedulable & Archivable
+export type Task = DataObj & Creatable & Deletable & Updatable & Syncable & Schedulable & Completable
 
 interface Props {
     tasks: Record<string, Task>,
