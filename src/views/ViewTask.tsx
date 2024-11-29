@@ -7,6 +7,7 @@ import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
 import moment from "moment"
+import { Tag } from "../models/Tag"
 
 interface Props {
     item: Identifiable & Task,
@@ -30,6 +31,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
 
     const { id, archive, ...item } = props.item
 
+    const tags: Tag[] = []
     const actions: Action[] = []
 
     const today = belongsToToday(props.item)
@@ -47,6 +49,22 @@ export const ViewTask = memo(function ViewTask(props: Props) {
                 action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
             },
         )
+        if (item.progress !== undefined) {
+            const tag = { name: "%", data: "N/A", desc: "% progress so far" };
+            switch (item.progress) {
+                // Ignore 0
+                case 1: tag.data = "10%"; break
+                case 2: tag.data = "20%"; break
+                case 3: tag.data = "30%"; break
+                case 4: tag.data = "40%"; break
+                case 5: tag.data = "50%"; break
+                case 6: tag.data = "60%"; break
+                case 7: tag.data = "70%"; break
+                case 8: tag.data = "80%"; break
+                case 9: tag.data = "90%"; break
+            }
+            tags.push(tag)
+        }
     }
     actions.push(
         {
@@ -81,6 +99,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
             readonly={props.readonly ? props.readonly : archive}
             icon={props.icon}
             oneline={true}
+            tags={tags}
             actions={actions}
             strikethru={archive}
             placeholder={"Describe your task..."}
