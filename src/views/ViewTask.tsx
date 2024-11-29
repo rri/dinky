@@ -96,6 +96,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
 }, (prevProps, nextProps) => {
     return prevProps.item.data === nextProps.item.data &&
         prevProps.item.archive === nextProps.item.archive &&
+        prevProps.item.progress === nextProps.item.progress &&
         prevProps.item.today === nextProps.item.today &&
         prevProps.readonly === nextProps.readonly
 })

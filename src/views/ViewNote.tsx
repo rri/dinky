@@ -81,5 +81,6 @@ export const ViewNote = memo(function ViewNote(props: Props) {
 }, (prevProps, nextProps) => {
     return prevProps.item.data === nextProps.item.data &&
         prevProps.item.archive === nextProps.item.archive &&
+        prevProps.item.progress === nextProps.item.progress &&
         prevProps.readonly === nextProps.readonly
 })

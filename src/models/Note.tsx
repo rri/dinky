@@ -1,7 +1,7 @@
-import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, DataObj, Deletable, Updatable, Syncable, Archivable } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, DataObj, Deletable, Updatable, Syncable, Completable } from "./Item"
 import { Term } from "./Term"
 
-export type Note = DataObj & Creatable & Deletable & Updatable & Syncable & Archivable
+export type Note = DataObj & Creatable & Deletable & Updatable & Syncable & Completable
 
 interface Props {
     notes: Record<string, Note>,

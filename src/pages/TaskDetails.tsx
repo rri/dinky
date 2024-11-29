@@ -8,6 +8,8 @@ import { Wrapper } from "../views/Wrapper"
 import { ViewTask } from "../views/ViewTask"
 import { Setting, SettingList } from "../views/Settings"
 import { InfoBox } from "../views/InfoBox"
+import { ProgressBar } from "../views/ProgressBar"
+import { Progress } from "../models/Item"
 
 interface Props {
     tasks: Record<string, Task>,
@@ -23,6 +25,21 @@ export function TaskDetails(props: Props) {
     const item = id ? { ...props.tasks[id], id } : undefined
 
     const killAction = props.killAction(() => id && item && found && props.putTask(id, item, !item?.deleted), !!item?.deleted)
+
+    const progressAction = (val: Progress | boolean) => {
+        if (item && found) {
+            if (val === true) {
+                props.putTask(item.id, { ...item, progress: undefined, archive: true })
+                return
+            }
+            if (val === false) {
+                props.putTask(item.id, { ...item, progress: undefined, archive: false })
+                return
+            }
+            props.putTask(item.id, { ...item, progress: val, archive: false })
+            return
+        }
+    }
 
     return (
         <Wrapper layout="col">
@@ -43,6 +60,13 @@ export function TaskDetails(props: Props) {
                         : <MsgBox emoji="🚫">The task you're looking for cannot be found!</MsgBox>
                 }
             </Card>
+            {item && found && <Card title="Task Progress">
+                <ProgressBar
+                    archive={item.archive}
+                    progress={item.progress}
+                    action={progressAction}
+                ></ProgressBar>
+            </Card>}
             {item && found && <Card title="Remind Me">
                 <SettingList>
                     <Setting
