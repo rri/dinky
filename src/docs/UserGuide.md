@@ -24,7 +24,7 @@ A [note](/notes) helps you write down short blurbs of information (ideas, sugges
 
 # Library
 
-You can use your personalized [library](/works)) to manage references to books, papers, articles, journals, blog posts, and other reading material. When you add items to your library you can use the following special format to capture the title and authors separately. Authors are optional, and you can add as many as you like.
+You can use your personalized [library](/works) to manage references to books, papers, articles, journals, blog posts, and other reading material. When you add items to your library you can use the following special format to capture the title and authors separately. Authors are optional, and you can add as many as you like.
 
 ```
 <title> | <primary-author>; <secondary-author>; ...
