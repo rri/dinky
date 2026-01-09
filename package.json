@@ -15,7 +15,7 @@
     "react-dom": "^18.0.0",
     "react-hotkeys": "^2.0.0",
     "react-markdown": "^8.0.3",
-    "react-router-dom": "^6.2.2",
+    "react-router-dom": "^6.30.3",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-textr": "^5.0.1",
