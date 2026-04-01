@@ -200,113 +200,114 @@ export class Store {
 
         this.lastSyncStart = moment().format("YYYY-MM-DD HH:mm")
         this.notify("Synchronizing your data...")
-        await this.cloud
-            .pullData(data, async (mergedData: AppState) => {
-                await this.cloud
-                    .listEvents(mergedData, async keys => {
 
-                        const refKeys: string[] = []
-                        const valKeys: string[] = []
-                        const newKeys: string[] = []
-
-                        keys.forEach(key => {
-                            this.withRefVal(mergedData, key, (res: RefVal) => {
-                                switch (res.ref) {
-                                    case true:
-                                        refKeys.push(key)
-                                        break
-                                    case false:
-                                        valKeys.push(key)
-                                        break
-                                }
-                            }, () => {
-                                newKeys.push(key)
-                            })
-                        })
-
-                        const mergedDataWithCleanup = empty(mergedData)
-
-                        // Create ref-type keys for all val-type keys that are already
-                        // synced to the cloud. The reason these exist is because a prior
-                        // sync process did not successfully convert them,
-                        this.createRefs(mergedDataWithCleanup, valKeys)
-
-                        await this.cloud.pullEvents(mergedDataWithCleanup, newKeys, async (mergedDataWithEvents: AppState) => {
-
-                            const mergedDataWithEventsAndRefs = empty(mergedDataWithEvents)
-
-                            // Create ref-type keys as an optimization to prevent the same
-                            // events from getting downloaded and applied again.
-                            this.createRefs(mergedDataWithEventsAndRefs, newKeys)
-
-                            await this.saveToDisk(mergedDataWithEventsAndRefs)
-                            this.setData(mergedDataWithEventsAndRefs)
-
-                            const forceSync = mergedDataWithEventsAndRefs.settings.storage.registry?.forceSync
-                            const unsynced: Writable[] = []
-                            Object
-                                .values(mergedDataWithEventsAndRefs.settings.storage.registry?.events || {})
-                                .forEach(elem => {
-                                    if (!elem.ref) {
-                                        unsynced.push(elem.val)
-                                    }
-                                })
-
-                            const pushFull = !this.isRegistryEnabled(mergedDataWithEventsAndRefs) || (!!fullSync && (unsynced.length > 0 || keys.length > 0 || !!forceSync))
-                            const pushPart = this.isRegistryEnabled(mergedDataWithEventsAndRefs) && ((!fullSync && unsynced.length > 0))
-
-                            if (!pushFull && !pushPart) {
-                                // no data that needs to be pushed
-                                this.notify("Sync completed!")
-                                return
-                            }
-
-                            if (pushFull) {
-                                await this.cloud
-                                    .pushData(mergedDataWithEventsAndRefs, async (pushedData: AppState) => {
-
-                                        this.notify("Sync completed, cleaning up...")
-
-                                        // After a successful full sync, enable the registry if it isn't already.
-                                        const pushedDataWithRegistryEnabled = empty(pushedData)
-                                        pushedDataWithRegistryEnabled.settings.storage.registry = {
-                                            enabled: true,
-                                            events: pushedData.settings.storage.registry?.events || {},
-                                        }
-
-                                        // Delete all events pulled, just before they're to be be deleted from the cloud.
-                                        this.deleteRefVals(pushedDataWithRegistryEnabled, keys)
-                                        // Delete all events pushed, after the data object has been saved to the cloud.
-                                        this.deleteRefVals(pushedDataWithRegistryEnabled, unsynced.map(obj => obj.evt))
-                                        // Clean up dangling references.
-                                        this.cleanupRefs(pushedDataWithRegistryEnabled, keys)
-
-                                        // Reset the forceSync flag in case it had been set.
-                                        delete (pushedDataWithRegistryEnabled.settings.storage.registry as any).forceSync
-
-                                        await this.saveToDisk(pushedDataWithRegistryEnabled)
-                                        this.setData(pushedDataWithRegistryEnabled)
-
-
-                                        // Delete all events that have been merged and re-uploaded with the full blob.
-                                        await this.cloud.deleteEvents(pushedDataWithRegistryEnabled, keys, () => {
-                                            this.notify("Sync completed!")
-                                        })
-                                    })
-                                    .catch(e => this.notify("Sync (put) failed: " + e.desc))
-                            }
-
-                            if (pushPart) {
-                                await this.cloud
-                                    .pushEvents(mergedDataWithEventsAndRefs,
-                                        unsynced,
-                                        (pushedData: AppState) => this.handleItemSyncComplete(pushedData, unsynced, true))
-                                    .catch(e => this.notify("Sync (put) failed: " + e.desc))
-                            }
-                        })
-                    })
+        try {
+            // 1. Pull full state from cloud
+            const mergedData = await new Promise<AppState>((resolve, reject) => {
+                this.cloud.pullData(data, resolve)
             })
-            .catch(e => this.notify("Sync (get) failed: " + e.desc))
+
+            // 2. List all events in the cloud
+            const keys = await new Promise<string[]>((resolve, reject) => {
+                this.cloud.listEvents(mergedData, resolve)
+            })
+
+            const valKeys: string[] = []
+            const newKeys: string[] = []
+
+            keys.forEach(key => {
+                this.withRefVal(mergedData, key, (res: RefVal) => {
+                    if (res.ref === false) {
+                        valKeys.push(key)
+                    }
+                }, () => {
+                    newKeys.push(key)
+                })
+            })
+
+            const mergedDataWithCleanup = empty(mergedData)
+
+            // Create ref-type keys for all val-type keys that are already
+            // synced to the cloud. The reason these exist is because a prior
+            // sync process did not successfully convert them,
+            this.createRefs(mergedDataWithCleanup, valKeys)
+
+            // 3. Pull missing events and apply them
+            const mergedDataWithEvents = await new Promise<AppState>((resolve, reject) => {
+                this.cloud.pullEvents(mergedDataWithCleanup, newKeys, resolve)
+            })
+
+            const mergedDataWithEventsAndRefs = empty(mergedDataWithEvents)
+
+            // Create ref-type keys as an optimization to prevent the same
+            // events from getting downloaded and applied again.
+            this.createRefs(mergedDataWithEventsAndRefs, newKeys)
+
+            await this.saveToDisk(mergedDataWithEventsAndRefs)
+            this.setData(mergedDataWithEventsAndRefs)
+
+            const forceSync = mergedDataWithEventsAndRefs.settings.storage.registry?.forceSync
+            const unsynced: Writable[] = []
+            Object
+                .values(mergedDataWithEventsAndRefs.settings.storage.registry?.events || {})
+                .forEach(elem => {
+                    if (!elem.ref) {
+                        unsynced.push(elem.val)
+                    }
+                })
+
+            const pushFull = !this.isRegistryEnabled(mergedDataWithEventsAndRefs) || (!!fullSync && (unsynced.length > 0 || keys.length > 0 || !!forceSync))
+            const pushPart = this.isRegistryEnabled(mergedDataWithEventsAndRefs) && ((!fullSync && unsynced.length > 0))
+
+            if (!pushFull && !pushPart) {
+                // no data that needs to be pushed
+                this.notify("Sync completed!")
+                return
+            }
+
+            if (pushFull) {
+                const pushedData = await new Promise<AppState>((resolve, reject) => {
+                    this.cloud.pushData(mergedDataWithEventsAndRefs, resolve)
+                })
+
+                this.notify("Sync completed, cleaning up...")
+
+                // After a successful full sync, enable the registry if it isn't already.
+                const pushedDataWithRegistryEnabled = empty(pushedData)
+                pushedDataWithRegistryEnabled.settings.storage.registry = {
+                    enabled: true,
+                    events: pushedData.settings.storage.registry?.events || {},
+                }
+
+                // Delete all events pulled, just before they're to be be deleted from the cloud.
+                this.deleteRefVals(pushedDataWithRegistryEnabled, keys)
+                // Delete all events pushed, after the data object has been saved to the cloud.
+                this.deleteRefVals(pushedDataWithRegistryEnabled, unsynced.map(obj => obj.evt))
+                // Clean up dangling references.
+                this.cleanupRefs(pushedDataWithRegistryEnabled, keys)
+
+                // Reset the forceSync flag in case it had been set.
+                delete (pushedDataWithRegistryEnabled.settings.storage.registry as any).forceSync
+
+                await this.saveToDisk(pushedDataWithRegistryEnabled)
+                this.setData(pushedDataWithRegistryEnabled)
+
+                // 4. Delete processed events from cloud
+                await new Promise<void>((resolve) => {
+                    this.cloud.deleteEvents(pushedDataWithRegistryEnabled, keys, () => resolve())
+                })
+                this.notify("Sync completed!")
+            } else if (pushPart) {
+                // 5. Push individual events
+                await new Promise<AppState>((resolve) => {
+                    this.cloud.pushEvents(mergedDataWithEventsAndRefs, unsynced, (data) => {
+                        this.handleItemSyncComplete(data, unsynced, true).then(resolve)
+                    })
+                })
+            }
+        } catch (e: any) {
+            this.notify("Sync failed: " + (e.desc || "unexpected error"))
+        }
     }
 
     handleItemSync(events: Writable[], dataProvider: () => AppState, saveAction?: (data: AppState) => void): AppState {
