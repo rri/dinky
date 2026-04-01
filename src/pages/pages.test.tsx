@@ -586,7 +586,7 @@ describe("Profile", () => {
         )
         expect(screen.getByText("Cloud Sync")).toBeInTheDocument()
         expect(screen.getByText("Last sync:")).toBeInTheDocument()
-        expect(screen.getByText("never")).toBeInTheDocument()
+        expect(screen.getByText("Never")).toBeInTheDocument()
     })
 
     it("renders Display Preferences section", () => {
