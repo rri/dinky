@@ -21,6 +21,7 @@ jest.mock("./Storage", () => ({
         set: jest.fn().mockResolvedValue(undefined),
         setMany: jest.fn().mockResolvedValue(undefined),
         getOldData: jest.fn(),
+        clearOldData: jest.fn().mockResolvedValue(undefined),
         delete: jest.fn().mockResolvedValue(undefined),
     },
     STORE_SETTINGS: "settings",
@@ -46,29 +47,23 @@ const makeStore = (initialState: AppState = empty()) => {
     
     // Setup Cloud mock before creating Store
     const mockCloud = {
-        pullData: jest.fn((data, onSuccess) => {
-            onSuccess(data)
-            return Promise.resolve()
+        pullData: jest.fn(async (data, onSuccess) => {
+            await onSuccess(data)
         }),
-        pushData: jest.fn((data, onSuccess) => {
-            onSuccess(data)
-            return Promise.resolve()
+        listEvents: jest.fn(async (data, onSuccess) => {
+            await onSuccess([])
         }),
-        listEvents: jest.fn((data, onSuccess) => {
-            onSuccess([])
-            return Promise.resolve()
+        pullEvents: jest.fn(async (data, keys, onSuccess) => {
+            await onSuccess(data)
         }),
-        pullEvents: jest.fn((data, keys, onSuccess) => {
-            onSuccess(data)
-            return Promise.resolve()
+        pushData: jest.fn(async (data, onSuccess) => {
+            await onSuccess(data)
         }),
-        pushEvents: jest.fn((data, events, onSuccess) => {
-            onSuccess(data)
-            return Promise.resolve()
+        pushEvents: jest.fn(async (data, events, onSuccess) => {
+            await onSuccess(data)
         }),
-        deleteEvents: jest.fn((data, keys, onSuccess) => {
-            onSuccess(data)
-            return Promise.resolve()
+        deleteEvents: jest.fn(async (data, keys, onSuccess) => {
+            await onSuccess(data)
         }),
     };
     (Cloud as jest.Mock).mockImplementation(() => mockCloud)
@@ -111,14 +106,15 @@ const makeDisabledState = (): AppState => ({
 
 describe("Store", () => {
     beforeEach(() => {
-        localStorage.clear()
-        jest.clearAllMocks()
-        ;(storage.get as jest.Mock).mockReset()
-        ;(storage.getAll as jest.Mock).mockReset()
-        ;(storage.set as jest.Mock).mockReset()
-        ;(storage.setMany as jest.Mock).mockReset()
-        ;(storage.getOldData as jest.Mock).mockReset()
-        ;(storage.delete as jest.Mock).mockReset()
+        localStorage.clear();
+        jest.clearAllMocks();
+        (storage.get as jest.Mock).mockReset();
+        (storage.getAll as jest.Mock).mockReset();
+        (storage.set as jest.Mock).mockReset();
+        (storage.setMany as jest.Mock).mockReset();
+        (storage.getOldData as jest.Mock).mockReset();
+        (storage.clearOldData as jest.Mock).mockReset();
+        (storage.delete as jest.Mock).mockReset();
     })
 
     afterEach(() => {
@@ -356,10 +352,12 @@ describe("Store", () => {
             
             expect(getState().settings.storage.registry?.enabled).toBe(true)
             expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", savedState.settings.storage)
+            expect(storage.clearOldData).toHaveBeenCalledWith(DATA_PATH)
         })
 
         it("migrates state from localStorage if all IndexedDB stores are empty", async () => {
             const savedState = makeEnabledState()
+            const removeItemSpy = jest.spyOn(Storage.prototype, "removeItem")
             ;(storage.get as jest.Mock).mockResolvedValue(null)
             ;(storage.getOldData as jest.Mock).mockResolvedValue(null)
             localStorage.setItem(DATA_PATH, JSON.stringify(savedState))
@@ -369,6 +367,7 @@ describe("Store", () => {
             
             expect(getState().settings.storage.registry?.enabled).toBe(true)
             expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", savedState.settings.storage)
+            expect(localStorage.getItem(DATA_PATH)).toBeNull()
         })
     })
 

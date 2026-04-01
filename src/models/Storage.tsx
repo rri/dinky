@@ -143,6 +143,22 @@ export class Storage {
             return null;
         }
     }
+
+    async clearOldData(key: string): Promise<void> {
+        try {
+            const db = await this.getDB();
+            if (!db.objectStoreNames.contains("kv")) return;
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction("kv", "readwrite");
+                const store = transaction.objectStore("kv");
+                const request = store.delete(key);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        } catch (e) {
+            console.error(`IndexedDB clearOldData failed for ${key}`, e);
+        }
+    }
 }
 
 export const storage = new Storage();

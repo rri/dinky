@@ -113,7 +113,8 @@ export class Store {
         const v1Data = await storage.getOldData(DATA_PATH)
         if (v1Data) {
             const data: AppState = empty(JSON.parse(v1Data))
-            this.saveToDisk(data)
+            await this.saveToDisk(data)
+            await storage.clearOldData(DATA_PATH)
             this.setData(() => data)
             return
         }
@@ -122,7 +123,8 @@ export class Store {
         const oldRes = localStorage.getItem(DATA_PATH)
         if (oldRes) {
             const data: AppState = empty(JSON.parse(oldRes))
-            this.saveToDisk(data)
+            await this.saveToDisk(data)
+            localStorage.removeItem(DATA_PATH)
             this.setData(() => data)
             return
         }
@@ -198,10 +200,10 @@ export class Store {
 
         this.lastSyncStart = moment().format("YYYY-MM-DD HH:mm")
         this.notify("Synchronizing your data...")
-        this.cloud
-            .pullData(data, (mergedData: AppState) => {
-                this.cloud
-                    .listEvents(mergedData, keys => {
+        await this.cloud
+            .pullData(data, async (mergedData: AppState) => {
+                await this.cloud
+                    .listEvents(mergedData, async keys => {
 
                         const refKeys: string[] = []
                         const valKeys: string[] = []
@@ -229,7 +231,7 @@ export class Store {
                         // sync process did not successfully convert them,
                         this.createRefs(mergedDataWithCleanup, valKeys)
 
-                        this.cloud.pullEvents(mergedDataWithCleanup, newKeys, (mergedDataWithEvents: AppState) => {
+                        await this.cloud.pullEvents(mergedDataWithCleanup, newKeys, async (mergedDataWithEvents: AppState) => {
 
                             const mergedDataWithEventsAndRefs = empty(mergedDataWithEvents)
 
@@ -237,7 +239,7 @@ export class Store {
                             // events from getting downloaded and applied again.
                             this.createRefs(mergedDataWithEventsAndRefs, newKeys)
 
-                            this.saveToDisk(mergedDataWithEventsAndRefs)
+                            await this.saveToDisk(mergedDataWithEventsAndRefs)
                             this.setData(mergedDataWithEventsAndRefs)
 
                             const forceSync = mergedDataWithEventsAndRefs.settings.storage.registry?.forceSync
@@ -260,8 +262,8 @@ export class Store {
                             }
 
                             if (pushFull) {
-                                this.cloud
-                                    .pushData(mergedDataWithEventsAndRefs, (pushedData: AppState) => {
+                                await this.cloud
+                                    .pushData(mergedDataWithEventsAndRefs, async (pushedData: AppState) => {
 
                                         this.notify("Sync completed, cleaning up...")
 
@@ -280,13 +282,14 @@ export class Store {
                                         this.cleanupRefs(pushedDataWithRegistryEnabled, keys)
 
                                         // Reset the forceSync flag in case it had been set.
-                                        delete pushedDataWithRegistryEnabled.settings.storage.registry.forceSync
+                                        delete (pushedDataWithRegistryEnabled.settings.storage.registry as any).forceSync
 
-                                        this.saveToDisk(pushedDataWithRegistryEnabled)
+                                        await this.saveToDisk(pushedDataWithRegistryEnabled)
                                         this.setData(pushedDataWithRegistryEnabled)
 
+
                                         // Delete all events that have been merged and re-uploaded with the full blob.
-                                        this.cloud.deleteEvents(pushedDataWithRegistryEnabled, keys, () => {
+                                        await this.cloud.deleteEvents(pushedDataWithRegistryEnabled, keys, () => {
                                             this.notify("Sync completed!")
                                         })
                                     })
@@ -294,7 +297,7 @@ export class Store {
                             }
 
                             if (pushPart) {
-                                this.cloud
+                                await this.cloud
                                     .pushEvents(mergedDataWithEventsAndRefs,
                                         unsynced,
                                         (pushedData: AppState) => this.handleItemSyncComplete(pushedData, unsynced, true))
@@ -335,7 +338,7 @@ export class Store {
         return updated
     }
 
-    handleItemSyncComplete(data: AppState, events: Writable[], notifications?: boolean) {
+    async handleItemSyncComplete(data: AppState, events: Writable[], notifications?: boolean) {
         if (notifications) {
             this.notify("Sync completed, cleaning up...")
         }
@@ -346,7 +349,7 @@ export class Store {
         // events from getting downloaded and applied again.
         this.createRefs(pushedDataWithRefs, events.map(obj => obj.evt))
 
-        this.saveToDisk(pushedDataWithRefs)
+        await this.saveToDisk(pushedDataWithRefs)
         this.setData(pushedDataWithRefs)
 
         if (notifications) {
@@ -417,35 +420,35 @@ export class Store {
         })
     }
 
-    private saveToDisk(data: AppState) {
-        this.saveSettingsToDisk(data.settings)
-        storage.setMany(STORE_TASKS, data.contents.tasks || {})
-        storage.setMany(STORE_TOPICS, data.contents.topics || {})
-        storage.setMany(STORE_NOTES, data.contents.notes || {})
-        storage.setMany(STORE_WORKS, data.contents.works || {})
+    private async saveToDisk(data: AppState) {
+        await this.saveSettingsToDisk(data.settings)
+        await storage.setMany(STORE_TASKS, data.contents.tasks || {})
+        await storage.setMany(STORE_TOPICS, data.contents.topics || {})
+        await storage.setMany(STORE_NOTES, data.contents.notes || {})
+        await storage.setMany(STORE_WORKS, data.contents.works || {})
     }
 
-    private saveSettingsToDisk(settings: Settings) {
-        storage.set(STORE_SETTINGS, "storage", settings.storage)
-        storage.set(STORE_SETTINGS, "retention", settings.retention)
-        storage.set(STORE_SETTINGS, "display", settings.display)
+    private async saveSettingsToDisk(settings: Settings) {
+        await storage.set(STORE_SETTINGS, "storage", settings.storage)
+        await storage.set(STORE_SETTINGS, "retention", settings.retention)
+        await storage.set(STORE_SETTINGS, "display", settings.display)
     }
 
-    private saveSettingsPartToDisk(part: "storage" | "retention" | "display", value: any) {
-        storage.set(STORE_SETTINGS, part, value)
+    private async saveSettingsPartToDisk(part: "storage" | "retention" | "display", value: any) {
+        await storage.set(STORE_SETTINGS, part, value)
     }
 
-    private saveItemToDisk(path: ItemPath, id: string, item: any) {
+    private async saveItemToDisk(path: ItemPath, id: string, item: any) {
         const store = this.pathToStore(path)
         if (store) {
-            storage.set(store, id, item)
+            await storage.set(store, id, item)
         }
     }
 
-    private saveItemsToDisk(path: ItemPath, items: Record<string, any>) {
+    private async saveItemsToDisk(path: ItemPath, items: Record<string, any>) {
         const store = this.pathToStore(path)
         if (store) {
-            storage.setMany(store, items)
+            await storage.setMany(store, items)
         }
     }
 
