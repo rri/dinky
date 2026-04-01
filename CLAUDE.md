@@ -32,7 +32,7 @@ Each model file (e.g., `src/models/Task.tsx`) exports a `fetch*()` function that
 
 - `AppState` (in `src/models/AppState.tsx`) holds `settings` and `contents` (tasks, topics, notes, works as `Record<string, T>`)
 - `Store` class (`src/models/Store.tsx`) wraps React `useState` with immutable update helpers (`merge*` functions)
-- Data persisted to localStorage (key: `"data"`) and optionally synced to S3 via `Cloud` class (`src/models/Cloud.tsx`)
+- Data persisted to IndexedDB (with fallback/migration from localStorage) and optionally synced to S3 via `Cloud` class (`src/models/Cloud.tsx`)
 - Soft deletes with configurable retention periods
 
 ### Source Layout
