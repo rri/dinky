@@ -77,7 +77,7 @@ export function App() {
             if (!res.contents.tasks) {
                 res.contents.tasks = {}
             }
-            res.contents.tasks[id] = item
+            res.contents.tasks![id] = item
             return res
         })
         return id
@@ -91,7 +91,7 @@ export function App() {
             if (!res.contents.topics) {
                 res.contents.topics = {}
             }
-            res.contents.topics[id] = item
+            res.contents.topics![id] = item
             return res
         })
         return id
@@ -105,7 +105,7 @@ export function App() {
             if (!res.contents.notes) {
                 res.contents.notes = {}
             }
-            res.contents.notes[id] = item
+            res.contents.notes![id] = item
             return res
         })
         return id
@@ -119,7 +119,7 @@ export function App() {
             if (!res.contents.works) {
                 res.contents.works = {}
             }
-            res.contents.works[id] = item
+            res.contents.works![id] = item
             return res
         })
         return id
@@ -147,7 +147,7 @@ export function App() {
                 const match = exp.exec(text)
                 if (match != null) {
                     const newTopic = match[0]
-                    const topics = data.contents.topics ? data.contents.topics : {}
+                    const topics = data.contents.topics!
                     if (Object
                         .values(topics)
                         .filter(topic => topic.data === newTopic)
@@ -187,7 +187,7 @@ export function App() {
         if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.tasks?.[id]
+                delete res.contents.tasks![id]
                 return res
             })
         } else {
@@ -206,7 +206,7 @@ export function App() {
         if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.topics?.[id]
+                delete res.contents.topics![id]
                 return res
             })
         } else {
@@ -220,7 +220,7 @@ export function App() {
         if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.notes?.[id]
+                delete res.contents.notes![id]
                 return res
             })
         } else {
@@ -235,7 +235,7 @@ export function App() {
         if (!itemData && !item.created) {
             setData(prev => {
                 const res = { ...prev }
-                delete res.contents.works?.[id]
+                delete res.contents.works![id]
                 return res
             })
         } else {
@@ -246,7 +246,7 @@ export function App() {
     }
 
     const killTasks = (makeIdList: () => string[]) => {
-        store.tombstoneItems(makeIdList, (prev: AppState) => prev.contents.tasks ? prev.contents.tasks : {}, mergeTasks, "contents.tasks")
+        store.tombstoneItems(makeIdList, (prev: AppState) => prev.contents.tasks!, mergeTasks, "contents.tasks")
     }
 
     const exportData = () => {
@@ -293,7 +293,7 @@ export function App() {
 
     const cloudSyncData = (fullSync?: boolean) => store.cloudSyncData(data, fullSync)
 
-    useEffect(() => store.loadFromDisk(), [store])
+    useEffect(() => { store.loadFromDisk() }, [store])
 
     useEffect(() => {
         const setDisplayTheme = () => {
