@@ -5,7 +5,6 @@ import { RetentionSettings } from "./RetentionSettings"
 import { StorageSettings } from "./StorageSettings"
 import { Settings } from "./Settings"
 import { v4 } from "uuid"
-import moment from "moment"
 import { Deletable, ItemPath, Updatable, Writable } from "./Item"
 import { RefVal } from "./Registry"
 import { storage, STORE_NOTES, STORE_SETTINGS, STORE_TASKS, STORE_TOPICS, STORE_WORKS } from "./Storage"
@@ -191,14 +190,16 @@ export class Store {
 
     async cloudSyncData(data: AppState, fullSync?: boolean, minDelayMinutes?: number) {
 
-        if (this.lastSyncStart &&
-            minDelayMinutes &&
-            moment().subtract(minDelayMinutes, "minutes").isBefore(moment(this.lastSyncStart))) {
-            // too soon, return immediately without doing anything
-            return
+        if (this.lastSyncStart && minDelayMinutes) {
+            const lastSync = new Date(this.lastSyncStart).getTime()
+            const now = new Date().getTime()
+            if (now - lastSync < minDelayMinutes * 60 * 1000) {
+                // too soon, return immediately without doing anything
+                return
+            }
         }
 
-        this.lastSyncStart = moment().format("YYYY-MM-DD HH:mm")
+        this.lastSyncStart = new Date().toISOString().slice(0, 16).replace('T', ' ')
         this.notify("Synchronizing your data...")
 
         try {
@@ -410,8 +411,8 @@ export class Store {
             idList.forEach(id => {
                 const item = {
                     ...prevItems[id],
-                    updated: moment().toISOString(),
-                    deleted: moment().toISOString(),
+                    updated: new Date().toISOString(),
+                    deleted: new Date().toISOString(),
                 }
                 events.push({ ...item, evt: v4(), path, id })
                 currItems[id] = item

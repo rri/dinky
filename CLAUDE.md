@@ -50,7 +50,7 @@ CSS Modules for scoped styles, Tailwind for utilities, CSS custom properties for
 
 ### Key Conventions
 
-- UUIDs (v4) for all entity IDs; ISO strings for timestamps (parsed with moment.js)
+- UUIDs (v4) for all entity IDs; ISO strings for timestamps (parsed with native Date)
 - Markdown content rendered via `remark` + GFM plugin
 - Global keyboard shortcuts via `react-hotkeys`
 - CI/CD: GitHub Actions builds on push to main and deploys to S3 + CloudFront

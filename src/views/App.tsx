@@ -1,7 +1,6 @@
 import React, { useMemo } from "react"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
-import moment from "moment"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
 import { AppState, empty, mergeNote, mergeTask, mergeTasks, mergeTopic, mergeWork, toExport } from "../models/AppState"
@@ -128,9 +127,9 @@ export function App() {
     const updateAuditFields = <T extends DataObj & Creatable & Deletable & Updatable & Syncable,>(item: T, tombstone?: boolean): T => {
         const updated = {
             ...item,
-            created: item.created ? item.created : moment().toISOString(),
-            updated: moment().toISOString(),
-            deleted: tombstone || !item.data ? moment().toISOString() : undefined,
+            created: item.created ? item.created : new Date().toISOString(),
+            updated: new Date().toISOString(),
+            deleted: tombstone || !item.data ? new Date().toISOString() : undefined,
         }
 
         if (!item.created) {
@@ -167,14 +166,14 @@ export function App() {
     const putRetentionSettings = (value: RetentionSettings) => {
         store.putRetentionSettings({
             ...value,
-            updated: moment().toISOString(),
+            updated: new Date().toISOString(),
         })
     }
 
     const putDisplaySettings = (value: DisplaySettings) => {
         store.putDisplaySettings({
             ...value,
-            updated: moment().toISOString(),
+            updated: new Date().toISOString(),
         })
     }
 
@@ -255,7 +254,7 @@ export function App() {
             { type: 'application/octet-stream' })
         const href = window.URL.createObjectURL(bytes)
         const anchor = document.createElement("a")
-        anchor.download = "dinky.dev.data." + moment().toISOString() + ".json"
+        anchor.download = "dinky.dev.data." + new Date().toISOString() + ".json"
         anchor.href = href
 
         if (window.confirm("Your data file is ready to be downloaded. Proceed?")) {
