@@ -4,6 +4,9 @@
   "private": true,
   "devDependencies": {
     "@material-design-icons/svg": "^0.14.13",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^16.11.27",
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
@@ -47,6 +50,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.385.0",
     "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@svgr/webpack": "^8.1.0",
     "@types/pluralize": "^0.0.29",
@@ -54,7 +58,6 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-named-asset-import": "^0.3.8",
     "babel-preset-react-app": "^10.0.1",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "bfj": "^7.0.2",
     "browserslist": "^4.18.1",
     "camelcase": "^6.2.1",
@@ -109,7 +112,9 @@
     "setupFiles": [
       "react-app-polyfill/jsdom"
     ],
-    "setupFilesAfterEnv": [],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.ts"
+    ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
       "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
@@ -121,7 +126,7 @@
       "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
     },
     "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "[/\\\\]node_modules[/\\\\](?!react-markdown|remark|remark-gfm|remark-textr|unified|bail|is-plain-obj|trough|vfile|unist-util-|mdast-util-|micromark|ccount|escape-string-regexp|markdown-table|zwitch|longest-streak|devlop|hast-util-|property-information|comma-separated-tokens|space-separated-tokens|stringify-entities|character-entities-html4|character-entities-legacy|trim-lines|mdast-util-find-and-replace|decode-named-character-reference|character-entities).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "modulePaths": [],
