@@ -23,14 +23,16 @@
     <title>dinky.dev</title>
     <style>
         noscript {
-            display: block;
+            display: flex;
             padding: 3em;
-            text-align: center;
             font-style: italic;
+            align-items: baseline;
+            justify-content: center;
+            gap: 1em;
         }
 
-        noscript>.message {
-            padding: 1em;
+        noscript>.message, noscript>.emoji {
+            padding: 1em 0;
         }
     </style>
 </head>
