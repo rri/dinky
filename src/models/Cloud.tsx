@@ -24,30 +24,32 @@ export class Cloud {
 
     async pullData(data: AppState, onSuccess: (updated: AppState) => void) {
         const getData = async (client: S3Client) => {
-            const get = new GetObjectCommand({
-                Bucket: data.settings.storage.s3Bucket,
-                Key: REMOTE_DATA_PATH,
-                IfNoneMatch: data.settings.storage.eTag,
-            })
-            await client
-                .send(get)
-                .then(async res => {
-                    const { Body, ETag } = res
-                    const body = await new Response(Body as ReadableStream).text()
-                    const updated = mergeData(data, empty(JSON.parse(body)), true)
-                    updated.settings.storage.eTag = ETag
-                    return updated
+            try {
+                const get = new GetObjectCommand({
+                    Bucket: data.settings.storage.s3Bucket,
+                    Key: REMOTE_DATA_PATH,
+                    IfNoneMatch: data.settings.storage.eTag,
                 })
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
+                const res = await client.send(get)
+                const { Body, ETag } = res
+                const body = await new Response(Body as ReadableStream).text()
+                const updated = mergeData(data, empty(JSON.parse(body)), true)
+                updated.settings.storage.eTag = ETag
+                const purged = purgeDeleted(updated)
+                onSuccess(purged)
+            } catch (e: any) {
+                const httpStatusCode = e.$metadata?.httpStatusCode
+                try {
                     this.checkHttpStatusCode(e, httpStatusCode)
-                    return data
-                })
-                .then(purgeDeleted)
-                .then(onSuccess)
+                } catch (err: any) {
+                    this.notify("Sync (get) failed: " + err.desc)
+                    return
+                }
+                onSuccess(purgeDeleted(data))
+            }
         }
         this.withS3Client(data.settings.storage,
-            client => getData(client).catch((e: any) => this.notify("Sync (get) failed: " + e.desc)),
+            client => getData(client),
             () => this.notify("Sync not set up!"))
     }
 
@@ -66,174 +68,174 @@ export class Cloud {
             }
         )
         const putData = async (client: S3Client) => {
-            const readyToExport = toExport(data)
-            const put = new PutObjectCommand({
-                Bucket: data.settings.storage.s3Bucket,
-                Key: REMOTE_DATA_PATH,
-                Body: JSON.stringify(readyToExport),
-                ContentType: "application/json",
-            })
-            await client
-                .send(put)
-                .then(async res => {
-                    const { ETag } = res
-                    return withMeta(readyToExport, new Date().toISOString(), ETag)
+            try {
+                const readyToExport = toExport(data)
+                const put = new PutObjectCommand({
+                    Bucket: data.settings.storage.s3Bucket,
+                    Key: REMOTE_DATA_PATH,
+                    Body: JSON.stringify(readyToExport),
+                    ContentType: "application/json",
                 })
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
+                const res = await client.send(put)
+                const { ETag } = res
+                onSuccess(withMeta(readyToExport, new Date().toISOString(), ETag))
+            } catch (e: any) {
+                const httpStatusCode = e.$metadata?.httpStatusCode
+                try {
                     this.checkHttpStatusCode(e, httpStatusCode)
-                    return withMeta(readyToExport, new Date().toISOString())
-                })
-                .then(onSuccess)
+                } catch (err: any) {
+                    this.notify("Sync (put) failed: " + err.desc)
+                    return
+                }
+                onSuccess(withMeta(toExport(data), new Date().toISOString()))
+            }
         }
         this.withS3Client(
             data.settings.storage,
-            client => putData(client).catch((e: any) => this.notify("Sync (put) failed: " + e.desc)),
+            client => putData(client),
             () => this.notify("Sync not set up!"))
     }
 
     async listEvents(data: AppState, onSuccess: (keys: string[]) => void) {
         const getEventKeys = async (client: S3Client) => {
-            const lst = new ListObjectsV2Command({
-                Bucket: data.settings.storage.s3Bucket,
-                Delimiter: DELIMITER,
-                Prefix: REMOTE_EVENTS_PREFIX,
-            })
-            await client
-                .send(lst)
-                .then(res => {
-                    const keys: string[] = []
-                    const { Contents, IsTruncated } = res
-                    if (IsTruncated) {
-                        this.notify("Hit max events (you may have to sync again)!")
-                    }
-                    Contents?.forEach(evt => evt.Key && keys.push(this.stripPrefixPath(evt.Key)))
-                    onSuccess(keys)
+            try {
+                const lst = new ListObjectsV2Command({
+                    Bucket: data.settings.storage.s3Bucket,
+                    Delimiter: DELIMITER,
+                    Prefix: REMOTE_EVENTS_PREFIX,
                 })
-                .catch(e => {
-                    const { $metadata: { httpStatusCode } } = e
+                const res = await client.send(lst)
+                const keys: string[] = []
+                const { Contents, IsTruncated } = res
+                if (IsTruncated) {
+                    this.notify("Hit max events (you may have to sync again)!")
+                }
+                Contents?.forEach(evt => evt.Key && keys.push(this.stripPrefixPath(evt.Key)))
+                onSuccess(keys)
+            } catch (e: any) {
+                const httpStatusCode = e.$metadata?.httpStatusCode
+                try {
                     this.checkHttpStatusCode(e, httpStatusCode)
-                })
+                } catch (err: any) {
+                    this.notify("Sync (get) failed: " + err.desc)
+                }
+            }
         }
         this.withS3Client(data.settings.storage,
-            client => getEventKeys(client).catch((e: any) => this.notify("Sync (get) failed: " + e.desc)),
+            client => getEventKeys(client),
             () => this.notify("Sync not set up!"))
     }
 
     async pullEvents(data: AppState, keys: string[], onSuccess: (updated: AppState) => void) {
-        const arr = [...keys]
-        const key = arr.pop()
-        if (key === undefined) {
-            // nothing more to pop from the stack, so we're done
-            onSuccess(data)
-        } else {
-            const getEvent = async (client: S3Client) => {
-                const get = new GetObjectCommand({
-                    Bucket: data.settings.storage.s3Bucket,
-                    Key: REMOTE_EVENTS_PREFIX + key,
-                })
-                await client
-                    .send(get)
-                    .then(async res => {
-                        const { Body } = res
-                        const body = await new Response(Body as ReadableStream).text()
-                        const { path, ...obj } = JSON.parse(body)
-                        switch (path) {
-                            case "settings.retention": {
-                                return mergeData(data, { ...data, settings: { ...data.settings, retention: obj as RetentionSettings } })
+        this.withS3Client(data.settings.storage,
+            async client => {
+                let updated = data
+                try {
+                    for (const key of keys) {
+                        const get = new GetObjectCommand({
+                            Bucket: data.settings.storage.s3Bucket,
+                            Key: REMOTE_EVENTS_PREFIX + key,
+                        })
+                        try {
+                            const res = await client.send(get)
+                            const { Body } = res
+                            const body = await new Response(Body as ReadableStream).text()
+                            const { path, ...obj } = JSON.parse(body)
+                            switch (path) {
+                                case "settings.retention": {
+                                    updated = mergeData(updated, { ...updated, settings: { ...updated.settings, retention: obj as RetentionSettings } })
+                                    break
+                                }
+                                case "settings.display": {
+                                    updated = mergeData(updated, { ...updated, settings: { ...updated.settings, display: obj as DisplaySettings } })
+                                    break
+                                }
+                                case "contents.tasks": {
+                                    const { id, ...task } = obj as Identifiable & Task
+                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, tasks: { ...updated.contents.tasks, [id]: task } } })
+                                    break
+                                }
+                                case "contents.topics": {
+                                    const { id, ...topic } = obj as Identifiable & Topic
+                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, topics: { ...updated.contents.topics, [id]: topic } } })
+                                    break
+                                }
+                                case "contents.notes": {
+                                    const { id, ...note } = obj as Identifiable & Note
+                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, notes: { ...updated.contents.notes, [id]: note } } })
+                                    break
+                                }
+                                case "contents.works": {
+                                    const { id, ...work } = obj as Identifiable & Work
+                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, works: { ...updated.contents.works, [id]: work } } })
+                                    break
+                                }
                             }
-                            case "settings.display": {
-                                return mergeData(data, { ...data, settings: { ...data.settings, display: obj as DisplaySettings } })
-                            }
-                            case "contents.tasks": {
-                                const { id, ...task } = obj as Identifiable & Task
-                                return mergeData(data, { ...data, contents: { ...data.contents, tasks: { ...data.contents.tasks, [id]: task } } })
-                            }
-                            case "contents.topics": {
-                                const { id, ...topic } = obj as Identifiable & Topic
-                                return mergeData(data, { ...data, contents: { ...data.contents, topics: { ...data.contents.topics, [id]: topic } } })
-                            }
-                            case "contents.notes": {
-                                const { id, ...note } = obj as Identifiable & Note
-                                return mergeData(data, { ...data, contents: { ...data.contents, notes: { ...data.contents.notes, [id]: note } } })
-                            }
-                            case "contents.works": {
-                                const { id, ...work } = obj as Identifiable & Work
-                                return mergeData(data, { ...data, contents: { ...data.contents, works: { ...data.contents.works, [id]: work } } })
-                            }
-                            default:
-                                return data
+                        } catch (e: any) {
+                            const httpStatusCode = e.$metadata?.httpStatusCode
+                            this.checkHttpStatusCode(e, httpStatusCode)
                         }
-                    })
-                    .catch(e => {
-                        const { $metadata: { httpStatusCode } } = e
-                        this.checkHttpStatusCode(e, httpStatusCode)
-                        return data
-                    })
-                    .then(updated => this.pullEvents(updated, arr, onSuccess))
-            }
-            this.withS3Client(data.settings.storage,
-                client => getEvent(client).catch((e: any) => this.notify("Sync (get) failed: " + e.desc)),
-                () => this.notify("Sync not set up!"))
-        }
+                    }
+                } catch (e: any) {
+                    this.notify("Sync (get) failed: " + (e.desc || "unexpected error"))
+                }
+                onSuccess(updated)
+            },
+            () => this.notify("Sync not set up!"))
     }
 
     async pushEvents(data: AppState, events: Writable[], onSuccess: (updated: AppState) => void) {
-        const arr = [...events]
-        const event = arr.pop()
-        if (event === undefined) {
-            // nothing more to pop from the stack, so we're done
-            onSuccess(data)
-        } else {
-            const putEvent = async (client: S3Client) => {
-                const { evt, unsynced, ...obj } = event
-                const put = new PutObjectCommand({
-                    Bucket: data.settings.storage.s3Bucket,
-                    Key: REMOTE_EVENTS_PREFIX + evt,
-                    Body: JSON.stringify(obj),
-                    ContentType: "application/json",
-                })
-                await client
-                    .send(put)
-                    .catch(e => {
-                        const { $metadata: { httpStatusCode } } = e
+        this.withS3Client(
+            data.settings.storage,
+            async client => {
+                try {
+                    for (const event of events) {
+                        const { evt, unsynced, ...obj } = event
+                        const put = new PutObjectCommand({
+                            Bucket: data.settings.storage.s3Bucket,
+                            Key: REMOTE_EVENTS_PREFIX + evt,
+                            Body: JSON.stringify(obj),
+                            ContentType: "application/json",
+                        })
+                        await client.send(put)
+                    }
+                } catch (e: any) {
+                    const httpStatusCode = e.$metadata?.httpStatusCode
+                    try {
                         this.checkHttpStatusCode(e, httpStatusCode)
-                    })
-                    .then(() => this.pushEvents(data, arr, onSuccess))
-            }
-            this.withS3Client(
-                data.settings.storage,
-                client => putEvent(client).catch((e: any) => this.notify("Cloud publishing failed (sync manually later): " + e.desc)))
-        }
+                    } catch (err: any) {
+                        this.notify("Cloud publishing failed (sync manually later): " + err.desc)
+                        return
+                    }
+                }
+                onSuccess(data)
+            },
+            () => this.notify("Sync not set up!"))
     }
 
     async deleteEvents(data: AppState, keys: string[], onSuccess: (updated: AppState) => void) {
-        const arr = [...keys]
-        const key = arr.pop()
-        if (key === undefined) {
-            // nothing more to pop from the stack, so we're done
-            onSuccess(data)
-        } else {
-            const deleteEvent = async (client: S3Client) => {
-                const del = new DeleteObjectCommand({
-                    Bucket: data.settings.storage.s3Bucket,
-                    Key: REMOTE_EVENTS_PREFIX + key,
-                })
-                // delete is best-effort (no action is taken if it fails),
-                // with subsequent synchronization attempts expected to
-                // take care of garbage collection
-                await client
-                    .send(del)
-                    .catch(e => {
-                        const { $metadata: { httpStatusCode } } = e
-                        this.checkHttpStatusCode(e, httpStatusCode)
+        this.withS3Client(
+            data.settings.storage,
+            async client => {
+                for (const key of keys) {
+                    const del = new DeleteObjectCommand({
+                        Bucket: data.settings.storage.s3Bucket,
+                        Key: REMOTE_EVENTS_PREFIX + key,
                     })
-                    .then(() => this.deleteEvents(data, arr, onSuccess))
-            }
-            this.withS3Client(
-                data.settings.storage,
-                client => deleteEvent(client).catch((e: any) => { /* Ignore */ }))
-        }
+                    try {
+                        await client.send(del)
+                    } catch (e: any) {
+                        const httpStatusCode = e.$metadata?.httpStatusCode
+                        try {
+                            this.checkHttpStatusCode(e, httpStatusCode)
+                        } catch (err: any) {
+                            // ignore best-effort deletion errors
+                        }
+                    }
+                }
+                onSuccess(data)
+            },
+            () => this.notify("Sync not set up!"))
     }
 
     private withS3Client(cfg: StorageSettings, action: (s3Client: S3Client) => void, otherwise?: () => void) {
