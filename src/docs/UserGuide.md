@@ -52,7 +52,9 @@ You can quickly search for text by pressing the "`/`" (forward slash) shortcut a
 
 # Storage & Security
 
-Your data is stored locally within the browser's [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), and is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time. Using the `S` (i.e., capitalized) shortcut forces a slower synchronization process where your data files on the server are consolidated into a single one.
+Your data is stored locally within the browser's [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API), which provides more robust and performant storage than traditional local storage. If you have existing data in local storage, it will be automatically migrated to IndexedDB the first time you use the updated application.
+
+Your data is synchronized to the cloud on demand, *only* if you've set up a personal S3 bucket on AWS with the necessary credentials and roles. This configuration needs to be set up and saved only once, after which you may initiate a sync from the [profile](/profile/#cloud-sync) page, or by using the `s` keyboard shortcut, at any time. Using the `S` (i.e., capitalized) shortcut forces a slower synchronization process where your data files on the server are consolidated into a single one.
 
 *Replace $bucket, $region, $policy, $usergroup and $user with arbitrary fresh values.*
 

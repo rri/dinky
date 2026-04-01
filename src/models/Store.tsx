@@ -7,6 +7,7 @@ import { v4 } from "uuid"
 import moment from "moment"
 import { Deletable, ItemPath, Updatable, Writable } from "./Item"
 import { RefVal } from "./Registry"
+import { storage, STORE_NOTES, STORE_SETTINGS, STORE_TASKS, STORE_TOPICS, STORE_WORKS } from "./Storage"
 
 export const DATA_PATH = "data"
 
@@ -69,16 +70,64 @@ export class Store {
         })
     }
 
-    loadFromDisk() {
-        this.setData(prev => {
-            const res = localStorage.getItem(DATA_PATH)
-            if (res) {
-                const data: AppState = empty(JSON.parse(res))
-                return mergeData(prev, data)
-            } else {
-                return empty()
+    async loadFromDisk() {
+        // 1. Try to load from new granular stores
+        const storageSettings = await storage.get(STORE_SETTINGS, "storage")
+        const retentionSettings = await storage.get(STORE_SETTINGS, "retention")
+        const displaySettings = await storage.get(STORE_SETTINGS, "display")
+        
+        // Backward compatibility for "all" key in STORE_SETTINGS
+        const allSettings = await storage.get(STORE_SETTINGS, "all")
+
+        if (storageSettings || retentionSettings || displaySettings || allSettings) {
+            const tasks = await storage.getAll(STORE_TASKS)
+            const topics = await storage.getAll(STORE_TOPICS)
+            const notes = await storage.getAll(STORE_NOTES)
+            const works = await storage.getAll(STORE_WORKS)
+
+            const data: AppState = {
+                settings: (allSettings || {
+                    storage: storageSettings,
+                    retention: retentionSettings,
+                    display: displaySettings,
+                }) as any,
+                contents: {
+                    tasks: tasks as any,
+                    topics: topics as any,
+                    notes: notes as any,
+                    works: works as any,
+                }
             }
-        })
+            this.setData(() => empty(data))
+
+            // Migration: if we loaded from "all", split it now
+            if (allSettings) {
+                this.saveSettingsToDisk(allSettings)
+                storage.delete(STORE_SETTINGS, "all")
+            }
+            return
+        }
+
+        // 2. Try to migrate from IndexedDB v1 "kv" store
+        const v1Data = await storage.getOldData(DATA_PATH)
+        if (v1Data) {
+            const data: AppState = empty(JSON.parse(v1Data))
+            this.saveToDisk(data)
+            this.setData(() => data)
+            return
+        }
+
+        // 3. Try to migrate from localStorage
+        const oldRes = localStorage.getItem(DATA_PATH)
+        if (oldRes) {
+            const data: AppState = empty(JSON.parse(oldRes))
+            this.saveToDisk(data)
+            this.setData(() => data)
+            return
+        }
+
+        // 4. Fallback to empty state
+        this.setData(() => empty())
     }
 
     isRegistryEnabled(data: AppState): boolean {
@@ -256,7 +305,7 @@ export class Store {
             .catch(e => this.notify("Sync (get) failed: " + e.desc))
     }
 
-    handleItemSync(events: Writable[], dataProvider: () => AppState): AppState {
+    handleItemSync(events: Writable[], dataProvider: () => AppState, saveAction?: (data: AppState) => void): AppState {
         const updated = dataProvider()
 
         if (events.length > 0) {
@@ -277,7 +326,11 @@ export class Store {
             }, 3000)
         }
 
-        this.saveToDisk(updated)
+        if (saveAction) {
+            saveAction(updated)
+        } else {
+            this.saveToDisk(updated)
+        }
         return updated
     }
 
@@ -303,28 +356,36 @@ export class Store {
     putStorageSettings(item: StorageSettings) {
         this.setData(prev => {
             const events: Writable[] = []
-            return this.handleItemSync(events, () => mergeStorageSettings(prev, item))
+            return this.handleItemSync(events,
+                () => mergeStorageSettings(prev, item),
+                (data) => this.saveSettingsPartToDisk("storage", data.settings.storage))
         })
     }
 
     putRetentionSettings(item: RetentionSettings) {
         this.setData(prev => {
             const events: Writable[] = [{ ...item, evt: v4(), path: "settings.retention" }]
-            return this.handleItemSync(events, () => mergeRetentionSettings(prev, item))
+            return this.handleItemSync(events,
+                () => mergeRetentionSettings(prev, item),
+                (data) => this.saveSettingsPartToDisk("retention", data.settings.retention))
         })
     }
 
     putDisplaySettings(item: DisplaySettings) {
         this.setData(prev => {
             const events: Writable[] = [{ ...item, evt: v4(), path: "settings.display" }]
-            return this.handleItemSync(events, () => mergeDisplaySettings(prev, item))
+            return this.handleItemSync(events,
+                () => mergeDisplaySettings(prev, item),
+                (data) => this.saveSettingsPartToDisk("display", data.settings.display))
         })
     }
 
     putItem<T>(id: string, item: T, mergeItem: (state: AppState, id: string, item: T) => AppState, path: ItemPath) {
         this.setData(prev => {
             const events = [{ ...item, evt: v4(), path, id }]
-            return this.handleItemSync(events, () => mergeItem(prev, id, item))
+            return this.handleItemSync(events,
+                () => mergeItem(prev, id, item),
+                () => this.saveItemToDisk(path, id, item))
         })
     }
 
@@ -349,11 +410,51 @@ export class Store {
                 currItems[id] = item
             })
 
-            return this.handleItemSync(events, () => mergeItems(prev, currItems))
+            return this.handleItemSync(events,
+                () => mergeItems(prev, currItems),
+                () => this.saveItemsToDisk(path, currItems))
         })
     }
 
     private saveToDisk(data: AppState) {
-        localStorage.setItem(DATA_PATH, JSON.stringify(data))
+        this.saveSettingsToDisk(data.settings)
+        storage.setMany(STORE_TASKS, data.contents.tasks || {})
+        storage.setMany(STORE_TOPICS, data.contents.topics || {})
+        storage.setMany(STORE_NOTES, data.contents.notes || {})
+        storage.setMany(STORE_WORKS, data.contents.works || {})
+    }
+
+    private saveSettingsToDisk(settings: Settings) {
+        storage.set(STORE_SETTINGS, "storage", settings.storage)
+        storage.set(STORE_SETTINGS, "retention", settings.retention)
+        storage.set(STORE_SETTINGS, "display", settings.display)
+    }
+
+    private saveSettingsPartToDisk(part: "storage" | "retention" | "display", value: any) {
+        storage.set(STORE_SETTINGS, part, value)
+    }
+
+    private saveItemToDisk(path: ItemPath, id: string, item: any) {
+        const store = this.pathToStore(path)
+        if (store) {
+            storage.set(store, id, item)
+        }
+    }
+
+    private saveItemsToDisk(path: ItemPath, items: Record<string, any>) {
+        const store = this.pathToStore(path)
+        if (store) {
+            storage.setMany(store, items)
+        }
+    }
+
+    private pathToStore(path: ItemPath): string | undefined {
+        switch (path) {
+            case "contents.tasks": return STORE_TASKS
+            case "contents.topics": return STORE_TOPICS
+            case "contents.notes": return STORE_NOTES
+            case "contents.works": return STORE_WORKS
+            default: return undefined
+        }
     }
 }

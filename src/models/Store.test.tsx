@@ -3,6 +3,7 @@ import { AppState, empty, mergeTask, mergeTasks } from "./AppState"
 import { DisplayTheme } from "./DisplaySettings"
 import { v4 } from "uuid"
 import { Cloud } from "./Cloud"
+import { storage, STORE_NOTES, STORE_SETTINGS, STORE_TASKS, STORE_TOPICS, STORE_WORKS } from "./Storage"
 
 // Mock Cloud
 jest.mock("./Cloud")
@@ -10,6 +11,23 @@ jest.mock("./Cloud")
 // Mock uuid
 jest.mock("uuid", () => ({
     v4: jest.fn(() => "mock-uuid"),
+}))
+
+// Mock Storage
+jest.mock("./Storage", () => ({
+    storage: {
+        get: jest.fn(),
+        getAll: jest.fn(),
+        set: jest.fn().mockResolvedValue(undefined),
+        setMany: jest.fn().mockResolvedValue(undefined),
+        getOldData: jest.fn(),
+        delete: jest.fn().mockResolvedValue(undefined),
+    },
+    STORE_SETTINGS: "settings",
+    STORE_TASKS: "tasks",
+    STORE_TOPICS: "topics",
+    STORE_NOTES: "notes",
+    STORE_WORKS: "works",
 }))
 
 // Suppress timers from Store constructor
@@ -95,6 +113,12 @@ describe("Store", () => {
     beforeEach(() => {
         localStorage.clear()
         jest.clearAllMocks()
+        ;(storage.get as jest.Mock).mockReset()
+        ;(storage.getAll as jest.Mock).mockReset()
+        ;(storage.set as jest.Mock).mockReset()
+        ;(storage.setMany as jest.Mock).mockReset()
+        ;(storage.getOldData as jest.Mock).mockReset()
+        ;(storage.delete as jest.Mock).mockReset()
     })
 
     afterEach(() => {
@@ -282,20 +306,69 @@ describe("Store", () => {
     })
 
     describe("loadFromDisk", () => {
-        it("calls setData with empty state when disk is empty", () => {
+        it("calls setData with empty state when disk is empty", async () => {
+            (storage.get as jest.Mock).mockResolvedValue(null)
+            ;(storage.getOldData as jest.Mock).mockResolvedValue(null)
             const { store, getState } = makeStore()
-            store.loadFromDisk()
+            await store.loadFromDisk()
             expect(getState()).toEqual(empty())
         })
 
-        it("loads state from localStorage", () => {
+        it("loads state from granular IndexedDB stores", async () => {
             const savedState = makeEnabledState()
+            ;(storage.get as jest.Mock).mockImplementation((store, key) => {
+                if (store === STORE_SETTINGS && key === "storage") return Promise.resolve(savedState.settings.storage)
+                if (store === STORE_SETTINGS && key === "retention") return Promise.resolve(savedState.settings.retention)
+                if (store === STORE_SETTINGS && key === "display") return Promise.resolve(savedState.settings.display)
+                return Promise.resolve(null)
+            })
+            ;(storage.getAll as jest.Mock).mockResolvedValue({})
+            
+            const { store, getState } = makeStore()
+            await store.loadFromDisk()
+            
+            expect(getState().settings.storage.registry?.enabled).toBe(true)
+        })
+
+        it("migrates from 'all' key in STORE_SETTINGS", async () => {
+            const savedState = makeEnabledState()
+            ;(storage.get as jest.Mock).mockImplementation((store, key) => {
+                if (store === STORE_SETTINGS && key === "all") return Promise.resolve(savedState.settings)
+                return Promise.resolve(null)
+            })
+            ;(storage.getAll as jest.Mock).mockResolvedValue({})
+            
+            const { store, getState } = makeStore()
+            await store.loadFromDisk()
+            
+            expect(getState().settings.storage.registry?.enabled).toBe(true)
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", savedState.settings.storage)
+            expect(storage.delete).toHaveBeenCalledWith(STORE_SETTINGS, "all")
+        })
+
+        it("migrates state from v1 IndexedDB if granular stores are empty", async () => {
+            const savedState = makeEnabledState()
+            ;(storage.get as jest.Mock).mockResolvedValue(null)
+            ;(storage.getOldData as jest.Mock).mockResolvedValue(JSON.stringify(savedState))
+            
+            const { store, getState } = makeStore()
+            await store.loadFromDisk()
+            
+            expect(getState().settings.storage.registry?.enabled).toBe(true)
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", savedState.settings.storage)
+        })
+
+        it("migrates state from localStorage if all IndexedDB stores are empty", async () => {
+            const savedState = makeEnabledState()
+            ;(storage.get as jest.Mock).mockResolvedValue(null)
+            ;(storage.getOldData as jest.Mock).mockResolvedValue(null)
             localStorage.setItem(DATA_PATH, JSON.stringify(savedState))
             
             const { store, getState } = makeStore()
-            store.loadFromDisk()
+            await store.loadFromDisk()
             
             expect(getState().settings.storage.registry?.enabled).toBe(true)
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", savedState.settings.storage)
         })
     })
 
@@ -307,7 +380,7 @@ describe("Store", () => {
             store.loadFromData(newData)
             
             expect(getState().settings.storage.registry?.enabled).toBe(true)
-            expect(localStorage.getItem(DATA_PATH)).not.toBeNull()
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", expect.any(Object))
         })
     })
 
@@ -319,7 +392,7 @@ describe("Store", () => {
             store.putRetentionSettings(settings)
             
             expect(getState().settings.retention.periodDays).toBe(60)
-            expect(localStorage.getItem(DATA_PATH)).not.toBeNull()
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "retention", expect.any(Object))
         })
     })
 
@@ -331,6 +404,7 @@ describe("Store", () => {
             store.putDisplaySettings(settings)
             
             expect(getState().settings.display.theme).toBe(DisplayTheme.Dark)
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "display", expect.any(Object))
         })
     })
 
@@ -342,6 +416,7 @@ describe("Store", () => {
             store.putStorageSettings(settings)
             
             expect(getState().settings.storage.s3Bucket).toBe("my-bucket")
+            expect(storage.set).toHaveBeenCalledWith(STORE_SETTINGS, "storage", expect.any(Object))
         })
     })
 
@@ -353,6 +428,7 @@ describe("Store", () => {
             store.putItem("task1", task, mergeTask, "contents.tasks")
             
             expect(getState().contents.tasks["task1"]).toEqual(task)
+            expect(storage.set).toHaveBeenCalledWith(STORE_TASKS, "task1", task)
         })
     })
 
