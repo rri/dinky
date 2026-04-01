@@ -1,4 +1,3 @@
-import moment from "moment"
 import { useParams } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
@@ -72,14 +71,29 @@ export function TaskDetails(props: Props) {
                     <Setting
                         label="Add to agenda on"
                         type="date"
-                        value={item.today && moment(item.today).isAfter(moment().startOf("day")) ? moment(item.today).format("YYYY-MM-DD") : ""}
-                        min={moment().format("YYYY-MM-DD")}
+                        value={(() => {
+                            if (!item.today) return ""
+                            const date = new Date(item.today)
+                            const now = new Date()
+                            now.setHours(0, 0, 0, 0)
+                            if (date.getTime() < now.getTime()) return ""
+                            return date.toISOString().split('T')[0]
+                        })()}
+                        min={new Date().toISOString().split('T')[0]}
                         onChange={evt => {
                             const { id, ...rest } = item
-                            const selected = moment(evt.currentTarget.value)
-                            const today = selected.isSame(new Date(), "day")
-                                ? moment().toISOString()
-                                : selected.toISOString()
+                            const val = evt.currentTarget.value
+                            if (!val) {
+                                props.putTask(id, { ...rest, today: undefined })
+                                return
+                            }
+                            const selected = new Date(val)
+                            const now = new Date()
+                            const isToday = selected.getUTCFullYear() === now.getFullYear() &&
+                                            selected.getUTCMonth() === now.getMonth() &&
+                                            selected.getUTCDate() === now.getDate()
+                            
+                            const today = isToday ? new Date().toISOString() : selected.toISOString()
                             props.putTask(id, { ...rest, today: today })
                         }}
                     ></Setting>

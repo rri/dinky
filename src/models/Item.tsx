@@ -1,4 +1,3 @@
-import moment from "moment"
 import { Term } from "./Term"
 
 export interface Identifiable {
@@ -110,9 +109,8 @@ export function filterByArchive(archive: boolean) {
 
 export function filterByToday<T extends Schedulable>() {
     return (item: T) => {
-        return item.today
-            ? moment(item.today) <= moment()
-            : false
+        if (!item.today) return false
+        return new Date(item.today).getTime() <= new Date().getTime()
     }
 }
 

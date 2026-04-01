@@ -6,7 +6,6 @@ import { belongsToToday, Identifiable } from "../models/Item"
 import { Term } from "../models/Term"
 import { icons } from "./Icon"
 import { ViewItem } from "./ViewItem"
-import moment from "moment"
 import { Tag } from "../models/Tag"
 
 interface Props {
@@ -37,7 +36,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
     const today = belongsToToday(props.item)
     const reminder =
         props.item.today                                // date is set
-        && moment(props.item.today).isAfter(moment())   // date is in the future
+        && new Date(props.item.today).getTime() > new Date().getTime()   // date is in the future
         && !today                                       // date is not "today" (considering buffer hours)
 
     if (!archive) {
@@ -46,7 +45,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
                 icon: reminder ? icons.alarm : icons.today,
                 desc: today ? "Remove this task from today's agenda" : (reminder ? "Remove from schedule." : "Add this task to today's agenda"),
                 gray: !reminder && !today,
-                action: () => props.putTask(id, { ...item, today: today ? undefined : moment().toISOString() }),
+                action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
             },
         )
         if (item.progress !== undefined) {

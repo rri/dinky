@@ -1,4 +1,3 @@
-import moment from "moment"
 import { NavLink } from "react-router-dom"
 import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
@@ -66,8 +65,9 @@ export function Profile(props: Props) {
     const registry = props.settings.storage.registry || { enabled: false, events: {} }
 
     const lastSynced = props.settings.storage.lastSynced
-        ? moment(props.settings.storage.lastSynced).format("YYYY-MM-DD HH:mm")
-        : "never"
+        ? new Date(props.settings.storage.lastSynced).toISOString().slice(0, 16).replace('T', ' ')
+        : "Never"
+
 
     return (
         <Wrapper layout="col">

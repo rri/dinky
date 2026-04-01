@@ -8,7 +8,6 @@ import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { Work } from "./Work"
 import { Deletable, Syncable, Updatable } from "./Item"
-import moment from "moment"
 
 export interface AppState {
     error?: string,
@@ -275,7 +274,9 @@ export const purgeDeleted = (data: AppState): AppState => {
             .forEach((val: [id: string, obj: T]) => {
                 if (val[1].deleted) {
                     const retentionPeriodDays = data.settings.retention.periodDays
-                    if (moment().subtract(retentionPeriodDays, "days").isBefore(moment(val[1].deleted))) {
+                    const deletedTime = new Date(val[1].deleted).getTime()
+                    const cutoff = new Date().getTime() - (retentionPeriodDays * 24 * 60 * 60 * 1000)
+                    if (deletedTime > cutoff) {
                         res[val[0]] = val[1]
                     }
                 } else {
