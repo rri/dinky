@@ -78,7 +78,7 @@ export class Cloud {
                 })
                 const res = await client.send(put)
                 const { ETag } = res
-                onSuccess(withMeta(readyToExport, new Date().toISOString(), ETag))
+                onSuccess(withMeta(readyToExport, moment().toISOString(), ETag))
             } catch (e: any) {
                 const httpStatusCode = e.$metadata?.httpStatusCode
                 try {
@@ -87,7 +87,7 @@ export class Cloud {
                     this.notify("Sync (put) failed: " + err.desc)
                     return
                 }
-                onSuccess(withMeta(toExport(data), new Date().toISOString()))
+                onSuccess(withMeta(toExport(data), moment().toISOString()))
             }
         }
         this.withS3Client(

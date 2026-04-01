@@ -255,7 +255,7 @@ export function App() {
             { type: 'application/octet-stream' })
         const href = window.URL.createObjectURL(bytes)
         const anchor = document.createElement("a")
-        anchor.download = "dinky.dev.data." + new Date().toISOString() + ".json"
+        anchor.download = "dinky.dev.data." + moment().toISOString() + ".json"
         anchor.href = href
 
         if (window.confirm("Your data file is ready to be downloaded. Proceed?")) {

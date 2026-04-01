@@ -46,7 +46,7 @@ export const ViewTask = memo(function ViewTask(props: Props) {
                 icon: reminder ? icons.alarm : icons.today,
                 desc: today ? "Remove this task from today's agenda" : (reminder ? "Remove from schedule." : "Add this task to today's agenda"),
                 gray: !reminder && !today,
-                action: () => props.putTask(id, { ...item, today: today ? undefined : new Date().toISOString() }),
+                action: () => props.putTask(id, { ...item, today: today ? undefined : moment().toISOString() }),
             },
         )
         if (item.progress !== undefined) {
