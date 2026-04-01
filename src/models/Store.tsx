@@ -301,7 +301,7 @@ export class Store {
                 // 5. Push individual events
                 await new Promise<AppState>((resolve) => {
                     this.cloud.pushEvents(mergedDataWithEventsAndRefs, unsynced, (data) => {
-                        this.handleItemSyncComplete(data, unsynced, true).then(resolve)
+                        this.handleItemSyncComplete(data, unsynced, true).then((res) => resolve(res))
                     })
                 })
             }
@@ -356,6 +356,8 @@ export class Store {
         if (notifications) {
             this.notify("Sync completed!")
         }
+
+        return pushedDataWithRefs
     }
 
     putStorageSettings(item: StorageSettings) {
@@ -408,8 +410,8 @@ export class Store {
             idList.forEach(id => {
                 const item = {
                     ...prevItems[id],
-                    updated: new Date().toISOString(),
-                    deleted: new Date().toISOString(),
+                    updated: moment().toISOString(),
+                    deleted: moment().toISOString(),
                 }
                 events.push({ ...item, evt: v4(), path, id })
                 currItems[id] = item

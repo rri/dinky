@@ -44,7 +44,7 @@ export const ViewWork = memo(function ViewWork(props: Props) {
                 icon: reminder ? icons.alarm : icons.today,
                 desc: today ? "Remove this item from today's reading" : (reminder ? "Remove from schedule." : "Add this item to today's reading"),
                 gray: !reminder && !today,
-                action: () => props.putWork(id, { ...item, archive, today: today ? undefined : new Date().toISOString() }),
+                action: () => props.putWork(id, { ...item, archive, today: today ? undefined : moment().toISOString() }),
             },
         )
     }

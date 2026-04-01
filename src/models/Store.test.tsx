@@ -2,6 +2,7 @@ import { Store, DATA_PATH } from "./Store"
 import { AppState, empty, mergeTask, mergeTasks } from "./AppState"
 import { DisplayTheme } from "./DisplaySettings"
 import { v4 } from "uuid"
+import moment from "moment"
 import { Cloud } from "./Cloud"
 import { storage, STORE_NOTES, STORE_SETTINGS, STORE_TASKS, STORE_TOPICS, STORE_WORKS } from "./Storage"
 
@@ -420,14 +421,14 @@ describe("Store", () => {
     })
 
     describe("putItem", () => {
-        it("adds a task to the store", () => {
+        it("adds a task to the store", async () => {
             const { store, getState } = makeStore()
-            const task = { data: "New Task", updated: new Date().toISOString() }
+            const task = { data: "New Task", updated: moment().toISOString() }
+
+            store.putItem("t1", task, mergeTask, "contents.tasks")
             
-            store.putItem("task1", task, mergeTask, "contents.tasks")
-            
-            expect(getState().contents.tasks!["task1"]).toEqual(task)
-            expect(storage.set).toHaveBeenCalledWith(STORE_TASKS, "task1", task)
+            expect(getState().contents.tasks!["t1"]).toEqual(task)
+            expect(storage.set).toHaveBeenCalledWith(STORE_TASKS, "t1", task)
         })
     })
 
