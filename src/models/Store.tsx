@@ -27,7 +27,7 @@ export class Store {
         // Sync on page load
         const syncOnLoad = () => {
             this.setData(prev => {
-                if (prev.settings.storage.syncOnLoad) {
+                if (prev.settings.storage && prev.settings.storage.syncOnLoad) {
                     const cfg = prev.settings.storage
                     if (!cfg.s3Bucket
                         || !cfg.awsAccessKey
@@ -48,14 +48,14 @@ export class Store {
         // Auto sync
         const autoSyncAction = () => {
             this.setData(prev => {
-                const periodMinutes = prev.settings.storage.periodMinutes || 0
+                const periodMinutes = (prev.settings.storage && prev.settings.storage.periodMinutes) || 0
                 if (periodMinutes > 0) {
                     // async call
                     this.cloudSyncData(prev, false, periodMinutes)
                 }
-                setTimeout(autoSyncAction, 60000)
                 return prev
             })
+            setTimeout(autoSyncAction, 60000)
         }
 
         autoSyncAction()
