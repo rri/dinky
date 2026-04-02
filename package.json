@@ -2,6 +2,9 @@
   "name": "dinky",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "@material-design-icons/svg": "^0.14.13",
     "@testing-library/jest-dom": "^5.17.0",
