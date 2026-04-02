@@ -131,7 +131,31 @@ export const empty = (state?: AppState): AppState => {
             works: {},
         },
     }
-    return { ...def, ...state }
+
+    if (!state) {
+        return def
+    }
+
+    return {
+        ...def,
+        ...state,
+        settings: {
+            ...def.settings,
+            ...state.settings,
+            storage: {
+                ...def.settings.storage,
+                ...(state.settings ? state.settings.storage : {}),
+            },
+            retention: {
+                ...def.settings.retention,
+                ...(state.settings ? state.settings.retention : {}),
+            },
+            display: {
+                ...def.settings.display,
+                ...(state.settings ? state.settings.display : {}),
+            },
+        }
+    }
 }
 
 export const mergeRetentionSettings = (state: AppState, value: RetentionSettings): AppState => {
