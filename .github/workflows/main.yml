@@ -26,7 +26,7 @@ jobs:
       - name: get-node
         uses: actions/setup-node@v3
         with:
-          node-version: '17'
+          node-version: '20'
           cache: 'npm'
       - name: build-package
         run: |
