@@ -7,33 +7,68 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Least privilege by default; jobs opt in to anything more.
 permissions:
- id-token: write
- contents: read
+  contents: read
 
 jobs:
+  # Builds and tests the app. This job runs third-party code (npm install
+  # scripts, build tooling, tests), so it has NO access to AWS credentials.
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: configure
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::337136710266:role/Builder
-          aws-region: us-west-1
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: get-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+      - name: install
+        # npm ci installs exactly what is in package-lock.json
+        run: npm ci
+      - name: test
+        run: node scripts/test.js --watchAll=false
+        env:
+          CI: true
       - name: build-package
-        run: |
-          npm install
-          npm run build
+        run: npm run build
+      - name: upload-package
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: build/
+          retention-days: 1
+
+  # Deploys the pre-built site. Only this job can assume the AWS role, and it
+  # runs no project or dependency code.
+  deploy:
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: download-package
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: build/
+      - name: configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::337136710266:role/Builder
+          aws-region: us-west-1
       - name: deploy-package
-        if: ${{ github.ref == 'refs/heads/main' }}
+        # Hashed assets are uploaded first and may be cached; the entry points
+        # (index.html, service worker) must be revalidated so that fixes roll
+        # out promptly.
         run: |
-          aws s3 sync build/ s3://dinky-dev-website-assets --delete --cache-control max-age=86400
+          aws s3 sync build/ s3://dinky-dev-website-assets --delete --cache-control max-age=86400 --exclude index.html --exclude service-worker.js
+          aws s3 cp build/index.html s3://dinky-dev-website-assets/index.html --cache-control no-cache
+          aws s3 cp build/service-worker.js s3://dinky-dev-website-assets/service-worker.js --cache-control no-cache
           aws cloudfront create-invalidation --distribution-id E3KRAT6E9HNOWI --paths '/*'

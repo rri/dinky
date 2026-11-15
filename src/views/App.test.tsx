@@ -29,6 +29,7 @@ describe("App", () => {
     beforeEach(() => {
         mockStoreInstance = {
             loadFromDisk: jest.fn(),
+            start: jest.fn(() => () => {}),
             cloudSyncData: jest.fn(),
             putRetentionSettings: jest.fn(),
             putDisplaySettings: jest.fn(),

@@ -12,6 +12,8 @@ import {
     purgeDeleted,
     toExport,
     AppState,
+    putContentItem,
+    removeContentItem,
 } from "./AppState"
 import { DisplayTheme } from "./DisplaySettings"
 import moment from "moment"
@@ -243,6 +245,64 @@ describe("mergeData", () => {
         const result = mergeData(curr, data, true)
         expect(result.contents.tasks!["t1"]).toBeDefined()
         // t2 is unsynced so it should be preserved even with forceDel
+        expect(result.contents.tasks!["t2"]).toBeDefined()
+    })
+
+    it("handles forceDel - deletes synced items missing from data", () => {
+        const curr = empty({
+            contents: { tasks: { "t1": { data: "task1", created: "2024-01-01T00:00:00Z", updated: "2024-01-01T00:00:00Z" } } },
+        } as any)
+        const result = mergeData(curr, empty(), true)
+        expect(result.contents.tasks!["t1"]).toBeUndefined()
+    })
+
+    it("handles forceDel - keeps drafts (items not yet created)", () => {
+        const curr = empty({
+            contents: { tasks: { "draft": { data: "" } } },
+        } as any)
+        const result = mergeData(curr, empty(), true)
+        expect(result.contents.tasks!["draft"]).toBeDefined()
+    })
+
+    it("keeps local items missing from data without forceDel (e.g. imports)", () => {
+        const curr = empty({
+            contents: {
+                tasks: { "t1": { data: "local", updated: "2024-01-01T00:00:00Z" } },
+                notes: { "n1": { data: "local note", updated: "2024-01-01T00:00:00Z" } },
+            },
+        } as any)
+        const data = empty({
+            contents: { tasks: { "t2": { data: "imported", updated: "2024-01-01T00:00:00Z" } } },
+        } as any)
+        const result = mergeData(curr, data, false, true)
+        expect(result.contents.tasks!["t1"].data).toBe("local")
+        expect(result.contents.tasks!["t2"].data).toBe("imported")
+        expect(result.contents.notes!["n1"].data).toBe("local note")
+    })
+
+    it("never takes storage settings (bucket, credentials) from incoming data", () => {
+        const curr = empty({
+            settings: { storage: { s3Bucket: "mine", awsAccessKey: "AK", awsSecretKey: "SK", awsRegion: "us-west-2" } },
+        } as any)
+        const data = empty({
+            settings: { storage: { s3Bucket: "attacker", awsAccessKey: "X", awsSecretKey: "Y", awsRegion: "eu-west-1" } },
+        } as any)
+        const result = mergeData(curr, data)
+        expect(result.settings.storage.s3Bucket).toBe("mine")
+        expect(result.settings.storage.awsAccessKey).toBe("AK")
+        expect(result.settings.storage.awsSecretKey).toBe("SK")
+        expect(result.settings.storage.awsRegion).toBe("us-west-2")
+    })
+
+    it("does not mutate its inputs", () => {
+        const curr = empty({
+            contents: { tasks: { "t1": { data: "a", updated: "2024-01-01T00:00:00Z" } } },
+        } as any)
+        const data = empty({
+            contents: { tasks: { "t1": { data: "b", updated: "2024-06-01T00:00:00Z" } } },
+        } as any)
+        mergeData(curr, data, false, true)
+        expect(data.contents.tasks!["t1"].unsynced).toBeUndefined()
     })
 
     it("handles forceSync - marks merged items as unsynced", () => {
@@ -424,5 +484,37 @@ describe("toExport", () => {
         const result = toExport(state)
         expect(result.contents.tasks!["t1"].data).toBe("important task")
         expect(result.contents.tasks!["t1"].created).toBe("2024-01-01")
+    })
+})
+
+describe("purgeDeleted with invalid retention", () => {
+    it("falls back to the default retention period when periodDays is NaN", () => {
+        const state = empty({
+            settings: { retention: { periodDays: NaN } },
+            contents: { tasks: { "t1": { data: "x", deleted: new Date().toISOString() } } },
+        } as any)
+        expect(purgeDeleted(state).contents.tasks!["t1"]).toBeDefined()
+    })
+})
+
+describe("putContentItem / removeContentItem", () => {
+    const deepFreeze = <T,>(obj: T): T => {
+        if (obj && typeof obj === "object" && !Object.isFrozen(obj)) {
+            Object.freeze(obj)
+            Object.values(obj as any).forEach(deepFreeze)
+        }
+        return obj
+    }
+
+    it("add and remove items without modifying the previous state", () => {
+        const prev = deepFreeze(empty({ contents: { tasks: { t1: { data: "a" } } } } as any))
+
+        const added = putContentItem(prev, "tasks", "t2", { data: "" })
+        expect(added.contents.tasks!["t2"]).toEqual({ data: "" })
+        expect(prev.contents.tasks!["t2"]).toBeUndefined()
+
+        const removed = removeContentItem(added, "tasks", "t1")
+        expect(removed.contents.tasks!["t1"]).toBeUndefined()
+        expect(prev.contents.tasks!["t1"]).toEqual({ data: "a" })
     })
 })

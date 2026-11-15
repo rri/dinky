@@ -1,7 +1,9 @@
-import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, Creatable, Deletable, Updatable, DataObj, Syncable, Named } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, DataObjFields, CreatableFields, DeletableFields, UpdatableFields, SyncableFields, NamedFields } from "./Item"
+import { InferFields } from "./Schema"
 import { Term } from "./Term"
 
-export type Topic = DataObj & Creatable & Deletable & Updatable & Syncable & Named
+export const TopicFields = { ...DataObjFields, ...CreatableFields, ...DeletableFields, ...UpdatableFields, ...SyncableFields, ...NamedFields }
+export type Topic = InferFields<typeof TopicFields>
 
 interface Props {
     topics: Record<string, Topic>,

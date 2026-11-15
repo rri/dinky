@@ -54,7 +54,7 @@ const makeStore = (initialState: AppState = empty()) => {
             await onSuccess([])
         }),
         pullEvents: jest.fn(async (data, keys, onSuccess) => {
-            await onSuccess(data)
+            await onSuccess(data, keys)
         }),
         pushData: jest.fn(async (data, onSuccess) => {
             await onSuccess(data)
@@ -200,19 +200,21 @@ describe("Store", () => {
             const { store } = makeStore()
             const state = makeEnabledState()
 
-            store.createRefs(state, ["k1", "k2"])
+            const res = store.createRefs(state, ["k1", "k2"])
 
-            expect(state.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
-            expect(state.settings.storage.registry!.events["k2"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["k2"]).toEqual({ ref: true })
+            // the input state is not modified
+            expect(state.settings.storage.registry!.events).toEqual({})
         })
 
         it("does nothing when registry is disabled", () => {
             const { store } = makeStore()
             const state = makeDisabledState()
 
-            store.createRefs(state, ["k1"])
+            const res = store.createRefs(state, ["k1"])
 
-            expect(state.settings.storage.registry!.events["k1"]).toBeUndefined()
+            expect(res.settings.storage.registry!.events["k1"]).toBeUndefined()
         })
     })
 
@@ -222,12 +224,13 @@ describe("Store", () => {
             const state = makeEnabledState()
             const writable = { evt: "e1", path: "contents.tasks" as const }
 
-            store.createVals(state, [writable])
+            const res = store.createVals(state, [writable])
 
-            expect(state.settings.storage.registry!.events["e1"]).toEqual({
+            expect(res.settings.storage.registry!.events["e1"]).toEqual({
                 ref: false,
                 val: writable,
             })
+            expect(state.settings.storage.registry!.events["e1"]).toBeUndefined()
         })
 
         it("does nothing when registry is disabled", () => {
@@ -235,9 +238,9 @@ describe("Store", () => {
             const state = makeDisabledState()
             const writable = { evt: "e1", path: "contents.tasks" as const }
 
-            store.createVals(state, [writable])
+            const res = store.createVals(state, [writable])
 
-            expect(state.settings.storage.registry!.events["e1"]).toBeUndefined()
+            expect(res.settings.storage.registry!.events["e1"]).toBeUndefined()
         })
     })
 
@@ -248,10 +251,11 @@ describe("Store", () => {
             state.settings.storage.registry!.events["k1"] = { ref: true }
             state.settings.storage.registry!.events["k2"] = { ref: true }
 
-            store.deleteRefVals(state, ["k1"])
+            const res = store.deleteRefVals(state, ["k1"])
 
-            expect(state.settings.storage.registry!.events["k1"]).toBeUndefined()
-            expect(state.settings.storage.registry!.events["k2"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["k1"]).toBeUndefined()
+            expect(res.settings.storage.registry!.events["k2"]).toEqual({ ref: true })
+            expect(state.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
         })
 
         it("does nothing when registry is disabled", () => {
@@ -259,10 +263,10 @@ describe("Store", () => {
             const state = makeDisabledState()
             state.settings.storage.registry!.events["k1"] = { ref: true }
 
-            store.deleteRefVals(state, ["k1"])
+            const res = store.deleteRefVals(state, ["k1"])
 
             // Should not throw, events remain because registry check prevents access
-            expect(state.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
         })
     })
 
@@ -273,10 +277,11 @@ describe("Store", () => {
             state.settings.storage.registry!.events["keep"] = { ref: true }
             state.settings.storage.registry!.events["dangling"] = { ref: true }
 
-            store.cleanupRefs(state, ["keep"])
+            const res = store.cleanupRefs(state, ["keep"])
 
-            expect(state.settings.storage.registry!.events["keep"]).toEqual({ ref: true })
-            expect(state.settings.storage.registry!.events["dangling"]).toBeUndefined()
+            expect(res.settings.storage.registry!.events["keep"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["dangling"]).toBeUndefined()
+            expect(state.settings.storage.registry!.events["dangling"]).toEqual({ ref: true })
         })
 
         it("does not delete val-type entries", () => {
@@ -285,9 +290,9 @@ describe("Store", () => {
             const writable = { evt: "e1", path: "contents.tasks" as const }
             state.settings.storage.registry!.events["val-key"] = { ref: false, val: writable }
 
-            store.cleanupRefs(state, [])
+            const res = store.cleanupRefs(state, [])
 
-            expect(state.settings.storage.registry!.events["val-key"]).toBeDefined()
+            expect(res.settings.storage.registry!.events["val-key"]).toBeDefined()
         })
 
         it("does nothing when registry is disabled", () => {
@@ -295,9 +300,9 @@ describe("Store", () => {
             const state = makeDisabledState()
             state.settings.storage.registry!.events["k1"] = { ref: true }
 
-            store.cleanupRefs(state, [])
+            const res = store.cleanupRefs(state, [])
 
-            expect(state.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
+            expect(res.settings.storage.registry!.events["k1"]).toEqual({ ref: true })
         })
     })
 
@@ -461,4 +466,218 @@ describe("Store", () => {
         })
     })
 
+})
+
+// Lets pending promise callbacks run (timers are faked in this file).
+const flush = async () => {
+    for (let i = 0; i < 20; i++) {
+        await Promise.resolve()
+    }
+}
+
+const deepFreeze = <T,>(obj: T): T => {
+    if (obj && typeof obj === "object" && !Object.isFrozen(obj)) {
+        Object.freeze(obj)
+        Object.values(obj as any).forEach(deepFreeze)
+    }
+    return obj
+}
+
+describe("Store sync behaviour", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (storage.set as jest.Mock).mockResolvedValue(undefined);
+        (storage.setMany as jest.Mock).mockResolvedValue(undefined);
+        (storage.delete as jest.Mock).mockResolvedValue(undefined)
+    })
+
+    afterEach(() => {
+        jest.clearAllTimers()
+    })
+
+    describe("event pull failures", () => {
+        it("only marks events that were processed as applied", async () => {
+            const { store, mockCloud, getState } = makeStore()
+            mockCloud.listEvents.mockImplementation(async (data: any, onSuccess: any) => onSuccess(["e1", "e2", "e3"]))
+            // e2 failed: e2 and e3 were not processed
+            mockCloud.pullEvents.mockImplementation(async (data: any, keys: any, onSuccess: any) => onSuccess(data, ["e1"]))
+
+            await store.cloudSyncData(makeEnabledState())
+
+            const events = getState().settings.storage.registry!.events
+            expect(events["e1"]).toEqual({ ref: true })
+            expect(events["e2"]).toBeUndefined()
+            expect(events["e3"]).toBeUndefined()
+        })
+
+        it("only deletes applied events from the cloud on a full sync", async () => {
+            const { store, mockCloud } = makeStore()
+            const state = makeEnabledState()
+            // "known" was applied by an earlier sync
+            state.settings.storage.registry!.events["known"] = { ref: true }
+            mockCloud.listEvents.mockImplementation(async (data: any, onSuccess: any) => onSuccess(["known", "e1", "e2"]))
+            mockCloud.pullEvents.mockImplementation(async (data: any, keys: any, onSuccess: any) => onSuccess(data, ["e1"]))
+
+            await store.cloudSyncData(state, true)
+
+            expect(mockCloud.deleteEvents).toHaveBeenCalledTimes(1)
+            expect(mockCloud.deleteEvents.mock.calls[0][1]).toEqual(["known", "e1"])
+        })
+    })
+
+    describe("auto-sync throttle", () => {
+        it("skips syncs within the configured period, in any time zone", async () => {
+            const { store, mockCloud } = makeStore()
+            const state = makeEnabledState()
+
+            await store.cloudSyncData(state, false, 5)
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(1)
+
+            jest.advanceTimersByTime(4 * 60 * 1000)
+            await store.cloudSyncData(state, false, 5)
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(1)
+
+            jest.advanceTimersByTime(2 * 60 * 1000)
+            await store.cloudSyncData(state, false, 5)
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(2)
+        })
+
+        it("does not throttle syncs requested without a period", async () => {
+            const { store, mockCloud } = makeStore()
+            await store.cloudSyncData(makeEnabledState())
+            await store.cloudSyncData(makeEnabledState())
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(2)
+        })
+    })
+
+    describe("disk cleanup", () => {
+        it("deletes items removed by a sync from disk", async () => {
+            const { store, mockCloud } = makeStore()
+            const state = makeEnabledState()
+            state.contents.tasks = {
+                gone: { data: "gone", created: "2024-01-01T00:00:00Z" },
+                kept: { data: "kept", created: "2024-01-01T00:00:00Z" },
+            }
+            mockCloud.pullData.mockImplementation(async (data: any, onSuccess: any) =>
+                onSuccess({ ...data, contents: { ...data.contents, tasks: { kept: data.contents.tasks.kept } } }))
+
+            await store.cloudSyncData(state)
+
+            expect(storage.delete).toHaveBeenCalledWith(STORE_TASKS, "gone")
+            expect(storage.delete).not.toHaveBeenCalledWith(STORE_TASKS, "kept")
+        })
+
+        it("purges expired items from memory and disk on load", async () => {
+            const { store, getState } = makeStore()
+            const old = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
+            const recent = new Date().toISOString();
+            (storage.get as jest.Mock).mockImplementation(async (store: string, key: string) =>
+                key === "retention" ? { periodDays: 30 } : null);
+            (storage.getAll as jest.Mock).mockImplementation(async (name: string) =>
+                name === STORE_TASKS
+                    ? { old: { data: "old", deleted: old }, recent: { data: "recent", deleted: recent } }
+                    : {})
+
+            await store.loadFromDisk()
+
+            expect(getState().contents.tasks!["old"]).toBeUndefined()
+            expect(getState().contents.tasks!["recent"]).toBeDefined()
+            expect(storage.delete).toHaveBeenCalledWith(STORE_TASKS, "old")
+            expect(storage.delete).not.toHaveBeenCalledWith(STORE_TASKS, "recent")
+        })
+    })
+
+    describe("sync guard", () => {
+        it("never runs two syncs at once, and runs one follow-up afterwards", async () => {
+            const { store, mockCloud } = makeStore()
+            const state = makeEnabledState()
+            let release: () => void = () => {}
+            mockCloud.pullData.mockImplementationOnce((data: any, onSuccess: any) =>
+                new Promise<void>(resolve => { release = () => { onSuccess(data); resolve() } }))
+
+            const first = store.cloudSyncData(state)
+            await store.cloudSyncData(state)
+            await store.cloudSyncData(state, true)
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(1)
+
+            const spy = jest.spyOn(store, "cloudSyncData")
+            release()
+            await first
+            jest.runOnlyPendingTimers()
+            await flush()
+
+            // exactly one follow-up, and it is a full sync because one was requested
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(2)
+            expect(spy).toHaveBeenCalledTimes(1)
+            expect(spy.mock.calls[0][1]).toBe(true)
+        })
+
+        it("is released when a cloud call fails, without a second error message", async () => {
+            const { store, mockCloud, notify } = makeStore()
+            ;(mockCloud.pullData as jest.Mock).mockImplementationOnce(async (data: any, onSuccess: any, onFailure: any) =>
+                onFailure({ desc: "invalid authentication credentials" }))
+
+            await store.cloudSyncData(makeEnabledState())
+            expect(notify).not.toHaveBeenCalledWith(expect.stringMatching(/^Sync failed/))
+
+            await store.cloudSyncData(makeEnabledState())
+            expect(mockCloud.pullData).toHaveBeenCalledTimes(2)
+            expect(notify).toHaveBeenCalledWith("Sync completed!")
+        })
+    })
+
+    describe("unsynced flag", () => {
+        const T0 = "2024-01-01T00:00:00Z"
+
+        it("is cleared after a push, unless the item changed in the meantime", () => {
+            const state = makeEnabledState()
+            state.contents.tasks = {
+                same: { data: "a", created: T0, updated: "2024-01-02T00:00:00Z", unsynced: true },
+                edited: { data: "b2", created: T0, updated: "2024-01-03T00:00:00Z", unsynced: true },
+            }
+            const { store, getState } = makeStore(state)
+
+            store.handleItemSyncComplete([
+                { evt: "e1", path: "contents.tasks", id: "same", updated: "2024-01-02T00:00:00Z" } as any,
+                { evt: "e2", path: "contents.tasks", id: "edited", updated: "2024-01-02T00:00:00Z" } as any,
+            ])
+
+            expect(getState().contents.tasks!["same"].unsynced).toBeUndefined()
+            expect(getState().contents.tasks!["edited"].unsynced).toBe(true)
+            expect(getState().settings.storage.registry!.events["e1"]).toEqual({ ref: true })
+            expect(storage.set).toHaveBeenCalledWith(STORE_TASKS, "same", { data: "a", created: T0, updated: "2024-01-02T00:00:00Z" })
+            expect(storage.set).not.toHaveBeenCalledWith(STORE_TASKS, "edited", expect.anything())
+        })
+
+        it("is cleared after an automatic push of an edit", async () => {
+            const state = makeEnabledState()
+            state.settings.storage.autoPushItems = true
+            const { store, mockCloud, getState } = makeStore(state)
+            const item = { data: "a", created: T0, updated: "2024-01-02T00:00:00Z", unsynced: true }
+
+            store.putItem("t1", item, mergeTask, "contents.tasks")
+            expect(getState().contents.tasks!["t1"].unsynced).toBe(true)
+
+            jest.advanceTimersByTime(3000)
+            await flush()
+
+            expect(mockCloud.pushEvents).toHaveBeenCalledTimes(1)
+            expect(getState().contents.tasks!["t1"].unsynced).toBeUndefined()
+        })
+    })
+
+    describe("immutability", () => {
+        it("never modifies the previous state", async () => {
+            const state = makeEnabledState()
+            state.contents.tasks = { t1: { data: "a", created: "2024-01-01T00:00:00Z", unsynced: true } }
+            const { store } = makeStore(deepFreeze(state))
+
+            expect(() => {
+                store.putItem("t1", { data: "b", created: "2024-01-01T00:00:00Z" }, mergeTask, "contents.tasks")
+                store.tombstoneItems(() => ["t1"], s => s.contents.tasks!, mergeTasks, "contents.tasks")
+                store.handleItemSyncComplete([{ evt: "e1", path: "contents.tasks", id: "t1" } as any])
+            }).not.toThrow()
+            await expect(store.cloudSyncData(deepFreeze(makeEnabledState()), true)).resolves.toBeUndefined()
+        })
+    })
 })

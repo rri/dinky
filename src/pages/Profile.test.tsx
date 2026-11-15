@@ -61,6 +61,9 @@ describe("Profile", () => {
         )
         const input = screen.getByDisplayValue("30")
         fireEvent.change(input, { target: { value: "60" } })
+        // not saved while typing
+        expect(putRetentionSettings).not.toHaveBeenCalled()
+        fireEvent.blur(input)
         expect(putRetentionSettings).toHaveBeenCalledWith({ periodDays: 60 })
     })
 
@@ -126,7 +129,10 @@ describe("Profile", () => {
             </BrowserRouter>
         )
         fireEvent.click(screen.getByText("Sync"))
-        expect(sync).toHaveBeenCalled()
+        expect(sync).toHaveBeenCalledWith(false)
+        fireEvent.click(screen.getByText("Sync and compact data"))
+        expect(sync).toHaveBeenLastCalledWith(true)
+        expect(sync).toHaveBeenCalledTimes(2)
     })
 
     it("calls exportData when Export button is clicked", () => {
@@ -148,5 +154,84 @@ describe("Profile", () => {
         )
         fireEvent.click(screen.getByText(/Export a copy/))
         expect(exportData).toHaveBeenCalled()
+    })
+
+    describe("number settings", () => {
+        const renderProfile = (putRetentionSettings = jest.fn(), putStorageSettings = jest.fn()) => {
+            render(
+                <BrowserRouter future={routerFuture}>
+                    <Profile
+                        settings={{ ...defaultSettings, storage: { ...defaultSettings.storage, periodMinutes: 15 } } as any}
+                        putRetentionSettings={putRetentionSettings}
+                        putDisplaySettings={noop}
+                        putStorageSettings={putStorageSettings}
+                        registerExportHandler={noopHandler}
+                        registerImportHandler={noopHandler}
+                        exportData={noop}
+                        importData={noop}
+                        sync={noop}
+                    />
+                </BrowserRouter>
+            )
+            return { putRetentionSettings, putStorageSettings }
+        }
+
+        it("does not save an empty value, and restores the saved one", () => {
+            const { putRetentionSettings } = renderProfile()
+            const input = screen.getByDisplayValue("30") as HTMLInputElement
+            fireEvent.change(input, { target: { value: "" } })
+            fireEvent.blur(input)
+            expect(putRetentionSettings).not.toHaveBeenCalled()
+            expect(input.value).toBe("30")
+        })
+
+        it("does not save invalid values", () => {
+            const { putRetentionSettings } = renderProfile()
+            const input = screen.getByDisplayValue("30") as HTMLInputElement
+            for (const value of ["abc", "-5", "1.5"]) {
+                fireEvent.change(input, { target: { value } })
+                fireEvent.blur(input)
+                expect(input.value).toBe("30")
+            }
+            expect(putRetentionSettings).not.toHaveBeenCalled()
+        })
+
+        it("saves an explicit zero", () => {
+            const { putRetentionSettings } = renderProfile()
+            const input = screen.getByDisplayValue("30")
+            fireEvent.change(input, { target: { value: "0" } })
+            fireEvent.blur(input)
+            expect(putRetentionSettings).toHaveBeenCalledWith({ periodDays: 0 })
+        })
+
+        it("saves on Enter", () => {
+            const { putRetentionSettings } = renderProfile()
+            const input = screen.getByDisplayValue("30")
+            fireEvent.change(input, { target: { value: "45" } })
+            fireEvent.keyDown(input, { key: "Enter" })
+            expect(putRetentionSettings).toHaveBeenCalledWith({ periodDays: 45 })
+        })
+
+        it("restores the saved value on Escape", () => {
+            const { putRetentionSettings } = renderProfile()
+            const input = screen.getByDisplayValue("30") as HTMLInputElement
+            fireEvent.change(input, { target: { value: "45" } })
+            fireEvent.keyDown(input, { key: "Escape" })
+            fireEvent.blur(input)
+            expect(input.value).toBe("30")
+            expect(putRetentionSettings).not.toHaveBeenCalled()
+        })
+
+        it("applies the same rules to the auto-sync period", () => {
+            const { putStorageSettings } = renderProfile()
+            const input = screen.getByDisplayValue("15") as HTMLInputElement
+            fireEvent.change(input, { target: { value: "" } })
+            fireEvent.blur(input)
+            expect(putStorageSettings).not.toHaveBeenCalled()
+            expect(input.value).toBe("15")
+            fireEvent.change(input, { target: { value: "10" } })
+            fireEvent.blur(input)
+            expect(putStorageSettings).toHaveBeenCalledWith(expect.objectContaining({ periodMinutes: 10 }))
+        })
     })
 })

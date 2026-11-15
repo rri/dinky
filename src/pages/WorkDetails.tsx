@@ -7,6 +7,7 @@ import { Wrapper } from "../views/Wrapper"
 import { ViewWork } from "../views/ViewWork"
 import { Setting, SettingList } from "../views/Settings"
 import { InfoBox } from "../views/InfoBox"
+import { fromLocalDateInput, toLocalDateInput } from "../models/Item"
 
 interface Props {
     works: Record<string, Work>,
@@ -53,9 +54,9 @@ export function WorkDetails(props: Props) {
                             const now = new Date()
                             now.setHours(0, 0, 0, 0)
                             if (date.getTime() < now.getTime()) return ""
-                            return date.toISOString().split('T')[0]
+                            return toLocalDateInput(date)
                         })()}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={toLocalDateInput(new Date())}
                         onChange={evt => {
                             const { id, ...rest } = item
                             const val = evt.currentTarget.value
@@ -63,11 +64,9 @@ export function WorkDetails(props: Props) {
                                 props.putWork(id, { ...rest, today: undefined })
                                 return
                             }
-                            const selected = new Date(val)
+                            const selected = fromLocalDateInput(val)
                             const now = new Date()
-                            const isToday = selected.getUTCFullYear() === now.getFullYear() &&
-                                            selected.getUTCMonth() === now.getMonth() &&
-                                            selected.getUTCDate() === now.getDate()
+                            const isToday = toLocalDateInput(selected) === toLocalDateInput(now)
 
                             const today = isToday ? new Date().toISOString() : selected.toISOString()
                             props.putWork(id, { ...rest, today: today })

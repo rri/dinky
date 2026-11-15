@@ -29,3 +29,11 @@ describe('WebpackDevServer Configuration', () => {
     }
   });
 });
+
+describe('Test environment', () => {
+  it('runs outside UTC, so that time zone bugs are caught', () => {
+    // Set in scripts/test.js; America/Los_Angeles is UTC-8 / UTC-7 (DST).
+    expect(new Date('2026-01-15T12:00:00Z').getTimezoneOffset()).toBe(480)
+    expect(new Date('2026-07-15T12:00:00Z').getTimezoneOffset()).toBe(420)
+  });
+});

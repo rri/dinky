@@ -1,9 +1,9 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useRef } from "react"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { GlobalHotKeys } from "react-hotkeys"
 import { Action } from "../models/Action"
-import { AppState, empty, mergeNote, mergeTask, mergeTasks, mergeTopic, mergeWork, toExport } from "../models/AppState"
+import { AppState, empty, mergeNote, mergeTask, mergeTasks, mergeTopic, mergeWork, putContentItem, removeContentItem, toExport } from "../models/AppState"
 import { Creatable, DataObj, Deletable, Syncable, Updatable } from "../models/Item"
 import { Task } from "../models/Task"
 import { Note } from "../models/Note"
@@ -14,6 +14,7 @@ import { DisplaySettings, DisplayTheme } from "../models/DisplaySettings"
 import { RetentionSettings } from "../models/RetentionSettings"
 import { StorageSettings } from "../models/StorageSettings"
 import { Term } from "../models/Term"
+import { sanitizeState } from "../models/Sanitize"
 import { NotifyBox } from "./NotifyBox"
 import { Footer } from "./Footer"
 import { Header } from "./Header"
@@ -38,12 +39,23 @@ export function App() {
     const [data, setData] = useState<AppState>(empty())
     const [note, setNotify] = useState<string>("")
 
+    const notifyTimer = useRef<ReturnType<typeof setTimeout>>()
+
     const notify = (note?: string) => {
         setNotify(note || "")
-        setTimeout(setNotify, 10000)
+        // Restart the timer, so that a newer notification is not cleared early.
+        notifyTimer.current && clearTimeout(notifyTimer.current)
+        notifyTimer.current = setTimeout(() => setNotify(""), 10000)
     }
 
-    const store = useMemo(() => new Store(setData, notify), [setData])
+    const store = useMemo(() => new Store(setData, notify), [setData]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => store.start(), [store])
+
+    // Clear a pending notification timer on unmount.
+    useEffect(() => () => {
+        notifyTimer.current && clearTimeout(notifyTimer.current)
+    }, [])
 
     const refs: Record<string, React.RefObject<HTMLInputElement>> = {
         search: React.createRef(),
@@ -71,56 +83,28 @@ export function App() {
     const newTask = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
-        setData(prev => {
-            const res = { ...prev }
-            if (!res.contents.tasks) {
-                res.contents.tasks = {}
-            }
-            res.contents.tasks![id] = item
-            return res
-        })
+        setData(prev => putContentItem(prev, "tasks", id, item))
         return id
     }
 
     const newTopic = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
-        setData(prev => {
-            const res = { ...prev }
-            if (!res.contents.topics) {
-                res.contents.topics = {}
-            }
-            res.contents.topics![id] = item
-            return res
-        })
+        setData(prev => putContentItem(prev, "topics", id, item))
         return id
     }
 
     const newNote = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
-        setData(prev => {
-            const res = { ...prev }
-            if (!res.contents.notes) {
-                res.contents.notes = {}
-            }
-            res.contents.notes![id] = item
-            return res
-        })
+        setData(prev => putContentItem(prev, "notes", id, item))
         return id
     }
 
     const newWork = (template?: string): string => {
         const id = v4()
         const item = { data: template || "" }
-        setData(prev => {
-            const res = { ...prev }
-            if (!res.contents.works) {
-                res.contents.works = {}
-            }
-            res.contents.works![id] = item
-            return res
-        })
+        setData(prev => putContentItem(prev, "works", id, item))
         return id
     }
 
@@ -184,11 +168,7 @@ export function App() {
     const putTask = (id: string, item: Task, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
-            setData(prev => {
-                const res = { ...prev }
-                delete res.contents.tasks![id]
-                return res
-            })
+            setData(prev => removeContentItem(prev, "tasks", id))
         } else {
             itemData && createTopics(itemData)
             store.putItem(id, updateAuditFields(item, tombstone), mergeTask, "contents.tasks")
@@ -203,11 +183,7 @@ export function App() {
             .replaceAll(/[^a-zA-Z0-9-]+/g, "-")
         const itemData = regx.exec(cand) ? cand : ""
         if (!itemData && !item.created) {
-            setData(prev => {
-                const res = { ...prev }
-                delete res.contents.topics![id]
-                return res
-            })
+            setData(prev => removeContentItem(prev, "topics", id))
         } else {
             store.putItem(id, { name: item.name, ...updateAuditFields(item, tombstone), data: itemData ? `#${itemData}` : "" }, mergeTopic, "contents.topics")
         }
@@ -217,11 +193,7 @@ export function App() {
     const putNote = (id: string, item: Note, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
-            setData(prev => {
-                const res = { ...prev }
-                delete res.contents.notes![id]
-                return res
-            })
+            setData(prev => removeContentItem(prev, "notes", id))
         } else {
             itemData && createTopics(itemData)
             store.putItem(id, updateAuditFields(item, tombstone), mergeNote, "contents.notes")
@@ -232,11 +204,7 @@ export function App() {
     const putWork = (id: string, item: Work, tombstone?: boolean): boolean => {
         const itemData = item.data?.trim()
         if (!itemData && !item.created) {
-            setData(prev => {
-                const res = { ...prev }
-                delete res.contents.works![id]
-                return res
-            })
+            setData(prev => removeContentItem(prev, "works", id))
         } else {
             itemData && createTopics(itemData)
             store.putItem(id, updateAuditFields(item, tombstone), mergeWork, "contents.works")
@@ -273,7 +241,7 @@ export function App() {
                     reader.onload = (evt) => {
                         if (evt.target && evt.target.result) {
                             try {
-                                const toImport = empty(JSON.parse(evt.target.result.toString()))
+                                const toImport = sanitizeState(JSON.parse(evt.target.result.toString()))
                                 store.loadFromData(toImport)
                             } catch (e) {
                                 notify("File contents could not be read!")
@@ -317,8 +285,13 @@ export function App() {
                 window.document.documentElement.setAttribute("data-theme", "Light")
             }
         }
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setDisplayTheme())
         setDisplayTheme()
+        if (!window.matchMedia) {
+            return
+        }
+        const query = window.matchMedia('(prefers-color-scheme: dark)')
+        query.addEventListener('change', setDisplayTheme)
+        return () => query.removeEventListener('change', setDisplayTheme)
     }, [data.settings.display.theme])
 
     useEffect(() => {
