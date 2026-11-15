@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, PropsWithChildren } from "react"
+import { InputHTMLAttributes, PropsWithChildren, useEffect, useRef } from "react"
 import { Wrapper } from "./Wrapper"
 import { Icon } from "./Icon"
 import { Shortcut } from "./Shortcuts"
@@ -45,6 +45,71 @@ export function Setting(props: SettingProps) {
         <Wrapper layout="row" className={styles.main}>
             <div className={styles.label} title={label}>{label}</div>
             <input {...rest} title={label} />
+        </Wrapper>
+    )
+}
+
+interface NumberSettingProps {
+    name: string,
+    label: string,
+    value: number,
+    onSave: (value: number) => void,
+}
+
+// A whole-number setting that is saved only when editing is done (on blur or
+// Enter), rather than on every keystroke. Escape restores the saved value, and
+// so does leaving the field empty or with an invalid value: an intermediate
+// state such as an empty field is never saved.
+export function NumberSetting(props: NumberSettingProps) {
+    const ref = useRef<HTMLInputElement>(null)
+
+    // Reflect changes to the saved value (e.g. from a sync), unless editing.
+    useEffect(() => {
+        const input = ref.current
+        if (input && document.activeElement !== input) {
+            input.value = String(props.value)
+        }
+    }, [props.value])
+
+    const revert = (input: HTMLInputElement) => {
+        input.value = String(props.value)
+    }
+
+    const commit = (input: HTMLInputElement) => {
+        const text = input.value.trim()
+        if (!/^\d+$/.test(text)) {
+            revert(input)
+            return
+        }
+        const value = parseInt(text, 10)
+        input.value = String(value)
+        if (value !== props.value) {
+            props.onSave(value)
+        }
+    }
+
+    return (
+        <Wrapper layout="row" className={styles.main}>
+            <div className={styles.label} title={props.label}>{props.label}</div>
+            <input
+                ref={ref}
+                name={props.name}
+                title={props.label}
+                type="text"
+                inputMode="numeric"
+                defaultValue={String(props.value)}
+                onBlur={evt => commit(evt.currentTarget)}
+                onKeyDown={evt => {
+                    if (evt.key === "Enter") {
+                        evt.preventDefault()
+                        commit(evt.currentTarget)
+                    } else if (evt.key === "Escape") {
+                        evt.preventDefault()
+                        revert(evt.currentTarget)
+                        evt.currentTarget.blur()
+                    }
+                }}
+            />
         </Wrapper>
     )
 }

@@ -1,18 +1,27 @@
 import { GetObjectCommand, PutObjectCommand, ListObjectsV2Command, S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3"
-import { AppState, empty, mergeData, purgeDeleted, toExport } from "./AppState"
+import { AppState, mergeData, purgeDeleted, toExport } from "./AppState"
+import { ContentKind, isSafeId, sanitizeContentItem, sanitizeDisplay, sanitizeRetention, sanitizeState } from "./Sanitize"
 import { StorageSettings } from "./StorageSettings"
-import { Identifiable, Writable } from "./Item"
-import { RetentionSettings } from "./RetentionSettings"
-import { DisplaySettings } from "./DisplaySettings"
-import { Task } from "./Task"
-import { Topic } from "./Topic"
-import { Note } from "./Note"
-import { Work } from "./Work"
+import { Writable } from "./Item"
 
 export const DELIMITER = "/"
 export const REMOTE_DATA_PATH = "data"
 export const REMOTE_EVENTS_PATH = "events"
 export const REMOTE_EVENTS_PREFIX = REMOTE_EVENTS_PATH + DELIMITER
+
+// Applies a (sanitized) item event to the given state, ignoring invalid events.
+const applyItemEvent = (state: AppState, kind: ContentKind, obj: any): AppState => {
+    const { id, ...rest } = obj
+    const item = sanitizeContentItem(kind, rest)
+    if (!isSafeId(id) || !item) {
+        return state
+    }
+    return mergeData(state, { ...state, contents: { ...state.contents, [kind]: { ...state.contents[kind], [id]: item } } })
+}
+
+// Called when a cloud operation fails. The failure has already been reported
+// to the user (via notify) by the time this is called.
+export type OnFailure = (err: any) => void
 
 export class Cloud {
 
@@ -22,7 +31,7 @@ export class Cloud {
         this.notify = notify
     }
 
-    async pullData(data: AppState, onSuccess: (updated: AppState) => void) {
+    async pullData(data: AppState, onSuccess: (updated: AppState) => void, onFailure?: OnFailure) {
         const getData = async (client: S3Client) => {
             try {
                 const get = new GetObjectCommand({
@@ -33,7 +42,7 @@ export class Cloud {
                 const res = await client.send(get)
                 const { Body, ETag } = res
                 const body = await new Response(Body as ReadableStream).text()
-                const updated = mergeData(data, empty(JSON.parse(body)), true)
+                const updated = mergeData(data, sanitizeState(JSON.parse(body)), true)
                 updated.settings.storage.eTag = ETag
                 const purged = purgeDeleted(updated)
                 onSuccess(purged)
@@ -43,6 +52,7 @@ export class Cloud {
                     this.checkHttpStatusCode(e, httpStatusCode)
                 } catch (err: any) {
                     this.notify("Sync (get) failed: " + err.desc)
+                    onFailure && onFailure(err)
                     return
                 }
                 onSuccess(purgeDeleted(data))
@@ -50,10 +60,10 @@ export class Cloud {
         }
         this.withS3Client(data.settings.storage,
             client => getData(client),
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
     }
 
-    async pushData(data: AppState, onSuccess: (updated: AppState) => void) {
+    async pushData(data: AppState, onSuccess: (updated: AppState) => void, onFailure?: OnFailure) {
         const withMeta = (exported: AppState, lastSynced: string, eTag?: string) => (
             {
                 ...exported,
@@ -85,6 +95,7 @@ export class Cloud {
                     this.checkHttpStatusCode(e, httpStatusCode)
                 } catch (err: any) {
                     this.notify("Sync (put) failed: " + err.desc)
+                    onFailure && onFailure(err)
                     return
                 }
                 onSuccess(withMeta(toExport(data), new Date().toISOString()))
@@ -93,10 +104,10 @@ export class Cloud {
         this.withS3Client(
             data.settings.storage,
             client => putData(client),
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
     }
 
-    async listEvents(data: AppState, onSuccess: (keys: string[]) => void) {
+    async listEvents(data: AppState, onSuccess: (keys: string[]) => void, onFailure?: OnFailure) {
         const getEventKeys = async (client: S3Client) => {
             try {
                 const lst = new ListObjectsV2Command({
@@ -118,18 +129,26 @@ export class Cloud {
                     this.checkHttpStatusCode(e, httpStatusCode)
                 } catch (err: any) {
                     this.notify("Sync (get) failed: " + err.desc)
+                    onFailure && onFailure(err)
+                    return
                 }
+                // ignorable status (e.g. 404): there are no events to process
+                onSuccess([])
             }
         }
         this.withS3Client(data.settings.storage,
             client => getEventKeys(client),
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
     }
 
-    async pullEvents(data: AppState, keys: string[], onSuccess: (updated: AppState) => void) {
+    async pullEvents(data: AppState, keys: string[], onSuccess: (updated: AppState, processed: string[]) => void, onFailure?: OnFailure) {
         this.withS3Client(data.settings.storage,
             async client => {
                 let updated = data
+                // Keys of events that have been fully processed (applied, or
+                // skipped because they are missing or malformed). Events after
+                // a failure are not included, so that they are retried later.
+                const processed: string[] = []
                 try {
                     for (const key of keys) {
                         const get = new GetObjectCommand({
@@ -140,51 +159,50 @@ export class Cloud {
                             const res = await client.send(get)
                             const { Body } = res
                             const body = await new Response(Body as ReadableStream).text()
-                            const { path, ...obj } = JSON.parse(body)
+                            let parsed: any
+                            try {
+                                parsed = JSON.parse(body)
+                            } catch (e) {
+                                // malformed event, it will never become valid: skip it
+                                processed.push(key)
+                                continue
+                            }
+                            const { path, ...obj } = (typeof parsed === "object" && parsed !== null) ? parsed : {} as any
                             switch (path) {
                                 case "settings.retention": {
-                                    updated = mergeData(updated, { ...updated, settings: { ...updated.settings, retention: obj as RetentionSettings } })
+                                    const retention = sanitizeRetention(obj)
+                                    if (retention) {
+                                        updated = mergeData(updated, { ...updated, settings: { ...updated.settings, retention } })
+                                    }
                                     break
                                 }
                                 case "settings.display": {
-                                    updated = mergeData(updated, { ...updated, settings: { ...updated.settings, display: obj as DisplaySettings } })
+                                    const display = sanitizeDisplay(obj)
+                                    if (display) {
+                                        updated = mergeData(updated, { ...updated, settings: { ...updated.settings, display } })
+                                    }
                                     break
                                 }
-                                case "contents.tasks": {
-                                    const { id, ...task } = obj as Identifiable & Task
-                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, tasks: { ...updated.contents.tasks, [id]: task } } })
-                                    break
-                                }
-                                case "contents.topics": {
-                                    const { id, ...topic } = obj as Identifiable & Topic
-                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, topics: { ...updated.contents.topics, [id]: topic } } })
-                                    break
-                                }
-                                case "contents.notes": {
-                                    const { id, ...note } = obj as Identifiable & Note
-                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, notes: { ...updated.contents.notes, [id]: note } } })
-                                    break
-                                }
-                                case "contents.works": {
-                                    const { id, ...work } = obj as Identifiable & Work
-                                    updated = mergeData(updated, { ...updated, contents: { ...updated.contents, works: { ...updated.contents.works, [id]: work } } })
-                                    break
-                                }
+                                case "contents.tasks": updated = applyItemEvent(updated, "tasks", obj); break
+                                case "contents.topics": updated = applyItemEvent(updated, "topics", obj); break
+                                case "contents.notes": updated = applyItemEvent(updated, "notes", obj); break
+                                case "contents.works": updated = applyItemEvent(updated, "works", obj); break
                             }
                         } catch (e: any) {
                             const httpStatusCode = e.$metadata?.httpStatusCode
                             this.checkHttpStatusCode(e, httpStatusCode)
                         }
+                        processed.push(key)
                     }
                 } catch (e: any) {
                     this.notify("Sync (get) failed: " + (e.desc || "unexpected error"))
                 }
-                onSuccess(updated)
+                onSuccess(updated, processed)
             },
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
     }
 
-    async pushEvents(data: AppState, events: Writable[], onSuccess: (updated: AppState) => void) {
+    async pushEvents(data: AppState, events: Writable[], onSuccess: (updated: AppState) => void, onFailure?: OnFailure) {
         this.withS3Client(
             data.settings.storage,
             async client => {
@@ -205,15 +223,16 @@ export class Cloud {
                         this.checkHttpStatusCode(e, httpStatusCode)
                     } catch (err: any) {
                         this.notify("Cloud publishing failed (sync manually later): " + err.desc)
+                        onFailure && onFailure(err)
                         return
                     }
                 }
                 onSuccess(data)
             },
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
     }
 
-    async deleteEvents(data: AppState, keys: string[], onSuccess: (updated: AppState) => void) {
+    async deleteEvents(data: AppState, keys: string[], onSuccess: (updated: AppState) => void, onFailure?: OnFailure) {
         this.withS3Client(
             data.settings.storage,
             async client => {
@@ -235,7 +254,12 @@ export class Cloud {
                 }
                 onSuccess(data)
             },
-            () => this.notify("Sync not set up!"))
+            () => this.notifyNotSetUp(onFailure))
+    }
+
+    private notifyNotSetUp(onFailure?: OnFailure) {
+        this.notify("Sync not set up!")
+        onFailure && onFailure({ desc: "sync not set up" })
     }
 
     private withS3Client(cfg: StorageSettings, action: (s3Client: S3Client) => void, otherwise?: () => void) {

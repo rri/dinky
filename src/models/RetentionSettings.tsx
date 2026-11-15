@@ -1,5 +1,9 @@
-import { Updatable } from "./Item";
+import { UpdatableFields } from "./Item"
+import { InferFields, isNonNegativeNumber, required } from "./Schema"
 
-export interface RetentionSettings extends Updatable {
-    periodDays: number,
+export const RetentionSettingsFields = {
+    ...UpdatableFields,
+    periodDays: required(isNonNegativeNumber),
 }
+
+export type RetentionSettings = InferFields<typeof RetentionSettingsFields>

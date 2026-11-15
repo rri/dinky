@@ -110,6 +110,8 @@ To set up your sync configuration:
 
 Finally, enter the information collected above into your sync settings on the [profile](/profile/#cloud-sync) page.
 
+**A note on security:** your access keys are stored in this browser (and never included in exported files or uploaded to your bucket). Use a dedicated user whose only permissions are the ones listed above, on this one bucket, and do not reuse keys from other applications. If a device is lost or shared, deactivate the access key in the IAM console and create a new one.
+
 # Sync on Page Load
 
 You may configure the app to synchronize automatically whenever the page loads (or reloads), on the [profile](/profile/#cloud-sync) page. Please note that synchronization may incur charges on your AWS account.

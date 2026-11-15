@@ -1,7 +1,9 @@
-import { Completable, Creatable, DataObj, Deletable, filterByArchive, filterByDeleted, reduceByTerm, Schedulable, Sorter, Syncable, Updatable } from "./Item"
+import { filterByArchive, filterByDeleted, reduceByTerm, Sorter, DataObjFields, CreatableFields, DeletableFields, UpdatableFields, SyncableFields, SchedulableFields, CompletableFields } from "./Item"
+import { InferFields } from "./Schema"
 import { Term } from "./Term"
 
-export type Task = DataObj & Creatable & Deletable & Updatable & Syncable & Schedulable & Completable
+export const TaskFields = { ...DataObjFields, ...CreatableFields, ...DeletableFields, ...UpdatableFields, ...SyncableFields, ...SchedulableFields, ...CompletableFields }
+export type Task = InferFields<typeof TaskFields>
 
 interface Props {
     tasks: Record<string, Task>,

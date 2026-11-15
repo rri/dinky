@@ -7,7 +7,7 @@ import { Card } from "../views/Card"
 import { icons } from "../views/Icon"
 import { InfoBox } from "../views/InfoBox"
 import { LastSynced, LastSyncedDateTime } from "../views/LastSynced"
-import { ActionLink, OptionSetting, Setting, SettingList } from "../views/Settings"
+import { ActionLink, NumberSetting, OptionSetting, Setting, SettingList } from "../views/Settings"
 import { Wrapper } from "../views/Wrapper"
 import { Registry } from "../models/Registry"
 
@@ -20,7 +20,7 @@ interface Props {
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     exportData: () => void,
     importData: () => void,
-    sync: () => void,
+    sync: (fullSync?: boolean) => void,
 }
 
 export function Profile(props: Props) {
@@ -77,13 +77,13 @@ export function Profile(props: Props) {
                     <ActionLink
                         icon={icons.sync}
                         shortcuts={["s"]}
-                        onClick={props.sync}>
+                        onClick={() => props.sync(false)}>
                         Sync
                     </ActionLink>
                     <ActionLink
                         icon={icons.sync}
                         shortcuts={["S"]}
-                        onClick={props.sync}>
+                        onClick={() => props.sync(true)}>
                         Sync and compact data
                     </ActionLink>
                     <OptionSetting label="Sync on page load?" values={[
@@ -112,21 +112,18 @@ export function Profile(props: Props) {
                             checked: !syncOnLoad,
                         },
                     ]}></OptionSetting>
-                    <Setting
+                    <NumberSetting
                         name="periodMinutes"
                         label="Auto sync (minutes)"
-                        onChange={evt => updateCloudSync(s3Bucket,
+                        value={periodMinutes}
+                        onSave={value => updateCloudSync(s3Bucket,
                             awsAccessKey,
                             awsSecretKey,
                             awsRegion,
                             syncOnLoad,
-                            parseInt(evt.currentTarget.value),
+                            value,
                             autoPushItems,
                             registry)}
-                        type="text"
-                        inputMode="numeric"
-                        min={0}
-                        value={periodMinutes || 0}
                     />
                     <OptionSetting label="Auto push items?" values={[
                         {
@@ -227,17 +224,14 @@ export function Profile(props: Props) {
             </Card>
             <Card title="Manage Your Data" id="manage-your-data" collapsible={true}>
                 <SettingList>
-                    <Setting
+                    <NumberSetting
                         name="periodDays"
                         label="Retention period (days)"
-                        onChange={evt => props.putRetentionSettings({
-                            ...props.settings.retention,
-                            periodDays: parseInt(evt.currentTarget.value),
-                        })}
-                        type="text"
-                        inputMode="numeric"
-                        min={0}
                         value={props.settings.retention.periodDays || 0}
+                        onSave={value => props.putRetentionSettings({
+                            ...props.settings.retention,
+                            periodDays: value,
+                        })}
                     />
                     <ActionLink
                         icon={icons.download}

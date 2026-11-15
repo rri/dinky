@@ -7,7 +7,9 @@ import { StorageSettings } from "./StorageSettings"
 import { Topic } from "./Topic"
 import { Task } from "./Task"
 import { Work } from "./Work"
-import { Deletable, Syncable, Updatable } from "./Item"
+import { Creatable, Deletable, Syncable, Updatable } from "./Item"
+
+export const DEFAULT_RETENTION_DAYS = 30
 
 export interface AppState {
     error?: string,
@@ -49,29 +51,33 @@ const mergeByUpdated = <T extends Updatable>(currVal: T, nextVal: T) => {
     return currVal
 }
 
-const mergeRecords = <T extends Syncable>(currRec?: Record<string, T>, nextRec?: Record<string, T>, forceDel?: boolean, forceSync?: boolean) => {
+const mergeRecords = <T extends Syncable & Updatable & Creatable>(currRec?: Record<string, T>, nextRec?: Record<string, T>, forceDel?: boolean, forceSync?: boolean) => {
+    const curr = currRec || {}
+    const next = nextRec || {}
     const res: Record<string, T> = {}
-    Object
-        .entries(nextRec ? nextRec : {})
-        .forEach((val: [id: string, obj: any]) => {
-            const currVal = currRec ? currRec[val[0]] : undefined
-            const nextVal = val[1]
+    const ids = new Set([...Object.keys(curr), ...Object.keys(next)])
+    ids.forEach(id => {
+        const currVal = Object.prototype.hasOwnProperty.call(curr, id) ? curr[id] : undefined
+        const nextVal = Object.prototype.hasOwnProperty.call(next, id) ? next[id] : undefined
 
-            if (currVal && nextVal) {
-                res[val[0]] = mergeByUpdated(currVal, nextVal)
-                const unsynced = forceSync || (currVal.unsynced && nextVal.unsynced)
-                if (unsynced) {
-                    res[val[0]].unsynced = unsynced
-                }
-            } else if (forceDel && !nextVal && (!currVal || !currVal.unsynced)) {
-                // Delete the value by simply not setting it.
-            } else {
-                res[val[0]] = currVal ? currVal : nextVal
-                if (forceSync) {
-                    res[val[0]].unsynced = true
-                }
+        if (currVal && nextVal) {
+            res[id] = { ...mergeByUpdated(currVal, nextVal) }
+            const unsynced = forceSync || (currVal.unsynced && nextVal.unsynced)
+            if (unsynced) {
+                res[id].unsynced = unsynced
             }
-        })
+        } else if (forceDel && !nextVal && currVal && currVal.created && !currVal.unsynced) {
+            // The authoritative copy no longer has this (synced) item, so
+            // delete it by simply not setting it. Unsynced items are kept,
+            // as they have never made it to the authoritative copy, and so
+            // are drafts (items not yet created), which are local only.
+        } else {
+            const val = currVal || nextVal
+            if (val) {
+                res[id] = forceSync ? { ...val, unsynced: true } : val
+            }
+        }
+    })
     return res
 }
 
@@ -118,7 +124,7 @@ export const empty = (state?: AppState): AppState => {
                 }
             },
             retention: {
-                periodDays: 30,
+                periodDays: DEFAULT_RETENTION_DAYS,
             },
             display: {
                 theme: DisplayTheme.Auto,
@@ -268,8 +274,10 @@ export const mergeWork = (state: AppState, id: string, item: Work): AppState => 
 export const mergeData = (curr: AppState, data: AppState, forceDel?: boolean, forceSync?: boolean): AppState => ({
     settings: {
         storage: {
+            // Storage settings hold the bucket and credentials and are
+            // device-local: they are never taken from incoming data (imports,
+            // cloud data and events), which may be untrusted.
             ...curr.settings.storage,
-            ...data.settings.storage,
             registry: {
                 enabled: curr.settings.storage.registry?.enabled || data.settings.storage.registry?.enabled || false,
                 events: {
@@ -290,6 +298,11 @@ export const mergeData = (curr: AppState, data: AppState, forceDel?: boolean, fo
     }
 })
 
+// Guard against invalid retention periods (e.g. NaN from an empty input box),
+// which would otherwise cause every deleted item to be purged immediately.
+export const validRetentionDays = (days: any): number =>
+    typeof days === "number" && Number.isFinite(days) && days >= 0 ? days : DEFAULT_RETENTION_DAYS
+
 export const purgeDeleted = (data: AppState): AppState => {
     const purge = <T extends Deletable>(arr1?: Record<string, T>) => {
         const res: Record<string, T> = {}
@@ -297,7 +310,7 @@ export const purgeDeleted = (data: AppState): AppState => {
             .entries(arr1 ? arr1 : {})
             .forEach((val: [id: string, obj: T]) => {
                 if (val[1].deleted) {
-                    const retentionPeriodDays = data.settings.retention.periodDays
+                    const retentionPeriodDays = validRetentionDays(data.settings.retention?.periodDays)
                     const deletedTime = new Date(val[1].deleted).getTime()
                     const cutoff = new Date().getTime() - (retentionPeriodDays * 24 * 60 * 60 * 1000)
                     if (deletedTime > cutoff) {
@@ -337,3 +350,18 @@ export const toExport = (data: AppState) => ({
         storage: {},
     }
 })
+
+type ContentKey = keyof Contents
+
+// Adds (or replaces) an item without modifying the state passed in.
+export const putContentItem = (state: AppState, kind: ContentKey, id: string, item: any): AppState => ({
+    ...state,
+    contents: { ...state.contents, [kind]: { ...state.contents[kind], [id]: item } },
+})
+
+// Removes an item without modifying the state passed in.
+export const removeContentItem = (state: AppState, kind: ContentKey, id: string): AppState => {
+    const items: Record<string, any> = { ...state.contents[kind] }
+    delete items[id]
+    return { ...state, contents: { ...state.contents, [kind]: items } }
+}

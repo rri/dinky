@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Action } from "../models/Action"
 import { Task } from "../models/Task"
@@ -49,7 +49,7 @@ interface Props {
     killTasks: (makeIdList: () => string[]) => void,
     exportData: () => void,
     importData: () => void,
-    sync: () => void,
+    sync: (fullSync?: boolean) => void,
     registerNewHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerExportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
     registerImportHandler: (handler: (evt?: KeyboardEvent) => void) => void,
@@ -59,10 +59,11 @@ export function PageContent(props: Props) {
 
     const [userguideMarkdown, setUserguideMarkdown] = useState("")
 
-    useMemo(() => {
+    useEffect(() => {
         fetch(userguide)
             .then(res => res.text())
             .then(setUserguideMarkdown)
+            .catch(() => setUserguideMarkdown("The user guide could not be loaded."))
     }, [])
 
     const tasks = props.contents.tasks || {}

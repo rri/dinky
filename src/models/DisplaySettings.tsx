@@ -1,4 +1,5 @@
-import { Updatable } from "./Item";
+import { UpdatableFields } from "./Item"
+import { InferFields, isOneOf, required } from "./Schema"
 
 export enum DisplayTheme {
     Auto = 0,
@@ -6,6 +7,9 @@ export enum DisplayTheme {
     Dark = 2,
 }
 
-export interface DisplaySettings extends Updatable {
-    theme: DisplayTheme,
+export const DisplaySettingsFields = {
+    ...UpdatableFields,
+    theme: required(isOneOf([DisplayTheme.Auto, DisplayTheme.Light, DisplayTheme.Dark])),
 }
+
+export type DisplaySettings = InferFields<typeof DisplaySettingsFields>

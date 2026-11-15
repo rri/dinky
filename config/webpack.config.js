@@ -46,7 +46,30 @@ const babelRuntimeRegenerator = require.resolve('@babel/runtime/regenerator', {
 
 // Some apps do not need the benefits of saving a web request, so not inlining the chunk
 // makes for a smoother build process.
-const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
+// The runtime chunk is not inlined by default, so that the Content Security
+// Policy below can forbid inline scripts.
+const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK === 'true';
+
+// Content Security Policy for production builds. Scripts may only be loaded
+// from the app's own origin, and network requests may only go to the app
+// itself and to AWS (S3) for cloud sync. Images are allowed from any HTTPS
+// source because notes may embed images via Markdown.
+// NOTE: frame-ancestors cannot be set via a <meta> tag; set it (and other
+// security headers) via a CloudFront response headers policy.
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.amazonaws.com https://*.amazonaws.com.cn",
+  "manifest-src 'self'",
+  "worker-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+  "frame-src 'none'",
+].join('; ');
 
 const emitErrorsAsWarnings = process.env.ESLINT_NO_DEV_ERRORS === 'true';
 const disableESLintPlugin = process.env.DISABLE_ESLINT_PLUGIN === 'true';
@@ -571,6 +594,13 @@ module.exports = function (webpackEnv) {
           },
           isEnvProduction
             ? {
+                meta: {
+                  'Content-Security-Policy': {
+                    'http-equiv': 'Content-Security-Policy',
+                    content: contentSecurityPolicy,
+                  },
+                  referrer: 'strict-origin-when-cross-origin',
+                },
                 minify: {
                   removeComments: true,
                   collapseWhitespace: true,

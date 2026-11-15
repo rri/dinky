@@ -1,4 +1,5 @@
 import { Term } from "./Term"
+import { InferFields, isBoolean, isDateString, isOneOf, isString, local, optional, required } from "./Schema"
 
 export interface Identifiable {
     id: string,
@@ -8,40 +9,36 @@ export interface Event {
     evt: string,
 }
 
-export interface Creatable {
-    created?: string,
-}
+export const CreatableFields = { created: optional(isDateString) }
+export type Creatable = InferFields<typeof CreatableFields>
 
-export interface Syncable {
-    unsynced?: boolean,
-}
+// "unsynced" is device-local sync bookkeeping, never accepted from outside.
+export const SyncableFields = { unsynced: local(optional(isBoolean)) }
+export type Syncable = InferFields<typeof SyncableFields>
 
-export interface Deletable {
-    deleted?: string,
-}
+export const DeletableFields = { deleted: optional(isDateString) }
+export type Deletable = InferFields<typeof DeletableFields>
 
-export interface Updatable {
-    updated?: string,
-}
+export const UpdatableFields = { updated: optional(isDateString) }
+export type Updatable = InferFields<typeof UpdatableFields>
 
-export interface DataObj {
-    data: string,
-}
+export const DataObjFields = { data: required(isString) }
+export type DataObj = InferFields<typeof DataObjFields>
 
-export interface Schedulable {
-    today?: string,
-}
+export const SchedulableFields = { today: optional(isDateString) }
+export type Schedulable = InferFields<typeof SchedulableFields>
 
-export type Progress = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+export const PROGRESS_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const
+export type Progress = typeof PROGRESS_VALUES[number]
 
-export interface Completable {
-    archive?: boolean,
-    progress?: Progress,
+export const CompletableFields = {
+    archive: optional(isBoolean),
+    progress: optional(isOneOf(PROGRESS_VALUES)),
 }
+export type Completable = InferFields<typeof CompletableFields>
 
-export interface Named {
-    name?: string,
-}
+export const NamedFields = { name: optional(isString) }
+export type Named = InferFields<typeof NamedFields>
 
 export interface Typed {
     path: ItemPath,
@@ -127,10 +124,14 @@ export function sortByData<T extends { data: string }>(reverse?: boolean) {
         if (!a && !b) {
             return 0
         }
+        const cmp = a.localeCompare(b)
+        if (cmp === 0) {
+            return 0
+        }
         if (reverse) {
-            return a.localeCompare(b) > 0 ? -1 : 1
+            return cmp > 0 ? -1 : 1
         } else {
-            return a.localeCompare(b) > 0 ? 1 : -1
+            return cmp > 0 ? 1 : -1
         }
     }
 }
@@ -153,4 +154,18 @@ export function sortByToday(reverse?: boolean) {
 
 export function belongsToToday<T extends Schedulable>(item: T) {
     return filterByToday()(item)
+}
+
+// Formats a date as "YYYY-MM-DD" in the user's local time zone, as expected
+// by <input type="date">.
+export function toLocalDateInput(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, "0")
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+// Parses a "YYYY-MM-DD" value from <input type="date"> as local midnight
+// (the Date constructor would otherwise parse it as UTC midnight).
+export function fromLocalDateInput(val: string): Date {
+    const [y, m, d] = val.split("-").map(Number)
+    return new Date(y, m - 1, d)
 }

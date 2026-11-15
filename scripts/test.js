@@ -4,6 +4,9 @@
 process.env.BABEL_ENV = 'test';
 process.env.NODE_ENV = 'test';
 process.env.PUBLIC_URL = '';
+// Run tests outside UTC (with daylight saving time), so that time zone bugs
+// are caught: code that mixes UTC and local time often only works in UTC.
+process.env.TZ = 'America/Los_Angeles';
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will

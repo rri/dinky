@@ -228,6 +228,13 @@ describe("Link", () => {
         expect(link.getAttribute("href")).toBe("/tasks")
     })
 
+    it("treats protocol-relative links as external", () => {
+        withRouter(<Link href="//example.com/x">ProtoRel</Link>)
+        const link = screen.getByText("ProtoRel")
+        expect(link.getAttribute("href")).toBe("//example.com/x")
+        expect(link.getAttribute("rel")).toBe("noopener noreferrer")
+    })
+
     it("stops propagation on click", () => {
         const parentClick = jest.fn()
         withRouter(

@@ -1,4 +1,6 @@
 import { Cloud, DELIMITER, REMOTE_DATA_PATH, REMOTE_EVENTS_PATH, REMOTE_EVENTS_PREFIX } from "./Cloud"
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { empty } from "./AppState"
 
 // Mock the AWS SDK entirely to avoid actual calls
 jest.mock("@aws-sdk/client-s3", () => ({
@@ -182,5 +184,72 @@ describe("Cloud", () => {
             expect(() => cloud.withS3Client({}, action)).not.toThrow()
             expect(action).not.toHaveBeenCalled()
         })
+    })
+})
+
+describe("Cloud.pullEvents", () => {
+    const state = () => empty({
+        settings: { storage: { s3Bucket: "b", awsAccessKey: "a", awsSecretKey: "s", awsRegion: "r" } },
+    } as any)
+
+    const event = (id: string, data: string) => JSON.stringify({ path: "contents.tasks", id, data, updated: "2024-01-01T00:00:00Z" })
+
+    const httpError = (status: number) => Object.assign(new Error("http " + status), { $metadata: { httpStatusCode: status } })
+
+    // S3 mock: responses keyed by object key; an Error value is thrown.
+    const mockS3 = (responses: Record<string, string | Error>) => {
+        (GetObjectCommand as unknown as jest.Mock).mockImplementation((input: any) => ({ input }));
+        (S3Client as unknown as jest.Mock).mockImplementation(() => ({
+            send: jest.fn(async (cmd: any) => {
+                const res = responses[cmd.input.Key]
+                if (res instanceof Error) {
+                    throw res
+                }
+                return { Body: res }
+            }),
+        }))
+    }
+
+    const pull = (keys: string[]) => new Promise<[any, string[]]>(resolve => {
+        new Cloud(jest.fn()).pullEvents(state(), keys, (updated, processed) => resolve([updated, processed]))
+    })
+
+    it("stops at a failure and only reports the events processed before it", async () => {
+        mockS3({
+            "events/e1": event("t1", "one"),
+            "events/e2": httpError(503),
+            "events/e3": event("t3", "three"),
+        })
+
+        const [updated, processed] = await pull(["e1", "e2", "e3"])
+
+        expect(processed).toEqual(["e1"])
+        expect(updated.contents.tasks["t1"].data).toBe("one")
+        expect(updated.contents.tasks["t3"]).toBeUndefined()
+    })
+
+    it("counts malformed and missing (404) events as processed", async () => {
+        mockS3({
+            "events/e1": "not json",
+            "events/e2": httpError(404),
+            "events/e3": event("t3", "three"),
+        })
+
+        const [updated, processed] = await pull(["e1", "e2", "e3"])
+
+        expect(processed).toEqual(["e1", "e2", "e3"])
+        expect(updated.contents.tasks["t3"].data).toBe("three")
+    })
+
+    it("ignores events with unsafe ids or invalid items", async () => {
+        mockS3({
+            "events/e1": event("__proto__", "evil"),
+            "events/e2": JSON.stringify({ path: "contents.tasks", id: "t2", data: 42 }),
+        })
+
+        const [updated, processed] = await pull(["e1", "e2"])
+
+        expect(processed).toEqual(["e1", "e2"])
+        expect(Object.keys(updated.contents.tasks)).toEqual([])
     })
 })
