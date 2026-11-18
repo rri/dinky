@@ -3,22 +3,33 @@
 }
 
 .main {
-    position: fixed;
-    background-color: rgba(var(--color-rgb-bg-notify-box), var(--color-alpha-bg-notify-box));
-    border-radius: 1em;
-    color: rgba(var(--color-rgb-fg-notify-box), 1.0);
     align-items: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-color: var(--color-bg-toast);
+    border-radius: var(--radius-l);
+    bottom: max(24px, env(safe-area-inset-bottom));
+    box-shadow: var(--shadow-toast);
+    color: var(--color-fg-toast);
     display: flex;
     font-family: var(--font-content);
     justify-content: center;
-    letter-spacing: 0.05em;
+    left: 50%;
+    line-height: 1.5;
+    max-width: calc(100vw - 32px);
+    min-height: 4.5rem;
+    padding: 16px 22px;
+    position: fixed;
     text-align: center;
-    padding: var(--spacing);
-    width: 20em;
-    height: 10em;
-    line-height: 1.5em;
-    top: calc(80% - 5em);
-    left: calc(50% - 10em);
-    margin-bottom: calc(-20% + 5em);
-    margin-right: calc(-50% + 10em);
+    transform: translateX(-50%);
+    width: 22em;
+    z-index: 200;
+    animation: toast-in 180ms ease-out;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 8px);
+    }
 }

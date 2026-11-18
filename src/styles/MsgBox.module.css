@@ -1,16 +1,21 @@
 .main {
+    align-items: center;
+    color: var(--color-fg-muted);
     font-style: italic;
-    padding: calc(1.6 * var(--spacing));
+    padding: 20px 16px 24px;
     text-align: center;
 }
 
 .main .emoji {
-    font-size: 4em;
+    font-size: 3.5em;
     font-style: normal;
+    line-height: 1.2;
     padding: 0 var(--spacing);
 }
 
 .main p {
     font-family: var(--font-decorative);
-    padding: calc(var(--spacing) * 2)
+    font-size: 1.05rem;
+    max-width: 34em;
+    padding: 12px 12px 16px;
 }

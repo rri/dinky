@@ -1,36 +1,48 @@
 .main {
+    align-items: center;
     border: none;
+    column-gap: 4px;
     justify-content: stretch;
-    padding: var(--spacing);
+    padding: 12px 10px;
 }
 
 .segment {
+    appearance: none;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    color: inherit;
     cursor: pointer;
     flex-grow: 1;
+    font-size: 1.1rem;
+    height: 1.25rem;
+    margin: 0;
+    padding: 0;
     text-align: center;
-    height: 1.3rem;
+    transition: background-color var(--duration);
 
-    &.zero {
-        padding-right: var(--spacing);
-        text-align: right;
+    &.zero,
+    &.done {
+        flex-grow: 0;
+        height: var(--size-target);
+        min-width: var(--size-target);
+        border-radius: var(--radius-s);
+
+        &:hover {
+            background-color: var(--color-bg-hover);
+        }
     }
 
     &.progress {
         background-color: var(--color-progress);
-        border: var(--width-line) solid var(--color-bg-text);
     }
 
     &.none {
-        background-color: var(--color-line-3);
-        border: var(--width-line) solid var(--color-bg-text);
+        background-color: var(--color-progress-empty);
 
         &:hover, &:has(~ .segment:hover) {
             background-color: var(--color-progress);
+            opacity: 0.7;
         }
-    }
-
-    &.done {
-        padding-left: var(--spacing);
-        text-align: left;
     }
 }

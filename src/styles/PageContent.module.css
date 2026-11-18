@@ -1,4 +1,14 @@
+.wrap {
+    flex-grow: 1;
+}
+
 .main {
-    border: var(--width-line) solid var(--color-line-3);
-    padding: var(--spacing);
+    padding: 16px;
+    row-gap: 4px;
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: 12px 10px;
+    }
 }

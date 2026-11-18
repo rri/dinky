@@ -13,7 +13,7 @@ interface Props {
 
 export function PageNav(props: Props) {
     return (
-        <Wrapper layout="row" className={styles.main}>
+        <Wrapper layout="row" className={styles.main} wrapClassName={styles.wrap} role="navigation" aria-label="Main">
             <PageNavItem name="Today" slug="" icon={icons.today} clear={props.clear} />
             <PageNavItem name="Topics" slug="topics" icon={icons.topics} clear={props.clear} />
             <PageNavItem name="Tasks" slug="tasks" icon={icons.tasks} clear={props.clear} />

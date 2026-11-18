@@ -1,9 +1,25 @@
-.wrap {
-    flex-grow: 1;
+.main {
+    background-color: var(--color-surface);
+    padding: 14px 16px 6px;
 }
 
-.main {
-    background: var(--image-gradient-default-light);
-    border: none;
-    padding: var(--spacing);
+.main input {
+    background-color: var(--color-surface-2);
+    /* Inline magnifier so the field reads as search without extra markup */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+    background-position: 12px center;
+    background-repeat: no-repeat;
+    background-size: 18px;
+    border-color: transparent;
+    border-radius: var(--radius-m);
+    padding: 10px 12px 10px 40px;
+}
+
+.main input:hover {
+    border-color: var(--color-line-2);
+}
+
+.main input:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-focus);
 }

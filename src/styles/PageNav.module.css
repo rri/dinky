@@ -1,5 +1,28 @@
+.wrap {
+    background-color: var(--color-surface);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
 .main {
-    margin-bottom: calc(-1 * var(--width-line));
-    padding: var(--spacing) 0 0 0;
-    background-image: var(--image-gradient-reverse-light);
+    border-bottom: var(--width-line) solid var(--color-line-3);
+    column-gap: 2px;
+    padding: 4px 10px 0;
+}
+
+/* Narrow phones: tighten spacing and show Sync as an icon only so the
+   whole bar fits without sideways scrolling. */
+@media (max-width: 420px) {
+    .main {
+        column-gap: 0;
+        padding: 2px 4px 0;
+    }
+
+    .main button {
+        column-gap: 0;
+        font-size: 0;
+        margin: 0;
+        padding: 0;
+    }
 }

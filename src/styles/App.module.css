@@ -1,9 +1,25 @@
 .wrapper {
-    margin: auto;
+    margin: 0 auto;
     max-width: var(--width-page);
 }
 
 .main {
-    background-color: rgb(var(--color-rgb-bg-text), var(--color-alpha-bg));
+    background-color: var(--color-surface);
     font-family: var(--font-content);
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* On wide screens the app floats as a single sheet on the page. */
+@media (min-width: 860px) {
+    .wrapper {
+        padding: 24px 0 40px;
+    }
+
+    .main {
+        border-radius: var(--radius-l);
+        box-shadow: var(--shadow-page);
+        min-height: 0;
+        overflow: clip;
+    }
 }

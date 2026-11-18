@@ -127,6 +127,14 @@ export function ViewItem(props: Props) {
         return func()
     }
 
+    const activate = () => {
+        (props.readonly && props.details)
+            ? (props.returnURL
+                ? setReturnURLAndThen(() => props.details && props.details())
+                : props.details())
+            : setEdit(true)
+    }
+
     const markdownData = <ReactMarkdown
         children={props.oneline ? main : props.item.data}
         remarkPlugins={[remarkGfm]}
@@ -171,12 +179,14 @@ export function ViewItem(props: Props) {
                 props.oneline ? styles.oneline : "",
                 props.details ? styles.link : ""
             ].join(" ")}
-            onClick={() => {
-                (props.readonly && props.details)
-                    ? (props.returnURL
-                        ? setReturnURLAndThen(() => props.details && props.details())
-                        : props.details())
-                    : setEdit(true)
+            tabIndex={0}
+            onClick={activate}
+            onKeyDown={evt => {
+                // Let links inside the content handle their own keys.
+                if (evt.target === evt.currentTarget && evt.key === "Enter") {
+                    evt.preventDefault()
+                    activate()
+                }
             }}>
             {props.name
                 ? <React.Fragment><span className={styles.name}>{props.name}</span>{markdownData}</React.Fragment>

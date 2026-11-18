@@ -8,7 +8,7 @@ interface Props {
 export function NotifyBox(props: Props) {
     if (props.note) {
         return (
-            <Wrapper layout="row" className={styles.main} wrapClassName={styles.wrap}>
+            <Wrapper layout="row" className={styles.main} wrapClassName={styles.wrap} role="status" aria-live="polite">
                 {props.note || "Please wait while we take care of some housecleaning..."}
             </Wrapper>
         )

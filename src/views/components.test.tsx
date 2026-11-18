@@ -154,12 +154,12 @@ describe("Card", () => {
 
     it("renders item count with pluralization", () => {
         render(<Card title="Tasks" count={3}>Content</Card>)
-        expect(screen.getByText("(3 items)")).toBeInTheDocument()
+        expect(screen.getByText("3 items")).toBeInTheDocument()
     })
 
     it("renders singular count", () => {
         render(<Card title="Tasks" count={1}>Content</Card>)
-        expect(screen.getByText("(1 item)")).toBeInTheDocument()
+        expect(screen.getByText("1 item")).toBeInTheDocument()
     })
 
     it("does not render count when zero or undefined", () => {

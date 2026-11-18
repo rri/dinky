@@ -22,6 +22,7 @@ export function Card(props: PropsWithChildren<Props>) {
     const toggleCollapseAction = {
         icon: collapsed ? icons.arrowLeft : icons.arrowDown,
         desc: collapsed ? "Click to open" : "Click to close",
+        expanded: !collapsed,
         action: () => collapsed ? setCollapsed(false) : setCollapsed(true),
     }
 
@@ -33,7 +34,7 @@ export function Card(props: PropsWithChildren<Props>) {
                 <div className={[styles.titlebar, useToggleAction ? styles.link : ""].join(" ")} id={props.id} onClick={useToggleAction ? toggleCollapseAction.action : undefined}>
                     <div className={styles.title}>{props.title}</div>
                     {props.count
-                        && <div className={styles.info}>({pluralize("items", props.count, true)})</div>}
+                        && <div className={styles.info}>{pluralize("items", props.count, true)}</div>}
                     {props.actions
                         && props.actions.map((action, index) => <div key={index} className={styles.button}><Button {...action} /></div>)}
                     {useToggleAction

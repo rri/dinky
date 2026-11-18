@@ -1,6 +1,38 @@
 .main {
     background-color: var(--color-bg-banner);
+    border-bottom: var(--width-line) solid var(--color-line-banner);
     color: var(--color-fg-banner);
-    column-gap: var(--spacing);
-    padding: var(--spacing);
+    column-gap: 12px;
+    padding: 14px 20px;
+}
+
+.main img {
+    display: block;
+    height: auto;
+}
+
+/* Logo mark, then wordmark */
+.main > div:first-child img {
+    height: 60px;
+    width: 60px;
+}
+
+.main > div:last-child img {
+    height: 34px;
+    width: auto;
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: 10px 16px;
+    }
+
+    .main > div:first-child img {
+        height: 44px;
+        width: 44px;
+    }
+
+    .main > div:last-child img {
+        height: 26px;
+    }
 }

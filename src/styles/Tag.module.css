@@ -1,8 +1,11 @@
 .label {
     align-items: center;
+    color: var(--color-fg-muted);
     cursor: default;
     display: flex;
-    margin: 0 calc(var(--spacing)) 0 0;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    margin: 0 6px 0 4px;
     padding: 0;
-    opacity: 0.3;
 }

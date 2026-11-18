@@ -1,25 +1,51 @@
-.icon {
+.button {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-s);
+    color: inherit;
     cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    justify-content: center;
+    margin: 0;
+    min-height: var(--size-target);
+    min-width: var(--size-target);
+    padding: 0;
+    transition: background-color var(--duration);
+}
+
+.button:hover {
+    background-color: var(--color-bg-hover);
+}
+
+.button:active {
+    background-color: var(--color-bg-highlight);
+}
+
+.icon {
+    display: block;
     filter: var(--filter-icon);
-    padding: calc(var(--spacing) / 4);
+    height: var(--width-icon);
+    pointer-events: none;
+    transition: opacity var(--duration);
+    width: var(--width-icon);
 }
 
-.label:hover {
-    transform: scale(1.2);
-}
-
+/* "Off" state for toggles (e.g. not on today's agenda) */
 .gray {
-    opacity: 0.3;
+    opacity: var(--opacity-icon-off);
 }
 
-.gray:hover {
-    opacity: 1.0;
+.button:hover .gray,
+.button:focus-visible .gray {
+    opacity: 1;
 }
 
 .label {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    margin: 0 calc(var(--spacing));
-    padding: 0 calc(var(--spacing));
+    column-gap: 6px;
+    font-size: 0.95rem;
+    margin: 0 4px;
+    padding: 0 10px 0 8px;
 }

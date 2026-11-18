@@ -1,9 +1,14 @@
 .main {
-    background-color: var(--color-bg-highlight);
-    border: var(--width-line) solid var(--color-line-1);
+    background-color: var(--color-bg-info);
+    border: var(--width-line) solid var(--color-line-info);
+    border-radius: var(--radius-m);
+    color: var(--color-fg-text);
     font-family: var(--font-decorative);
+    font-size: 1.05rem;
     font-style: italic;
     justify-content: center;
-    margin: calc(var(--spacing)) 0;
-    padding: calc(var(--spacing) * 2);
+    line-height: 1.6;
+    margin: var(--spacing) 0;
+    padding: 16px 20px;
+    text-align: center;
 }

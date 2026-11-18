@@ -1,6 +1,7 @@
 .main {
-    border-top: var(--width-line) solid var(--color-line-3);
     border-bottom: var(--width-line) solid var(--color-line-3);
+    border-top: var(--width-line) solid var(--color-line-3);
+    color: var(--color-fg-muted);
     font-family: var(--font-decorative);
     font-style: italic;
     margin-bottom: var(--spacing);
@@ -8,6 +9,8 @@
 }
 
 .main .when {
+    color: var(--color-fg-text);
     display: inline;
-    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
 }

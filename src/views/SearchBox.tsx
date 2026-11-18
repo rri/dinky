@@ -9,7 +9,7 @@ interface Props {
 
 export function SearchBox(props: Props) {
     return (
-        <Wrapper layout="row" className={styles.main} wrapClassName={styles.wrap}>
+        <Wrapper layout="row" className={styles.main}>
             <input
                 className={styles.search}
                 name="search"
@@ -22,6 +22,7 @@ export function SearchBox(props: Props) {
                         && evt.currentTarget.blur()
                 }
                 placeholder="Enter text to search..."
+                aria-label="Search"
                 ref={props.refs.search}
             />
         </Wrapper>

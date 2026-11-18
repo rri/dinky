@@ -1,7 +1,9 @@
 .main {
+    border-top: var(--width-line) solid var(--color-line-3);
+    color: var(--color-fg-muted);
     column-gap: var(--spacing);
-    font-size: 1em;
+    font-size: 0.875rem;
     justify-content: center;
-    letter-spacing: 0.05em;
-    padding: calc(var(--spacing) * 2);
+    letter-spacing: 0.02em;
+    padding: 18px 16px 22px;
 }

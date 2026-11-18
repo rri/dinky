@@ -1,6 +1,6 @@
 .main {
-    line-height: 1.8em;
-    padding: var(--spacing) calc(2 * var(--spacing));
+    line-height: 1.7;
+    padding: 8px 14px 4px;
 }
 
 .main h1,
@@ -10,13 +10,23 @@
 .main h5,
 .main p {
     font-size: 1em;
-    padding: 0 0 var(--spacing) 0;
     margin: 0;
+    padding: 0 0 12px 0;
+}
+
+.main h1,
+.main h3,
+.main h4 {
+    font-weight: 600;
 }
 
 .main h2 {
-    font-weight: normal;
+    font-weight: 500;
+    padding-top: 8px;
     text-decoration: underline;
+    text-decoration-color: var(--color-line-2);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
 }
 
 .main p,
@@ -25,7 +35,36 @@
     text-align: left;
 }
 
+.main ul,
+.main ol {
+    margin: 0 0 12px;
+    padding-left: 1.4em;
+}
+
+.main code {
+    background-color: var(--color-bg-highlight);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+}
+
 .main pre {
     background-color: var(--color-bg-highlight);
-    padding: var(--spacing);
+    padding: 12px 14px;
+}
+
+.main pre code {
+    background: none;
+    padding: 0;
+}
+
+.main table {
+    border-collapse: collapse;
+    margin-bottom: 12px;
+}
+
+.main th,
+.main td {
+    border-bottom: var(--width-line) solid var(--color-line-3);
+    padding: 6px 12px 6px 0;
+    text-align: left;
 }

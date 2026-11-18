@@ -6,15 +6,17 @@ export function Button(props: Action) {
         className={[styles.icon, props.gray ? styles.gray : ""].join(" ")}
         src={props.icon}
         alt={props.desc}
-        title={props.desc}
-        onClick={props.action}
     />
     return (
-        props.label ?
-            <div className={styles.label} title={props.desc} onClick={props.action}>
-                {img}
-                {props.label}
-            </div>
-            : img
+        <button
+            type="button"
+            className={[styles.button, props.label ? styles.label : ""].join(" ")}
+            title={props.desc}
+            aria-expanded={props.expanded}
+            onClick={props.action}
+        >
+            {img}
+            {props.label}
+        </button>
     )
 }
